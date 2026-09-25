@@ -59,7 +59,7 @@ jobs:
           cat >> release-notes.md <<'EOF'
 
           ### Install or update
-          1. Download **scalemax-official-v*.zip** below and unzip it.
+          1. Download **scalemax-official-v*.zip** (or **scalemax-official.zip**, the same file) below and unzip it.
           2. First install: open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick the `scalemax-official` folder.
           3. Updating: unzip over your existing `scalemax-official` folder (replace all files), then click the reload icon on the Scalemax card in `chrome://extensions`. Your settings are kept.
           EOF
@@ -70,11 +70,15 @@ jobs:
         run: |
           tag="v${{ steps.version.outputs.version }}"
           zip="${{ steps.package.outputs.zip }}"
+          # Same zip under a fixed name, so this link always serves the newest release:
+          # https://github.com/<owner>/<repo>/releases/latest/download/scalemax-official.zip
+          latest="dist/scalemax-official.zip"
+          cp "$zip" "$latest"
           if gh release view "$tag" >/dev/null 2>&1; then
-            echo "Release $tag exists; replacing its zip."
-            gh release upload "$tag" "$zip" --clobber
+            echo "Release $tag exists; replacing its zips."
+            gh release upload "$tag" "$zip" "$latest" --clobber
           else
-            gh release create "$tag" "$zip" \
+            gh release create "$tag" "$zip" "$latest" \
               --title "Scalemax Official $tag" \
               --notes-file release-notes.md \
               --target "$GITHUB_SHA"
