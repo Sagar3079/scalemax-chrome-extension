@@ -1,0 +1,36 @@
+name: Validate
+
+# Checks every push and pull request, and uploads the zip so a build can be
+# tried before it is released.
+
+on:
+  push:
+    branches: ["**"]
+    tags-ignore: ["**"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate extension files
+        run: bash scripts/validate.sh
+
+      - name: Build zip
+        id: package
+        run: bash scripts/package.sh
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scalemax-official-v${{ steps.package.outputs.version }}
+          path: ${{ steps.package.outputs.zip }}
+          retention-days: 14

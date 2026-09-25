@@ -39,18 +39,43 @@
 
 ---
 
-## 🚀 Installation (Load Unpacked)
+## 🚀 Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/Sagar3079/scalemax-chrome-extension.git
-   ```
-2. Open Google Chrome, or another Chromium browser such as Brave, Edge or Arc (version 116 or later).
-3. Go to `chrome://extensions`.
+1. Download the latest **`scalemax-official-vX.Y.Z.zip`** from the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest).
+2. Unzip it. You get a folder named `scalemax-official`. Keep it somewhere permanent, because Chrome loads the extension from this folder.
+3. Open Google Chrome, or another Chromium browser such as Brave, Edge or Arc (version 116 or later), and go to `chrome://extensions`.
 4. Turn on **Developer mode** in the top-right corner.
-5. Click **Load unpacked** and select the cloned `scalemax-chrome-extension` folder.
+5. Click **Load unpacked** and select the `scalemax-official` folder.
 6. Open the extension popup → **Management → AI Provider**, enter your Base URL and API key, load and pick a model, then **Save**.
 7. Open the side panel (popup → **Agent Chat**), start a new session and describe a task.
+
+## 🔄 Updating
+
+When a new version is released, the popup shows a **"Scalemax X.Y.Z is available"** banner.
+
+1. Download the new zip from the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest).
+2. Unzip it **over your existing `scalemax-official` folder**, replacing all files.
+3. In `chrome://extensions`, click the reload icon (↻) on the Scalemax Official card.
+
+Your settings, API key, sessions and skills are kept. Do **not** click *Remove*, because removing the extension deletes its saved data.
+
+You can also clone this repository and load the cloned folder directly; `git pull` then reload updates it.
+
+---
+
+## 🧰 Releasing a New Version (maintainers)
+
+1. Make your changes and bump `"version"` in `manifest.json` (for example `1.1.0` → `1.2.0`).
+2. Add a section for that version at the top of `CHANGELOG.md`; it becomes the release notes.
+3. Check locally: `bash scripts/validate.sh` and `bash scripts/package.sh` (writes `dist/scalemax-official-vX.Y.Z.zip`; commit your changes first, because the script packages tracked files).
+4. Merge to `main`, then tag and push:
+   ```bash
+   git tag v1.2.0
+   git push origin v1.2.0
+   ```
+5. The **Release** GitHub Action validates the files, checks that the tag matches the manifest version, builds the zip and publishes it on the Releases page. Installed copies see the update banner within about 12 hours.
+
+Every push and pull request also runs the **Validate** action, which uploads a test zip as a build artifact.
 
 ---
 
@@ -68,6 +93,9 @@ scalemax-chrome-extension/
 ├── approval.html / .js       # Approval window for high-risk agent actions
 ├── translate-settings.*      # Page translation settings and per-site policies
 ├── web-editor-v2.js          # In-page visual DOM editor
+├── scripts/                  # validate.sh and package.sh (release zip)
+├── .github/workflows/        # Validate and Release GitHub Actions
+├── CHANGELOG.md              # Release notes per version
 ├── offscreen.html            # Offscreen document (GIF encoding, keepalive, embeddings)
 ├── content-scripts/          # element-picker, quick-panel, translate
 ├── inject-scripts/           # On-demand page helpers (read, click, fill, keyboard, record…)
@@ -75,7 +103,7 @@ scalemax-chrome-extension/
 ├── workers/                  # Similarity worker and ONNX Runtime WASM
 ├── libs/                     # ONNX Runtime Web
 ├── assets/                   # Stylesheets
-├── icon/                     # Extension icons (16–128 px)
+├── icon/                     # Extension icons (16–128 px) and icon.svg source
 └── _locales/                 # UI strings (en, de, ja, ko, zh_CN, zh_TW)
 ```
 
@@ -84,6 +112,7 @@ scalemax-chrome-extension/
 ## 🔒 Security & Privacy
 
 - **No telemetry**: the extension sends no analytics or usage data anywhere.
+- **Update check**: about twice a day the extension asks the public GitHub API for the latest release number of this repository. No user data is included in the request.
 - **Your provider only**: prompts, page content the agent reads, and your API key go only to the Base URL you configure. Page translation uses the same provider.
 - **Local storage**: provider settings, sessions, skills, scheduled jobs and the audit log are kept in `chrome.storage.local` on your machine. The API key is stored there unencrypted, as with most extensions, so protect your browser profile.
 - **Optional model download**: the semantic tab-search engine (off by default) downloads its embedding model from Hugging Face the first time it is enabled, then caches it locally.

@@ -3175,6 +3175,20 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 	setup(__props) {
 		const scalemaxOnly = true;
 		const productName = PRODUCT_NAME;
+		const extensionVersion = chrome.runtime.getManifest().version;
+		/** Set by the background's daily GitHub release check (scalemax_update_info). */
+		const updateInfo = ref(null);
+		function loadUpdateInfo() {
+			chrome.storage.local.get("scalemax_update_info").then((res) => {
+				const info = res && res.scalemax_update_info;
+				updateInfo.value = info && info.available && info.latest ? info : null;
+			}).catch(() => {});
+		}
+		function openUpdatePage() {
+			const info = updateInfo.value;
+			const url = info && typeof info.releaseUrl === "string" && info.releaseUrl.startsWith("https://github.com/") ? info.releaseUrl : "https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest";
+			chrome.tabs.create({ url }).catch(() => {});
+		}
 		const { theme: agentTheme, initTheme } = useAgentTheme();
 		const currentView = ref("home");
 		/**
@@ -4126,6 +4140,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			window.__rr_popup_onMessage = onMessage;
 		};
 		onMounted(_asyncToGenerator(function* () {
+			loadUpdateInfo();
 			yield initTheme();
 			yield loadPortPreference();
 			yield loadModelPreference();
@@ -4173,6 +4188,29 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			}, [
 				withDirectives(createBaseVNode("div", _hoisted_2, [
 					createBaseVNode("div", _hoisted_3, [createBaseVNode("div", _hoisted_4, [createBaseVNode("h1", _hoisted_5, toDisplayString(unref(productName)), 1)])]),
+					updateInfo.value ? (openBlock(), createElementBlock("button", {
+						key: "scalemax-update",
+						type: "button",
+						onClick: openUpdatePage,
+						title: "Open the release page to download the new version",
+						style: {
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							gap: "8px",
+							width: "calc(100% - 32px)",
+							margin: "0 16px 8px",
+							padding: "10px 12px",
+							border: "1px solid #e8b9a6",
+							borderRadius: "10px",
+							background: "#fbeae3",
+							color: "#7a2f19",
+							font: "inherit",
+							fontSize: "13px",
+							textAlign: "left",
+							cursor: "pointer"
+						}
+					}, [createBaseVNode("span", null, "Scalemax " + toDisplayString(updateInfo.value.latest) + " is available (you have " + toDisplayString(unref(extensionVersion)) + ").", 1), createBaseVNode("strong", { style: { whiteSpace: "nowrap" } }, "Download ›")])) : createCommentVNode("", true),
 					createBaseVNode("div", _hoisted_6, [
 						!unref(scalemaxOnly) ? (openBlock(), createElementBlock("div", _hoisted_7, [createBaseVNode("h2", _hoisted_8, toDisplayString(unref(getMessage)("nativeServerConfigLabel")), 1), createBaseVNode("div", _hoisted_9, [
 							createBaseVNode("div", _hoisted_10, [
@@ -4298,7 +4336,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						"stroke-linejoin": "round",
 						"stroke-width": "2",
 						d: "M3 5h12M9 3v2m1.5 2C10 12 6 15 3 17m6-5c1.5 3 3 4 6 6M17 20l3.5-8L24 20m-5.5-2h5"
-					})], -1), createTextVNode(" Translate ", -1)])])]), _cache[25] || (_cache[25] = createBaseVNode("p", { class: "footer-text" }, "Scalemax Official · your AI agent in the browser", -1))])
+					})], -1), createTextVNode(" Translate ", -1)])])]), _cache[25] || (_cache[25] = createBaseVNode("p", { class: "footer-text" }, "Scalemax Official v" + extensionVersion + " · your AI agent in the browser", -1))])
 				], 512), [[vShow, currentView.value === "home"]]),
 				withDirectives(createVNode(AiProviderPage_default, { onBack: _cache[5] || (_cache[5] = ($event) => currentView.value = "home") }, null, 512), [[vShow, currentView.value === "ai-provider"]]),
 				withDirectives(createVNode(AgentChatPage_default, { onBack: _cache[6] || (_cache[6] = ($event) => currentView.value = "home") }, null, 512), [[vShow, currentView.value === "agent-chat"]]),

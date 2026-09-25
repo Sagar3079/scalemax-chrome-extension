@@ -84488,6 +84488,87 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 			console.warn("[storage] Legacy key migration failed:", error);
 		}
 	}
+	/**
+	* Release update check. Scalemax is distributed as a zip on GitHub Releases, so
+	* Chrome cannot update it automatically. Twice a day the worker asks the GitHub
+	* API for the latest release (no user data is sent) and records whether it is
+	* newer than the installed version; the popup shows a download banner.
+	*/
+	var UPDATE_RELEASES_API = "https://api.github.com/repos/Sagar3079/scalemax-chrome-extension/releases/latest";
+	var UPDATE_INFO_KEY = "scalemax_update_info";
+	var UPDATE_ALARM_NAME = "scalemax_update_check";
+	var UPDATE_CHECK_PERIOD_MINUTES = 720;
+	/** Compare dotted numeric versions: >0 when a is newer than b. */
+	function compareVersions(a, b) {
+		const pa = String(a).split(".").map((n) => parseInt(n, 10) || 0);
+		const pb = String(b).split(".").map((n) => parseInt(n, 10) || 0);
+		for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+			const d = (pa[i] || 0) - (pb[i] || 0);
+			if (d !== 0) return d;
+		}
+		return 0;
+	}
+	async function checkForUpdate() {
+		const current = chrome.runtime.getManifest().version;
+		const res = await fetch(UPDATE_RELEASES_API, {
+			headers: { Accept: "application/vnd.github+json" },
+			cache: "no-store",
+			credentials: "omit"
+		});
+		if (res.status === 404) {
+			await chrome.storage.local.set({ [UPDATE_INFO_KEY]: {
+				current,
+				available: false,
+				checkedAt: Date.now()
+			} });
+			return null;
+		}
+		if (!res.ok) throw new Error(`GitHub releases API returned ${res.status}`);
+		const release = await res.json();
+		const latest = String(release && release.tag_name || "").trim().replace(/^v/i, "");
+		const asset = Array.isArray(release && release.assets) ? release.assets.find((a) => a && /\.zip$/i.test(String(a.name || ""))) : null;
+		const info = {
+			current,
+			latest,
+			available: /^\d+(\.\d+)*$/.test(latest) && compareVersions(latest, current) > 0,
+			releaseUrl: typeof (release && release.html_url) === "string" ? release.html_url : "",
+			zipUrl: asset && typeof asset.browser_download_url === "string" ? asset.browser_download_url : "",
+			checkedAt: Date.now()
+		};
+		await chrome.storage.local.set({ [UPDATE_INFO_KEY]: info });
+		return info;
+	}
+	var updateCheckerRegistered = false;
+	function registerUpdateChecker() {
+		if (updateCheckerRegistered) return;
+		updateCheckerRegistered = true;
+		chrome.alarms.onAlarm.addListener((alarm) => {
+			if (alarm && alarm.name === UPDATE_ALARM_NAME) checkForUpdate().catch((e) => console.debug("[update] check failed:", e));
+		});
+		// Keep an existing schedule; recreating it on every worker start would reset it.
+		chrome.alarms.get(UPDATE_ALARM_NAME).then((existing) => {
+			if (!existing) chrome.alarms.create(UPDATE_ALARM_NAME, {
+				delayInMinutes: 1,
+				periodInMinutes: UPDATE_CHECK_PERIOD_MINUTES
+			});
+		}).catch(() => {});
+		chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+			if (!message || message.type !== "scalemax_update_check") return void 0;
+			if (!isExtensionPageSender(sender)) return rejectUntrustedSender(sendResponse);
+			checkForUpdate().then((info) => sendResponse({
+				ok: true,
+				info
+			})).catch((e) => sendResponse({
+				ok: false,
+				error: (e === null || e === void 0 ? void 0 : e.message) || String(e)
+			}));
+			return true;
+		});
+		// A just-installed update clears a stale "update available" banner right away.
+		chrome.runtime.onInstalled.addListener((details) => {
+			if (details.reason === "update" || details.reason === "install") checkForUpdate().catch(() => {});
+		});
+	}
 	/** Remove MAIN-world props-agent registrations that older builds persisted forever. */
 	async function cleanupLegacyPropsAgentRegistrations() {
 		try {
@@ -84526,6 +84607,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 		registerTranslateMessaging();
 		registerExtensionToolMessaging();
 		registerUniversalRelay();
+		registerUpdateChecker();
 		ensureSessionsReady().then((cleared) => {
 			if (cleared) console.log(`[sessions] Recovered ${cleared} interrupted session run(s) left by a previous service worker instance.`);
 		}).catch((error) => {
