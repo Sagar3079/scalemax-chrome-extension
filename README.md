@@ -2,6 +2,10 @@
 
 > **Scalemax Official** is a privacy-first AI agent for Chrome, built on Manifest V3. Bring your own OpenAI-compatible LLM endpoint and let it read, navigate and automate your browser. Everything runs inside the extension: there is no server, native host or desktop app to install.
 
+### ⬇️ [Download Scalemax Official (latest .zip)](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest/download/scalemax-official.zip)
+
+Always the newest version. Then follow the [installation steps](#-installation) below. Release notes and older versions are on the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest).
+
 ---
 
 ## 🌟 Key Features
@@ -41,7 +45,7 @@
 
 ## 🚀 Installation
 
-1. Download the latest **`scalemax-official-vX.Y.Z.zip`** from the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest).
+1. **[Download the latest `scalemax-official.zip`](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest/download/scalemax-official.zip)**. You can also pick a specific version on the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest).
 2. Unzip it. You get a folder named `scalemax-official`. Keep it somewhere permanent, because Chrome loads the extension from this folder.
 3. Open Google Chrome, or another Chromium browser such as Brave, Edge or Arc (version 116 or later), and go to `chrome://extensions`.
 4. Turn on **Developer mode** in the top-right corner.
@@ -53,7 +57,7 @@
 
 When a new version is released, the popup shows a **"Scalemax X.Y.Z is available"** banner.
 
-1. Download the new zip from the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest).
+1. [Download the latest zip](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest/download/scalemax-official.zip) (the banner's **Download** button opens the [Releases page](https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest) too).
 2. Unzip it **over your existing `scalemax-official` folder**, replacing all files.
 3. In `chrome://extensions`, click the reload icon (↻) on the Scalemax Official card.
 
@@ -73,7 +77,7 @@ You can also clone this repository and load the cloned folder directly; `git pul
    git tag v1.2.0
    git push origin v1.2.0
    ```
-5. The **Release** GitHub Action validates the files, checks that the tag matches the manifest version, builds the zip and publishes it on the Releases page. Installed copies see the update banner within about 12 hours.
+5. The **Release** GitHub Action validates the files, checks that the tag matches the manifest version, builds the zip and publishes it on the Releases page, both as `scalemax-official-vX.Y.Z.zip` and as `scalemax-official.zip`, which the README's download link always points to. Installed copies see the update banner within about 12 hours.
 
 Every push and pull request also runs the **Validate** action, which uploads a test zip as a build artifact.
 
