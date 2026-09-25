@@ -1,0 +1,81 @@
+name: Release
+
+# Publishes a GitHub Release with the installable extension zip.
+#
+#   1. Bump "version" in manifest.json and add a CHANGELOG.md entry.
+#   2. Merge to main, then push a matching tag:  git tag v1.2.0 && git push origin v1.2.0
+#
+# The workflow can also be started by hand (Actions → Release → Run workflow);
+# it then releases the version currently in manifest.json on the selected branch.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate extension files
+        run: bash scripts/validate.sh
+
+      - name: Check tag matches manifest version
+        id: version
+        run: |
+          version="$(node -p "require('./manifest.json').version")"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ] && [ "${GITHUB_REF_NAME}" != "v${version}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} does not match manifest.json version ${version} (expected v${version})."
+            exit 1
+          fi
+
+      - name: Build zip
+        id: package
+        run: bash scripts/package.sh
+
+      - name: Extract release notes
+        run: |
+          version="${{ steps.version.outputs.version }}"
+          # The CHANGELOG.md section for this version, if there is one.
+          awk -v v="$version" '
+            $0 ~ "^## \\[?v?" v "\\]?([ ]|$)" { found = 1; next }
+            found && /^## / { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md || true
+          if [ ! -s release-notes.md ]; then
+            echo "Scalemax Official v${version}" > release-notes.md
+          fi
+          cat >> release-notes.md <<'EOF'
+
+          ### Install or update
+          1. Download **scalemax-official-v*.zip** below and unzip it.
+          2. First install: open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked** and pick the `scalemax-official` folder.
+          3. Updating: unzip over your existing `scalemax-official` folder (replace all files), then click the reload icon on the Scalemax card in `chrome://extensions`. Your settings are kept.
+          EOF
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.version.outputs.version }}"
+          zip="${{ steps.package.outputs.zip }}"
+          if gh release view "$tag" >/dev/null 2>&1; then
+            echo "Release $tag exists; replacing its zip."
+            gh release upload "$tag" "$zip" --clobber
+          else
+            gh release create "$tag" "$zip" \
+              --title "Scalemax Official $tag" \
+              --notes-file release-notes.md \
+              --target "$GITHUB_SHA"
+          fi

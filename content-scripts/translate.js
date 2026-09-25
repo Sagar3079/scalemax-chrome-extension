@@ -18,7 +18,7 @@
 //   4. "always" -> translate immediately. "ask" -> show a small shadow-DOM banner
 //      offering Translate / Always / Never / dismiss, and only translate on demand.
 //   5. Walk visible text nodes, batch them, send to the background
-//      (potato_translate_batch), and write results back onto the SAME node
+//      (scalemax_translate_batch), and write results back onto the SAME node
 //      references in the SAME order the batch was sent -- this ordering guarantee is
 //      what makes the zip-back safe.
 //   6. A MutationObserver catches text added after the initial pass (SPA navigation,
@@ -45,7 +45,14 @@
 
   const state = {
     originals: new Map(), // Text node -> original string, so we can revert.
-    translatedNodes: new Set(), // Text nodes we've already replaced, to avoid re-sending.
+    // Text node -> the exact string this script left in it after translating. If the
+    // node's current nodeValue still equals this, the text is ours (skip it); if it
+    // differs, the PAGE rewrote it since, so it is fresh original text again.
+    translatedNodes: new Map(),
+    inFlight: new Set(), // Text nodes collected by a pass whose translation hasn't landed yet.
+    generation: 0, // Bumped on revert, so late responses from before it are discarded.
+    dirtyRoots: new Set(), // Elements queued by the MutationObserver for the next pass.
+    flushTimer: null,
     touchedElements: new Set(), // Parent elements whose text we changed (for layout mitigation).
     growth: new Map(), // Element -> { before, after } char counts, to detect big expansions.
     measured: new Set(), // Elements already put through the mitigation pass, so incremental
@@ -154,9 +161,23 @@
     });
     let n;
     while ((n = walker.nextNode())) {
-      if (!state.translatedNodes.has(n)) nodes.push(n);
+      // Already queued/sent by another pass -- don't translate it twice.
+      if (state.inFlight.has(n)) continue;
+      if (state.translatedNodes.has(n)) {
+        // Still holding our translation: nothing to do.
+        if (state.translatedNodes.get(n) === n.nodeValue) continue;
+        // The page replaced our translated text since; its current text is the new
+        // original, so forget the stale bookkeeping and translate it afresh.
+        state.translatedNodes.delete(n);
+        state.originals.delete(n);
+      }
+      nodes.push(n);
     }
     return nodes;
+  }
+
+  function isOurText(node) {
+    return state.translatedNodes.has(node) && state.translatedNodes.get(node) === node.nodeValue;
   }
 
   // ---------------------------------------------------------------------------
@@ -173,24 +194,46 @@
    */
   async function translateNodes(nodes) {
     if (!nodes.length) return;
+    const generation = state.generation;
     const texts = nodes.map((n) => n.nodeValue);
-    const response = await sendMessage({
-      type: 'potato_translate_batch',
-      texts,
-      targetLang: state.targetLang,
-      sourceLang: state.detectedLang,
-    });
+    let response;
+    try {
+      response = await sendMessage({
+        type: 'scalemax_translate_batch',
+        texts,
+        targetLang: state.targetLang,
+        sourceLang: state.detectedLang,
+      });
+    } finally {
+      // Release these nodes (claimed in runTranslationPass). After a revert, inFlight
+      // was already reset, so leave it alone in case a newer pass claimed them.
+      if (generation === state.generation) {
+        for (const n of nodes) state.inFlight.delete(n);
+      }
+    }
+    // Reverted ("Show original") while this batch was in flight: drop the result.
+    if (generation !== state.generation) return;
     const translations = Array.isArray(response.translations) ? response.translations : texts;
+    const changedByPage = [];
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i];
       // A node can be detached from the document by the time an async response
       // arrives (e.g. the page re-rendered that section) -- isConnected guards
       // against writing into a node nobody can see anymore.
       if (!node.isConnected) continue;
-      if (!state.originals.has(node)) state.originals.set(node, node.nodeValue);
+      // The page rewrote this node while the request was in flight: the result is a
+      // translation of text that is no longer there. Don't write it; re-queue the
+      // node so its new text gets translated instead.
+      if (node.nodeValue !== texts[i]) {
+        changedByPage.push(node);
+        continue;
+      }
+      if (!state.originals.has(node)) state.originals.set(node, texts[i]);
       const translated = translations[i];
       if (typeof translated === 'string' && translated !== node.nodeValue) {
         const before = node.nodeValue;
+        // Plain text only: nodeValue never parses markup, so provider output can't
+        // inject HTML into the page.
         node.nodeValue = translated;
         // Track per-element text growth so the mitigation pass can tell "this
         // heading got 4x longer" apart from "this paragraph is about the same".
@@ -203,7 +246,10 @@
           state.touchedElements.add(el);
         }
       }
-      state.translatedNodes.add(node);
+      state.translatedNodes.set(node, node.nodeValue);
+    }
+    if (changedByPage.length && state.observer) {
+      queueDirtyRoots(changedByPage.map((node) => node.parentElement));
     }
     if (response.ok === false && response.error) {
       log('translateBatch reported an error (falling back to original text):', response.error);
@@ -244,17 +290,34 @@
   async function runTranslationPass(root) {
     const nodes = collectTextNodes(root);
     if (!nodes.length) return;
+    const generation = state.generation;
+    // Mark every collected node (both phases) as in flight up front, so an
+    // overlapping pass -- e.g. a MutationObserver pass on a nested root, or a manual
+    // "Translate now" -- skips them instead of sending them a second time.
+    // translateNodes() releases each phase's nodes once its response is back.
+    for (const n of nodes) state.inFlight.add(n);
     const { inView, rest } = partitionByViewport(nodes);
-    // One message per phase, not per chunk: the background splits it into small
-    // chunks and fans those out concurrently (bounded), which is much faster than
-    // this script awaiting a sequence of batches itself.
-    if (inView.length) {
-      await translateNodes(inView);
-      applyLayoutMitigations();
-    }
-    if (rest.length) {
-      await translateNodes(rest);
-      applyLayoutMitigations();
+    let restSent = false;
+    try {
+      // One message per phase, not per chunk: the background splits it into small
+      // chunks and fans those out concurrently (bounded), which is much faster than
+      // this script awaiting a sequence of batches itself.
+      if (inView.length) {
+        await translateNodes(inView);
+        if (generation !== state.generation) return;
+        applyLayoutMitigations();
+      }
+      if (rest.length) {
+        restSent = true;
+        await translateNodes(rest);
+        if (generation !== state.generation) return;
+        applyLayoutMitigations();
+      }
+    } finally {
+      // If we bailed out before sending the second phase, release its nodes here.
+      if (!restSent && generation === state.generation) {
+        for (const n of rest) state.inFlight.delete(n);
+      }
     }
   }
 
@@ -376,11 +439,17 @@
   }
 
   function revertAll() {
+    // Invalidate any in-flight batches so they can't re-apply translations after this.
+    state.generation++;
     for (const [node, original] of state.originals) {
-      if (node.isConnected) node.nodeValue = original;
+      // Only restore nodes that still hold OUR translation. If the page has rewritten
+      // a node since, its current text is newer than our saved original and must win.
+      if (node.isConnected && isOurText(node)) node.nodeValue = original;
     }
     clearLayoutMitigations();
+    state.originals.clear();
     state.translatedNodes.clear();
+    state.inFlight.clear();
     state.touchedElements.clear();
     state.growth.clear();
     state.measured.clear();
@@ -391,35 +460,58 @@
   // Dynamic content: MutationObserver, debounced
   // ---------------------------------------------------------------------------
 
+  function queueDirtyRoots(roots) {
+    for (const root of roots) state.dirtyRoots.add(root || document.body);
+    if (state.flushTimer) clearTimeout(state.flushTimer);
+    state.flushTimer = setTimeout(flushDirtyRoots, 600);
+  }
+
+  function flushDirtyRoots() {
+    state.flushTimer = null;
+    const roots = Array.from(state.dirtyRoots).filter((root) => root && root.isConnected);
+    state.dirtyRoots.clear();
+    // Collapse nested roots: a root inside another queued root is already covered by
+    // that ancestor's walk, so running both would translate its text twice.
+    // (Ancestor walk against a Set rather than pairwise contains(), which would be
+    // quadratic on big SPA mutation bursts.)
+    const queued = new Set(roots);
+    const unique = roots.filter((root) => {
+      for (let p = root.parentNode; p; p = p.parentNode) {
+        if (queued.has(p)) return false;
+      }
+      return true;
+    });
+    for (const root of unique) {
+      runTranslationPass(root).catch((e) => log('pass failed', e));
+    }
+  }
+
+  // Callers start observing BEFORE their first runTranslationPass(), so content the
+  // page adds while that pass is in flight isn't missed; our own nodeValue writes are
+  // recognized via isOurText() and ignored.
   function startObserving() {
     if (state.observer) return;
-    let timer = null;
-    const dirtyRoots = new Set();
     state.observer = new MutationObserver((mutations) => {
+      const roots = [];
       for (const m of mutations) {
         if (m.type === 'childList' && m.addedNodes.length) {
           for (const added of m.addedNodes) {
             if (added.nodeType === Node.ELEMENT_NODE || added.nodeType === Node.TEXT_NODE) {
-              dirtyRoots.add(added.parentElement || document.body);
+              roots.push(added.parentElement || document.body);
             }
           }
         } else if (m.type === 'characterData') {
           const node = m.target;
-          // A node we just translated firing characterData is our OWN write, not new
-          // page content -- don't re-queue it, or we'd translate our own output.
-          if (state.translatedNodes.has(node)) continue;
-          dirtyRoots.add(node.parentElement || document.body);
+          // A node still holding exactly the text we wrote is our OWN write, not new
+          // page content -- don't re-queue it, or we'd translate our own output. If
+          // the page changed it afterwards, the value differs and it is re-queued.
+          if (isOurText(node)) continue;
+          // Already being translated; translateNodes re-queues it if its text changed.
+          if (state.inFlight.has(node)) continue;
+          roots.push(node.parentElement || document.body);
         }
       }
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => {
-        timer = null;
-        const roots = Array.from(dirtyRoots);
-        dirtyRoots.clear();
-        for (const root of roots) {
-          if (root && root.isConnected) runTranslationPass(root).catch((e) => log('pass failed', e));
-        }
-      }, 600);
+      if (roots.length) queueDirtyRoots(roots);
     });
     state.observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
@@ -429,6 +521,12 @@
       state.observer.disconnect();
       state.observer = null;
     }
+    // Drop any pending debounced pass too, so nothing is translated after a revert.
+    if (state.flushTimer) {
+      clearTimeout(state.flushTimer);
+      state.flushTimer = null;
+    }
+    state.dirtyRoots.clear();
   }
 
   // ---------------------------------------------------------------------------
@@ -545,26 +643,26 @@
       state.active = true;
       // Remember this domain for the rest of the browsing session, so navigating
       // around the same site keeps translating without re-prompting on every page.
-      sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: true });
-      await runTranslationPass();
+      sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: true });
       startObserving();
+      await runTranslationPass();
     });
 
     const alwaysBtn = document.createElement('button');
     alwaysBtn.textContent = 'Always translate this site';
     alwaysBtn.addEventListener('click', async () => {
       banner.remove();
-      await sendMessage({ type: 'potato_translate_site_policy_set', hostname: getHostname(), policy: 'always' });
+      await sendMessage({ type: 'scalemax_translate_site_policy_set', hostname: getHostname(), policy: 'always' });
       state.active = true;
-      await runTranslationPass();
       startObserving();
+      await runTranslationPass();
     });
 
     const neverBtn = document.createElement('button');
     neverBtn.textContent = 'Never translate this site';
     neverBtn.addEventListener('click', async () => {
       banner.remove();
-      await sendMessage({ type: 'potato_translate_site_policy_set', hostname: getHostname(), policy: 'never' });
+      await sendMessage({ type: 'scalemax_translate_site_policy_set', hostname: getHostname(), policy: 'never' });
     });
 
     const closeBtn = document.createElement('button');
@@ -598,7 +696,7 @@
       stopObserving();
       // Clear the session flag too, otherwise the next page on this domain would
       // immediately re-translate and reverting would feel like it didn't stick.
-      sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: false });
+      sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: false });
       banner.remove();
     });
     const closeBtn = document.createElement('button');
@@ -640,7 +738,7 @@
     const hostname = getHostname();
     if (!hostname) return;
 
-    const policyResp = await sendMessage({ type: 'potato_translate_site_policy_get', hostname });
+    const policyResp = await sendMessage({ type: 'scalemax_translate_site_policy_get', hostname });
     if (!policyResp || policyResp.ok === false) return;
     const settings = policyResp.settings || { enabled: true, targetLang: 'en' };
     if (!settings.enabled) return;
@@ -654,8 +752,8 @@
     // have changed for a page the user already chose to translate on this domain.
     if (policy !== 'always' && policyResp.sessionAuto) {
       state.active = true;
-      await runTranslationPass();
       startObserving();
+      await runTranslationPass();
       return;
     }
 
@@ -668,8 +766,8 @@
 
     if (policy === 'always') {
       state.active = true;
-      await runTranslationPass();
       startObserving();
+      await runTranslationPass();
       return;
     }
 
@@ -709,9 +807,9 @@
         state.active = true;
         // Manual translate also opts this domain in for the session, same as the
         // banner's Translate button.
-        sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: true });
-        await runTranslationPass();
+        sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: true });
         startObserving();
+        await runTranslationPass();
         sendResponse({ success: true });
       })();
       return true;
@@ -719,7 +817,7 @@
     if (request && request.action === 'translate_revert') {
       revertAll();
       stopObserving();
-      sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: false });
+      sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: false });
       sendResponse({ success: true });
       return false;
     }
@@ -748,5 +846,10 @@
   // `Permissions-Policy: unload=()` header.
   window.addEventListener('pagehide', () => {
     stopObserving();
+  });
+  // Restored from the back/forward cache: this script doesn't run again, so resume
+  // watching for new content if the page is still in translated mode.
+  window.addEventListener('pageshow', (event) => {
+    if (event.persisted && state.active) startObserving();
   });
 })();

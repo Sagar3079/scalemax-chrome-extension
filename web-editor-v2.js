@@ -9,11 +9,11 @@ var webEditorV2 = (function() {
 	/** Log prefix for console messages */
 	var WEB_EDITOR_V2_LOG_PREFIX = "[WebEditorV2]";
 	/** Shadow host element ID */
-	var WEB_EDITOR_V2_HOST_ID = "__mcp_web_editor_v2_host__";
+	var WEB_EDITOR_V2_HOST_ID = "__scalemax_web_editor_v2_host__";
 	/** Overlay container ID (for Canvas and visual feedback) */
-	var WEB_EDITOR_V2_OVERLAY_ID = "__mcp_web_editor_v2_overlay__";
+	var WEB_EDITOR_V2_OVERLAY_ID = "__scalemax_web_editor_v2_overlay__";
 	/** UI container ID (for panels and controls) */
-	var WEB_EDITOR_V2_UI_ID = "__mcp_web_editor_v2_ui__";
+	var WEB_EDITOR_V2_UI_ID = "__scalemax_web_editor_v2_ui__";
 	/** Maximum z-index to ensure editor is always on top */
 	var WEB_EDITOR_V2_Z_INDEX = 2147483647;
 	var WEB_EDITOR_V2_COLORS = {
@@ -3673,7 +3673,7 @@ var webEditorV2 = (function() {
 		} catch (_unused) {}
 		const host = document.createElement("div");
 		host.id = WEB_EDITOR_V2_HOST_ID;
-		host.setAttribute("data-mcp-web-editor", "v2");
+		host.setAttribute("data-scalemax-web-editor", "v2");
 		setImportantStyle(host, "position", "fixed");
 		setImportantStyle(host, "inset", "0");
 		setImportantStyle(host, "z-index", String(WEB_EDITOR_V2_Z_INDEX));
@@ -18980,7 +18980,7 @@ var webEditorV2 = (function() {
 	* - Only redraws when dirty flag is set
 	* - Pixel-aligned strokes for crisp lines
 	*/
-	var CANVAS_ATTR = "data-mcp-canvas";
+	var CANVAS_ATTR = "data-scalemax-canvas";
 	var CANVAS_ATTR_VALUE = "overlay";
 	/** Duration of hover rect transition animation in milliseconds */
 	var HOVER_ANIMATION_DURATION_MS = 100;
@@ -26016,7 +26016,7 @@ var webEditorV2 = (function() {
 	* Create the Web Editor V2 instance.
 	*
 	* This is the main factory function that creates the editor API.
-	* The returned object implements WebEditorV2Api and is exposed on window.__MCP_WEB_EDITOR_V2__
+	* The returned object implements WebEditorV2Api and is exposed on window.__SCALEMAX_WEB_EDITOR_V2__
 	*/
 	function createWebEditorV2() {
 		const state = {
@@ -27087,7 +27087,7 @@ var webEditorV2 = (function() {
 	*
 	* Architecture:
 	* - Uses WXT's defineUnlistedScript for TypeScript compilation
-	* - Exposes API on window.__MCP_WEB_EDITOR_V2__
+	* - Exposes API on window.__SCALEMAX_WEB_EDITOR_V2__
 	* - Communicates with background via chrome.runtime.onMessage
 	*
 	* Module structure:
@@ -27101,17 +27101,17 @@ var webEditorV2 = (function() {
 	*/
 	var web_editor_v2_default = defineUnlistedScript(() => {
 		if (window !== window.top) return;
-		if (window.__MCP_WEB_EDITOR_V2__) {
+		if (window.__SCALEMAX_WEB_EDITOR_V2__) {
 			console.log(`${WEB_EDITOR_V2_LOG_PREFIX} Already installed, skipping initialization`);
 			return;
 		}
 		const api = createWebEditorV2();
-		window.__MCP_WEB_EDITOR_V2__ = api;
+		window.__SCALEMAX_WEB_EDITOR_V2__ = api;
 		installMessageListener(api);
 		console.log(`${WEB_EDITOR_V2_LOG_PREFIX} Installed successfully`);
 	});
 	//#endregion
-	//#region \0virtual:wxt-unlisted-script-entrypoint?C:/Users/pc/Downloads/Opus-4.8-Unleashed/ClaudeJB/chrome-mcp/base-mcp-chrome/app/chrome-extension/entrypoints/web-editor-v2.ts
+	//#region \0virtual:wxt-unlisted-script-entrypoint?entrypoints/web-editor-v2.ts
 	/** Wrapper around `console` with a "[wxt]" prefix */
 	var logger = {
 		debug: (...args) => ([...args], void 0),

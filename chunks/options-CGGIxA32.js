@@ -265,7 +265,6 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						], 512), [[vModelSelect, form.value.runAt]])]),
 						createBaseVNode("label", null, [createTextVNode(toDisplayString(m("worldLabel")) + " ", 1), withDirectives(createBaseVNode("select", { "onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => form.value.world = $event) }, [
 							createBaseVNode("option", _hoisted_11, toDisplayString(m("worldAuto")), 1),
-							createBaseVNode("option", _hoisted_12, toDisplayString(m("worldIsolated")), 1),
 							createBaseVNode("option", _hoisted_13, toDisplayString(m("worldMain")), 1)
 						], 512), [[vModelSelect, form.value.world]])]),
 						createBaseVNode("label", null, [createTextVNode(toDisplayString(m("modeLabel")) + " ", 1), withDirectives(createBaseVNode("select", { "onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => form.value.mode = $event) }, [

@@ -288,10 +288,9 @@ var quickPanel = (function() {
 		* Send a new instruction to the selected AgentChat session.
 		*
 		* The background layer will:
-		* 1. Read the selected session ID
-		* 2. Open SSE subscription
-		* 3. POST /act to start the request
-		* 4. Stream events back via QUICK_PANEL_AI_EVENT
+		* 1. Resolve (or create) the agent chat session
+		* 2. Start the request with the Scalemax agent
+		* 3. Stream events back via QUICK_PANEL_AI_EVENT
 		*
 		* @param payload - The instruction and optional context
 		* @returns Promise resolving to success with requestId/sessionId, or failure with error
@@ -1558,9 +1557,9 @@ var quickPanel = (function() {
 	* - Shadow root contains styles + UI container
 	* - Theme is synced from chrome.storage.local['agentTheme']
 	*/
-	var DEFAULT_HOST_ID = "__mcp_quick_panel_host__";
-	var UI_CONTAINER_ID = "__mcp_quick_panel_ui__";
-	var ROOT_ID = "__mcp_quick_panel_root__";
+	var DEFAULT_HOST_ID = "__scalemax_quick_panel_host__";
+	var UI_CONTAINER_ID = "__scalemax_quick_panel_ui__";
+	var ROOT_ID = "__scalemax_quick_panel_root__";
 	/** Highest possible z-index to ensure Quick Panel is on top */
 	var DEFAULT_Z_INDEX = 2147483647;
 	/** Storage key for AgentChat theme (owned by sidepanel) */
@@ -1708,7 +1707,7 @@ var quickPanel = (function() {
 		} catch (_unused3) {}
 		const host = document.createElement("div");
 		host.id = hostId;
-		host.setAttribute("data-mcp-quick-panel", "true");
+		host.setAttribute("data-scalemax-quick-panel", "true");
 		setImportantStyle(host, "position", "fixed");
 		setImportantStyle(host, "inset", "0");
 		setImportantStyle(host, "z-index", String(zIndex));
@@ -2188,7 +2187,7 @@ var quickPanel = (function() {
 		const placeholder = ((_options$placeholder = options.placeholder) === null || _options$placeholder === void 0 ? void 0 : _options$placeholder.trim()) || DEFAULT_PLACEHOLDER;
 		const overlay = document.createElement("div");
 		overlay.className = "qp-overlay";
-		overlay.setAttribute("data-mcp-quick-panel-ai-chat", "true");
+		overlay.setAttribute("data-scalemax-quick-panel-ai-chat", "true");
 		const panel = document.createElement("div");
 		panel.className = "qp-panel";
 		panel.setAttribute("role", "dialog");
@@ -2327,7 +2326,7 @@ var quickPanel = (function() {
 		const defaultSubtitle = ((_options$subtitle2 = options.subtitle) === null || _options$subtitle2 === void 0 ? void 0 : _options$subtitle2.trim()) || DEFAULT_SUBTITLE;
 		try {
 			var _mount$querySelector;
-			const existing = (_mount$querySelector = mount.querySelector) === null || _mount$querySelector === void 0 ? void 0 : _mount$querySelector.call(mount, "[data-mcp-quick-panel-ai-chat=\"true\"]");
+			const existing = (_mount$querySelector = mount.querySelector) === null || _mount$querySelector === void 0 ? void 0 : _mount$querySelector.call(mount, "[data-scalemax-quick-panel-ai-chat=\"true\"]");
 			if (existing instanceof HTMLElement) existing.remove();
 		} catch (_unused3) {}
 		let disposed = false;
@@ -2982,6 +2981,17 @@ var quickPanel = (function() {
 					controller = null;
 				}
 			});
+			// When the page is restored from the back/forward cache this script does
+			// not run again, so re-attach the listener removed in `pagehide` above
+			// (the controller is re-created lazily by ensureController()).
+			window.addEventListener("pageshow", (event) => {
+				if (!event.persisted) return;
+				try {
+					if (!chrome.runtime.onMessage.hasListener(handleMessage)) chrome.runtime.onMessage.addListener(handleMessage);
+				} catch (err) {
+					console.warn("[QuickPanelContentScript] Failed to re-attach message listener after bfcache restore:", err);
+				}
+			});
 		}
 	});
 	//#endregion
@@ -3274,7 +3284,7 @@ var quickPanel = (function() {
 		return i;
 	}
 	//#endregion
-	//#region \0virtual:wxt-content-script-isolated-world-entrypoint?C:/Users/pc/Downloads/Opus-4.8-Unleashed/ClaudeJB/chrome-mcp/base-mcp-chrome/app/chrome-extension/entrypoints/quick-panel.content.ts
+	//#region \0virtual:wxt-content-script-isolated-world-entrypoint?entrypoints/quick-panel.content.ts
 	var _excluded = ["main"];
 	/** Wrapper around `console` with a "[wxt]" prefix */
 	var logger = {

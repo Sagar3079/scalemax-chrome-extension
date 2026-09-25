@@ -14,9 +14,9 @@ init_asyncToGenerator();
 * Provides safe access to chrome.i18n.getMessage with fallbacks
 */
 var fallbackMessages = {
-	extensionName: "chrome-mcp-server",
-	extensionDescription: "Exposes browser capabilities with your own chrome",
-	nativeServerConfigLabel: "Native Server Configuration",
+	extensionName: "Scalemax Official",
+	extensionDescription: "Scalemax Official — browser-only AI agent. Bring your own OpenAI-compatible LLM and let it work in your browser.",
+	nativeServerConfigLabel: "Local Connection",
 	semanticEngineLabel: "Semantic Engine",
 	embeddingModelLabel: "Embedding Model",
 	indexDataManagementLabel: "Index Data Management",
@@ -34,7 +34,7 @@ var fallbackMessages = {
 	serviceRunningStatus: "Service Running (Port: {0})",
 	serviceNotConnectedStatus: "Service Not Connected",
 	connectedServiceNotStartedStatus: "Connected, Service Not Started",
-	mcpServerConfigLabel: "MCP Server Configuration",
+	mcpServerConfigLabel: "Advanced Connection Settings",
 	connectionPortLabel: "Connection Port",
 	refreshStatusButton: "Refresh Status",
 	copyConfigButton: "Copy Configuration",
@@ -122,11 +122,11 @@ var fallbackMessages = {
 	gigabytesUnit: "GB",
 	itemsUnit: "items",
 	pagesUnit: "pages",
-	nativeServerConfig: "Native Server Configuration",
+	nativeServerConfig: "Local Connection",
 	runningStatus: "Running Status",
 	refreshStatus: "Refresh Status",
 	lastUpdated: "Last Updated:",
-	mcpServerConfig: "MCP Server Configuration",
+	mcpServerConfig: "Advanced Connection Settings",
 	connectionPort: "Connection Port",
 	connecting: "Connecting...",
 	disconnect: "Disconnect",
@@ -851,7 +851,7 @@ var LocalModelPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 			return openBlock(), createElementBlock("div", _hoisted_1$6, [createBaseVNode("div", _hoisted_2$6, [createBaseVNode("button", {
 				class: "back-button",
 				onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("back")),
-				title: "返回首页"
+				title: "Back to home"
 			}, [..._cache[6] || (_cache[6] = [createBaseVNode("svg", {
 				viewBox: "0 0 24 24",
 				width: "20",
@@ -863,7 +863,7 @@ var LocalModelPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 				"stroke-linecap": "round",
 				"stroke-linejoin": "round",
 				d: "M15 19l-7-7 7-7"
-			})], -1), createBaseVNode("span", null, "返回", -1)])]), _cache[7] || (_cache[7] = createBaseVNode("h2", { class: "page-title" }, "本地模型", -1))]), createBaseVNode("div", _hoisted_3$6, [
+			})], -1), createBaseVNode("span", null, "Back", -1)])]), _cache[7] || (_cache[7] = createBaseVNode("h2", { class: "page-title" }, "Local Models", -1))]), createBaseVNode("div", _hoisted_3$6, [
 				createBaseVNode("div", _hoisted_4$6, [createBaseVNode("h3", _hoisted_5$6, toDisplayString(unref(getMessage)("semanticEngineLabel")), 1), createBaseVNode("div", _hoisted_6$6, [
 					createBaseVNode("div", _hoisted_7$6, [createBaseVNode("div", _hoisted_8$6, [createBaseVNode("span", { class: normalizeClass(["status-dot", getSemanticEngineStatusClass()]) }, null, 2), createBaseVNode("span", _hoisted_9$6, toDisplayString(getSemanticEngineStatusText()), 1)]), __props.semanticEngineLastUpdated ? (openBlock(), createElementBlock("div", _hoisted_10$6, toDisplayString(unref(getMessage)("lastUpdatedLabel")) + " " + toDisplayString(new Date(__props.semanticEngineLastUpdated).toLocaleTimeString()), 1)) : createCommentVNode("", true)]),
 					__props.isSemanticEngineInitializing ? (openBlock(), createBlock(ProgressIndicator_default, {
@@ -969,9 +969,8 @@ var _hoisted_18$4 = {
 	key: 3,
 	class: "ai-output"
 };
-var PORT = 12306;
-var PROVIDER_STORAGE_KEY = "potato_ai_provider";
-var RUN_MODE_KEY = "potato_ai_run_mode";
+var PROVIDER_STORAGE_KEY = "scalemax_ai_provider";
+var RUN_MODE_KEY = "scalemax_ai_run_mode";
 //#endregion
 //#region entrypoints/popup/components/AiProviderPage.vue
 var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ */ defineComponent({
@@ -979,7 +978,6 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 	emits: ["back"],
 	setup(__props) {
 		const scalemaxOnly = true;
-		const api = (p) => `http://127.0.0.1:${PORT}${p}`;
 		const baseURL = ref("");
 		const apiKey = ref("");
 		const model = ref("");
@@ -1031,7 +1029,7 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 			return _setRunMode.apply(this, arguments);
 		}
 		/**
-		* Mirror the provider config into chrome.storage.local['potato_ai_provider'] so the
+		* Mirror the provider config into chrome.storage.local['scalemax_ai_provider'] so the
 		* in-extension agent (Mode 2, no PC) can read it directly, in addition to whatever
 		* the Native path does. Keeps the previously stored key when the field is left blank,
 		* matching the native save behavior.
@@ -1078,14 +1076,6 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 						allowedDomainsText.value = Array.isArray(cfg.allowedDomains) ? cfg.allowedDomains.join("\n") : "";
 					}
 				} catch (_unused3) {}
-				try {
-					const j = yield (yield fetch(api("/ai/provider"))).json();
-					baseURL.value = j.baseURL || baseURL.value;
-					model.value = j.model || model.value;
-					hasStoredKey.value = hasStoredKey.value || !!j.hasKey;
-				} catch (_unused4) {
-					if (runMode.value === "native") setStatus("Native bridge not reachable on :12306 — click Connect first.", false);
-				}
 			});
 			return _loadCurrent.apply(this, arguments);
 		}
@@ -1108,34 +1098,23 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 				setStatus("");
 				try {
 					const usableApiKey = yield effectiveApiKey();
-					if (runMode.value === "extension") {
-						const url = `${normalizeBaseUrl(baseURL.value)}/models`;
-						const r = yield fetch(url, {
-							method: "GET",
-							headers: _objectSpread2({ "Content-Type": "application/json" }, usableApiKey ? { Authorization: `Bearer ${usableApiKey}` } : {})
-						});
-						if (!r.ok) {
-							const body = yield r.text().catch(() => "");
-							throw new Error(`${r.status} ${body.slice(0, 200)}`);
-						}
-						const j = yield r.json();
-						const rows = Array.isArray(j === null || j === void 0 ? void 0 : j.data) ? j.data : Array.isArray(j) ? j : [];
-						models.value = rows.map((m) => {
-							var _ref, _m$id;
-							return { id: String((_ref = (_m$id = m === null || m === void 0 ? void 0 : m.id) !== null && _m$id !== void 0 ? _m$id : m === null || m === void 0 ? void 0 : m.name) !== null && _ref !== void 0 ? _ref : "") };
-						}).filter((m) => m.id).sort((a, b) => a.id.localeCompare(b.id));
-						if (!model.value && models.value.length) model.value = models.value[0].id;
-						setStatus(`Loaded ${models.value.length} models.`, true);
-					} else {
-						const qs = new URLSearchParams({ baseURL: baseURL.value });
-						if (usableApiKey) qs.set("apiKey", usableApiKey);
-						const j = yield (yield fetch(api("/ai/models?" + qs.toString()))).json();
-						if (j.status === "success") {
-							models.value = j.models || [];
-							if (!model.value && models.value.length) model.value = models.value[0].id;
-							setStatus(`Loaded ${models.value.length} models.`, true);
-						} else setStatus(j.message || "Failed to load models", false);
+					const url = `${normalizeBaseUrl(baseURL.value)}/models`;
+					const r = yield fetch(url, {
+						method: "GET",
+						headers: _objectSpread2({ "Content-Type": "application/json" }, usableApiKey ? { Authorization: `Bearer ${usableApiKey}` } : {})
+					});
+					if (!r.ok) {
+						const body = yield r.text().catch(() => "");
+						throw new Error(`${r.status} ${body.slice(0, 200)}`);
 					}
+					const j = yield r.json();
+					const rows = Array.isArray(j === null || j === void 0 ? void 0 : j.data) ? j.data : Array.isArray(j) ? j : [];
+					models.value = rows.map((m) => {
+						var _ref, _m$id;
+						return { id: String((_ref = (_m$id = m === null || m === void 0 ? void 0 : m.id) !== null && _m$id !== void 0 ? _m$id : m === null || m === void 0 ? void 0 : m.name) !== null && _ref !== void 0 ? _ref : "") };
+					}).filter((m) => m.id).sort((a, b) => a.id.localeCompare(b.id));
+					if (!model.value && models.value.length) model.value = models.value[0].id;
+					setStatus(`Loaded ${models.value.length} models.`, true);
 				} catch (e) {
 					setStatus("Model fetch failed: " + ((e === null || e === void 0 ? void 0 : e.message) || e), false);
 				} finally {
@@ -1153,32 +1132,13 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 				saving.value = true;
 				const usedApiKey = apiKey.value;
 				try {
+					// The provider config (including the API key) is stored only in this
+					// extension's local storage and sent only to the Base URL above.
 					yield syncProviderToStorage(usedApiKey);
-					const body = {
-						baseURL: baseURL.value,
-						model: model.value
-					};
-					if (usedApiKey) body.apiKey = usedApiKey;
-					if (fallbackModel.value) body.fallbackModel = fallbackModel.value;
-					body.vision = vision.value;
-					const domainsForNative = parseAllowedDomains(allowedDomainsText.value);
-					if (domainsForNative.length) body.allowedDomains = domainsForNative;
-					const j = yield (yield fetch(api("/ai/provider"), {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify(body)
-					})).json();
-					if (j.status === "success") {
-						var _j$config;
-						hasStoredKey.value = !!((_j$config = j.config) === null || _j$config === void 0 ? void 0 : _j$config.hasKey) || hasStoredKey.value;
-						apiKey.value = "";
-						setStatus("Saved.", true);
-					} else setStatus(j.message || "Save failed", false);
+					apiKey.value = "";
+					setStatus("Saved.", true);
 				} catch (e) {
-					if (runMode.value === "extension") {
-						apiKey.value = "";
-						setStatus("Saved.", true);
-					} else setStatus("Save failed: " + ((e === null || e === void 0 ? void 0 : e.message) || e), false);
+					setStatus("Save failed: " + ((e === null || e === void 0 ? void 0 : e.message) || e), false);
 				} finally {
 					saving.value = false;
 				}
@@ -1195,25 +1155,13 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 				agentOutput.value = "Running…";
 				try {
 					var _res$stepCount;
-					let res;
-					if (runMode.value === "extension") {
-						const payload = { task: testTask.value };
-						if (testTabId.value != null) payload.tabId = testTabId.value;
-						res = yield chrome.runtime.sendMessage({
-							type: "potato_agent_run",
-							payload
-						});
-						if (!res) throw new Error("No response from the background agent runner.");
-					} else {
-						const body = { task: testTask.value };
-						if (testTabId.value != null) body.tabId = testTabId.value;
-						const j = yield (yield fetch(api("/ai/agent/run"), {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify(body)
-						})).json();
-						res = j.result || j;
-					}
+					const payload = { task: testTask.value };
+					if (testTabId.value != null) payload.tabId = testTabId.value;
+					const res = yield chrome.runtime.sendMessage({
+						type: "scalemax_agent_run",
+						payload
+					});
+					if (!res) throw new Error("No response from the background agent runner.");
 					agentOutput.value = `stop: ${res.stopReason || res.status}\nsteps: ${(_res$stepCount = res.stepCount) !== null && _res$stepCount !== void 0 ? _res$stepCount : "?"} | model: ${res.model || model.value}\n` + (res.error ? `error: ${res.error}\n` : "") + `\n${res.finalText || "(no final text)"}\n\n` + (res.steps || []).map((s) => `• ${s.tool} ${s.ok ? "✓" : "✗"}`).join("\n");
 				} catch (e) {
 					agentOutput.value = "Run failed: " + ((e === null || e === void 0 ? void 0 : e.message) || e);
@@ -1250,19 +1198,7 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 					spellcheck: "false"
 				}, null, 512), [[vModelText, apiKey.value]]),
 				hasStoredKey.value && !apiKey.value ? (openBlock(), createElementBlock("p", _hoisted_3$5, "A key is already saved. Leave blank to keep it.")) : createCommentVNode("", true),
-				!unref(scalemaxOnly) ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [
-					_cache[12] || (_cache[12] = createBaseVNode("label", { class: "ai-label" }, "Run mode", -1)),
-					createBaseVNode("div", _hoisted_4$5, [createBaseVNode("button", {
-						type: "button",
-						class: normalizeClass(["ai-mode-btn", { active: runMode.value === "extension" }]),
-						onClick: _cache[3] || (_cache[3] = ($event) => setRunMode("extension"))
-					}, " In-extension (no PC) ", 2), createBaseVNode("button", {
-						type: "button",
-						class: normalizeClass(["ai-mode-btn", { active: runMode.value === "native" }]),
-						onClick: _cache[4] || (_cache[4] = ($event) => setRunMode("native"))
-					}, " Native (PC) ", 2)]),
-					createBaseVNode("p", _hoisted_5$5, toDisplayString(runMode.value === "extension" ? "Runs the agent loop inside the extension background worker — no native host or PC server needed." : "Runs the agent loop through the native host on 127.0.0.1:12306 (requires the PC bridge to be running)."), 1)
-				], 64)) : (openBlock(), createElementBlock("p", _hoisted_6$5, " Browser-only build: the agent loop runs entirely inside the extension — no PC, no native host. Everything goes to your Base URL directly. ")),
+				(openBlock(), createElementBlock("p", _hoisted_6$5, " The agent runs entirely inside your browser. Your API key is stored only in this extension and sent only to your Base URL. ")),
 				createBaseVNode("div", _hoisted_7$5, [createBaseVNode("div", _hoisted_8$5, [_cache[13] || (_cache[13] = createBaseVNode("label", { class: "ai-label" }, "Model", -1)), withDirectives(createBaseVNode("select", {
 					class: "ai-input",
 					"onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => model.value = $event)
@@ -1350,7 +1286,7 @@ init_asyncToGenerator();
 * - The AES-GCM key is derived from a user passphrase via PBKDF2 (SHA-256,
 *   >=100k iterations, random salt). The salt + iteration count + IV +
 *   ciphertext are the ONLY things ever written to `chrome.storage.local`
-*   under `potato_vault`. Nothing else is persisted.
+*   under `scalemax_vault`. Nothing else is persisted.
 * - The passphrase itself is never stored anywhere, and the derived
 *   `CryptoKey` + decrypted entry list live only in the module-level
 *   variables below — i.e. only in memory, only for as long as this JS
@@ -1361,7 +1297,7 @@ init_asyncToGenerator();
 *   "for free": AES-GCM authenticates the ciphertext, so decrypting with the
 *   wrong derived key throws instead of silently returning garbage.
 */
-var STORAGE_KEY = "potato_vault";
+var STORAGE_KEY = "scalemax_vault";
 var PBKDF2_ITERATIONS = 21e4;
 var SALT_BYTES = 16;
 var IV_BYTES = 12;
@@ -2072,7 +2008,7 @@ var _hoisted_21$1 = ["disabled", "onClick"];
 var _hoisted_22$1 = { class: "agent-close-toggle" };
 var _hoisted_23$1 = ["onUpdate:modelValue"];
 var _hoisted_24$1 = ["onClick"];
-var REGISTRY_KEY = "potato_agent_registry";
+var REGISTRY_KEY = "scalemax_agent_registry";
 var POLL_MS = 2e3;
 //#endregion
 //#region entrypoints/popup/components/AgentDashboard.vue
@@ -2398,7 +2334,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 		}
 		function _loadSessions() {
 			_loadSessions = _asyncToGenerator(function* () {
-				const r = yield send_("potato_session_list");
+				const r = yield send_("scalemax_session_list");
 				sessions.value = r.sessions || [];
 			});
 			return _loadSessions.apply(this, arguments);
@@ -2488,7 +2424,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				if (disposed || generation !== pollGeneration || currentId.value !== id) return;
 				pollTimer = setTimeout(() => {
 					_asyncToGenerator(function* () {
-						const r = yield send_("potato_session_get", { id });
+						const r = yield send_("scalemax_session_get", { id });
 						if (disposed || generation !== pollGeneration || currentId.value !== id) return;
 						if (r.ok) {
 							applyPopupSessionSnapshot(id, r.session || null);
@@ -2520,7 +2456,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					stopSessionPolling();
 					return null;
 				}
-				const r = yield send_("potato_session_get", { id });
+				const r = yield send_("scalemax_session_get", { id });
 				if (disposed || generation !== loadGeneration || currentId.value !== id) return null;
 				if (!r.ok) {
 					statusUnknown.value = true;
@@ -2559,7 +2495,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 		}
 		function _newSession() {
 			_newSession = _asyncToGenerator(function* () {
-				const r = yield send_("potato_session_create");
+				const r = yield send_("scalemax_session_create");
 				if (r.session) {
 					yield loadSessions();
 					currentId.value = r.session.id;
@@ -2575,7 +2511,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 			_removeSession = _asyncToGenerator(function* () {
 				if (!currentId.value) return;
 				const deletedId = currentId.value;
-				yield send_("potato_session_delete", {
+				yield send_("scalemax_session_delete", {
 					id: deletedId,
 					closeTab: true
 				});
@@ -2780,7 +2716,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				running.value = true;
 				startSessionPolling(sid);
 				yield scrollToBottom();
-				const r = yield send_("potato_session_run", { payload: {
+				const r = yield send_("scalemax_session_run", { payload: {
 					sessionId: sid,
 					requestId,
 					task: task || "Describe the attached image(s).",
@@ -2961,7 +2897,7 @@ var _hoisted_16$1 = {
 var _hoisted_17$1 = { class: "sched-item-actions" };
 var _hoisted_18$1 = ["onClick"];
 var _hoisted_19$1 = ["onClick"];
-var JOBS_KEY = "potato_jobs";
+var JOBS_KEY = "scalemax_jobs";
 //#endregion
 //#region entrypoints/popup/components/SchedulerPage.vue
 var SchedulerPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ */ defineComponent({
@@ -3025,7 +2961,7 @@ var SchedulerPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					return;
 				}
 				try {
-					yield chrome.runtime.sendMessage({ type: "potato_jobs_changed" });
+					yield chrome.runtime.sendMessage({ type: "scalemax_jobs_changed" });
 				} catch (_unused2) {}
 			});
 			return _persistJobs.apply(this, arguments);
@@ -3239,6 +3175,20 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 	setup(__props) {
 		const scalemaxOnly = true;
 		const productName = PRODUCT_NAME;
+		const extensionVersion = chrome.runtime.getManifest().version;
+		/** Set by the background's daily GitHub release check (scalemax_update_info). */
+		const updateInfo = ref(null);
+		function loadUpdateInfo() {
+			chrome.storage.local.get("scalemax_update_info").then((res) => {
+				const info = res && res.scalemax_update_info;
+				updateInfo.value = info && info.available && info.latest ? info : null;
+			}).catch(() => {});
+		}
+		function openUpdatePage() {
+			const info = updateInfo.value;
+			const url = info && typeof info.releaseUrl === "string" && info.releaseUrl.startsWith("https://github.com/") ? info.releaseUrl : "https://github.com/Sagar3079/scalemax-chrome-extension/releases/latest";
+			chrome.tabs.create({ url }).catch(() => {});
+		}
 		const { theme: agentTheme, initTheme } = useAgentTheme();
 		const currentView = ref("home");
 		/**
@@ -3253,7 +3203,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			_openBrowserAgentSidepanel = _asyncToGenerator(function* () {
 				try {
 					var _chrome$sidePanel, _chrome$sidePanel$ope;
-					yield chrome.storage.local.set({ potato_sidepanel_tab: "browser-agent" });
+					yield chrome.storage.local.set({ scalemax_sidepanel_tab: "browser-agent" });
 					let tabId=null; let winId=null;
 					try{const [tab]=yield chrome.tabs.query({active:true,currentWindow:true}); if(tab){tabId=tab.id; winId=tab.windowId;}}catch(e){}
 					if(!winId){const win=yield chrome.windows.getCurrent(); winId=win.id;}
@@ -3319,7 +3269,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 				if (!currentTabUrl.value) return true;
 				const url = new URL(currentTabUrl.value);
 				return bindings.some((b) => {
-					if (b.type === "domain") return url.hostname.includes(b.value);
+					if (b.type === "domain") return ((h, d) => h === d || h.endsWith("." + d))(url.hostname.toLowerCase(), String(b.value || "").trim().toLowerCase().replace(/^\*?\./, ""));
 					if (b.type === "path") return url.pathname.startsWith(b.value);
 					if (b.type === "url") return (url.href || "").startsWith(b.value);
 					return false;
@@ -3362,7 +3312,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						options: _objectSpread2(_objectSpread2(_objectSpread2({}, runOptions), {}), {}, { returnLogs: true })
 					});
 					if (!(res && res.success)) {
-						console.warn("回放失败");
+						console.warn("Replay failed");
 						return;
 					}
 					try {
@@ -3378,7 +3328,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						}
 					} catch (_unused4) {}
 				} catch (e) {
-					console.error("回放失败:", e);
+					console.error("Replay failed:", e);
 				}
 			});
 			return function runFlow(_x) {
@@ -3489,7 +3439,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						currentWindow: true
 					});
 					if (!(tab === null || tab === void 0 ? void 0 : tab.id)) {
-						console.warn("无法获取当前tab");
+						console.warn("Could not get the current tab");
 						return;
 					}
 					yield chrome.runtime.sendMessage({
@@ -3497,7 +3447,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						tabId: tab.id
 					});
 				} catch (error) {
-					console.warn("开启元素标注失败:", error);
+					console.warn("Failed to enable element markers:", error);
 				}
 			});
 			return _toggleElementMarker.apply(this, arguments);
@@ -3530,7 +3480,15 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 		function _openTranslateSettings() {
 			_openTranslateSettings = _asyncToGenerator(function* () {
 				try {
-					yield chrome.tabs.create({ url: chrome.runtime.getURL("translate-settings.html") });
+					// Tell the settings page which tab to act on: once it opens in its own tab,
+					// "the active tab" is the settings page itself.
+					const [activeTab] = yield chrome.tabs.query({
+						active: true,
+						currentWindow: true
+					});
+					const settingsUrl = new URL(chrome.runtime.getURL("translate-settings.html"));
+					if (activeTab && typeof activeTab.id === "number") settingsUrl.searchParams.set("tabId", String(activeTab.id));
+					yield chrome.tabs.create({ url: settingsUrl.toString() });
 				} catch (_unusedOpenTranslateSettings) {}
 			});
 			return _openTranslateSettings.apply(this, arguments);
@@ -3609,7 +3567,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 					};
 					yield chrome.storage.local.set({ semanticEngineState });
 				} catch (error) {
-					console.error("保存语义引擎状态失败:", error);
+					console.error("Failed to save semantic engine state:", error);
 				}
 			});
 			return function saveSemanticEngineState() {
@@ -3734,7 +3692,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 					const response = yield chrome.runtime.sendMessage({ type: "ping_native" });
 					nativeConnectionStatus.value = (response === null || response === void 0 ? void 0 : response.connected) ? "connected" : "disconnected";
 				} catch (error) {
-					console.error("检测 Native 连接状态失败:", error);
+					console.error("Failed to check connection status:", error);
 					nativeConnectionStatus.value = "disconnected";
 				}
 			});
@@ -3749,7 +3707,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 					if ((response === null || response === void 0 ? void 0 : response.success) && response.serverStatus) serverStatus.value = response.serverStatus;
 					if ((response === null || response === void 0 ? void 0 : response.connected) !== void 0) nativeConnectionStatus.value = response.connected ? "connected" : "disconnected";
 				} catch (error) {
-					console.error("检测服务器状态失败:", error);
+					console.error("Failed to check server status:", error);
 				}
 			});
 			return function checkServerStatus() {
@@ -3763,7 +3721,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 					if ((response === null || response === void 0 ? void 0 : response.success) && response.serverStatus) serverStatus.value = response.serverStatus;
 					if ((response === null || response === void 0 ? void 0 : response.connected) !== void 0) nativeConnectionStatus.value = response.connected ? "connected" : "disconnected";
 				} catch (error) {
-					console.error("刷新服务器状态失败:", error);
+					console.error("Failed to refresh server status:", error);
 				}
 			});
 			return function refreshServerStatus() {
@@ -3779,7 +3737,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						copyButtonText.value = getMessage("copyConfigButton");
 					}, 2e3);
 				} catch (error) {
-					console.error("复制配置失败:", error);
+					console.error("Failed to copy configuration:", error);
 					copyButtonText.value = "❌" + getMessage("networkErrorMessage");
 					setTimeout(() => {
 						copyButtonText.value = getMessage("copyConfigButton");
@@ -3799,22 +3757,22 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						yield chrome.runtime.sendMessage({ type: "disconnect_native" });
 						nativeConnectionStatus.value = "disconnected";
 					} else {
-						console.log(`尝试连接到端口: ${nativeServerPort.value}`);
+						console.log(`Trying to connect on port: ${nativeServerPort.value}`);
 						const response = yield chrome.runtime.sendMessage({
 							type: "connectNative",
 							port: nativeServerPort.value
 						});
 						if (response && response.success) {
 							nativeConnectionStatus.value = "connected";
-							console.log("连接成功:", response);
+							console.log("Connected:", response);
 							yield savePortPreference(nativeServerPort.value);
 						} else {
 							nativeConnectionStatus.value = "disconnected";
-							console.error("连接失败:", response);
+							console.error("Connection failed:", response);
 						}
 					}
 				} catch (error) {
-					console.error("测试连接失败:", error);
+					console.error("Connection test failed:", error);
 					nativeConnectionStatus.value = "disconnected";
 				} finally {
 					isConnecting.value = false;
@@ -3880,7 +3838,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						} else semanticEngineStatus.value = "idle";
 					} else semanticEngineStatus.value = "idle";
 				} catch (error) {
-					console.error("❌ 加载模型偏好失败:", error);
+					console.error("❌ Failed to load model preference:", error);
 				}
 			});
 			return function loadModelPreference() {
@@ -3892,7 +3850,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 				try {
 					yield chrome.storage.local.set({ selectedModel: model });
 				} catch (error) {
-					console.error("保存模型偏好失败:", error);
+					console.error("Failed to save model preference:", error);
 				}
 			});
 			return function saveModelPreference(_x4) {
@@ -3904,7 +3862,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 				try {
 					yield chrome.storage.local.set({ selectedVersion: version });
 				} catch (error) {
-					console.error("保存版本偏好失败:", error);
+					console.error("Failed to save version preference:", error);
 				}
 			});
 			return function saveVersionPreference(_x5) {
@@ -3915,9 +3873,9 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			var _ref21 = _asyncToGenerator(function* (port) {
 				try {
 					yield chrome.storage.local.set({ nativeServerPort: port });
-					console.log(`端口偏好已保存: ${port}`);
+					console.log(`Port preference saved: ${port}`);
 				} catch (error) {
-					console.error("保存端口偏好失败:", error);
+					console.error("Failed to save port preference:", error);
 				}
 			});
 			return function savePortPreference(_x6) {
@@ -3930,10 +3888,10 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 					const result = yield chrome.storage.local.get(["nativeServerPort"]);
 					if (result.nativeServerPort) {
 						nativeServerPort.value = result.nativeServerPort;
-						console.log(`端口偏好已加载: ${result.nativeServerPort}`);
+						console.log(`Port preference loaded: ${result.nativeServerPort}`);
 					}
 				} catch (error) {
-					console.error("加载端口偏好失败:", error);
+					console.error("Failed to load port preference:", error);
 				}
 			});
 			return function loadPortPreference() {
@@ -3951,7 +3909,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 					};
 					yield chrome.storage.local.set({ modelState });
 				} catch (error) {
-					console.error("保存模型状态失败:", error);
+					console.error("Failed to save model state:", error);
 				}
 			});
 			return function saveModelState() {
@@ -3981,7 +3939,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						if (status.initializationStatus === "ready" || status.initializationStatus === "error") stopModelStatusMonitoring();
 					}
 				} catch (error) {
-					console.error("获取模型状态失败:", error);
+					console.error("Failed to get model state:", error);
 				}
 			}), 1e3);
 		};
@@ -4134,7 +4092,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						yield saveModelPreference(newModel);
 						yield saveVersionPreference("quantized");
 						modelSwitchProgress.value = getMessage("successNotification");
-						console.log("模型切换成功:", newModel, "version: quantized", "dimension:", newModelInfo.dimension);
+						console.log("Model switched:", newModel, "version: quantized", "dimension:", newModelInfo.dimension);
 						modelInitializationStatus.value = "ready";
 						isModelDownloading.value = false;
 						yield saveModelState();
@@ -4143,11 +4101,11 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						}, 2e3);
 					} else throw new Error((response === null || response === void 0 ? void 0 : response.error) || "Model switch failed");
 				} catch (error) {
-					console.error("模型切换失败:", error);
+					console.error("Model switch failed:", error);
 					modelSwitchProgress.value = `Model switch failed: ${(error === null || error === void 0 ? void 0 : error.message) || "Unknown error"}`;
 					modelInitializationStatus.value = "error";
 					isModelDownloading.value = false;
-					const errorMessage = (error === null || error === void 0 ? void 0 : error.message) || "未知错误";
+					const errorMessage = (error === null || error === void 0 ? void 0 : error.message) || "Unknown error";
 					if (errorMessage.includes("network") || errorMessage.includes("fetch") || errorMessage.includes("timeout")) {
 						modelErrorType.value = "network";
 						modelErrorMessage.value = getMessage("networkErrorMessage");
@@ -4182,11 +4140,10 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			window.__rr_popup_onMessage = onMessage;
 		};
 		onMounted(_asyncToGenerator(function* () {
+			loadUpdateInfo();
 			yield initTheme();
 			yield loadPortPreference();
 			yield loadModelPreference();
-			yield checkNativeConnection();
-			yield checkServerStatus();
 			yield refreshStorageStats();
 			yield loadCacheStats();
 			yield loadFlows();
@@ -4231,6 +4188,29 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			}, [
 				withDirectives(createBaseVNode("div", _hoisted_2, [
 					createBaseVNode("div", _hoisted_3, [createBaseVNode("div", _hoisted_4, [createBaseVNode("h1", _hoisted_5, toDisplayString(unref(productName)), 1)])]),
+					updateInfo.value ? (openBlock(), createElementBlock("button", {
+						key: "scalemax-update",
+						type: "button",
+						onClick: openUpdatePage,
+						title: "Open the release page to download the new version",
+						style: {
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "space-between",
+							gap: "8px",
+							width: "calc(100% - 32px)",
+							margin: "0 16px 8px",
+							padding: "10px 12px",
+							border: "1px solid #e8b9a6",
+							borderRadius: "10px",
+							background: "#fbeae3",
+							color: "#7a2f19",
+							font: "inherit",
+							fontSize: "13px",
+							textAlign: "left",
+							cursor: "pointer"
+						}
+					}, [createBaseVNode("span", null, "Scalemax " + toDisplayString(updateInfo.value.latest) + " is available (you have " + toDisplayString(unref(extensionVersion)) + ").", 1), createBaseVNode("strong", { style: { whiteSpace: "nowrap" } }, "Download ›")])) : createCommentVNode("", true),
 					createBaseVNode("div", _hoisted_6, [
 						!unref(scalemaxOnly) ? (openBlock(), createElementBlock("div", _hoisted_7, [createBaseVNode("h2", _hoisted_8, toDisplayString(unref(getMessage)("nativeServerConfigLabel")), 1), createBaseVNode("div", _hoisted_9, [
 							createBaseVNode("div", _hoisted_10, [
@@ -4298,6 +4278,10 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 								class: "entry-item",
 								onClick: _cache[2] || (_cache[2] = ($event) => currentView.value = "scheduler")
 							}, [..._cache[19] || (_cache[19] = [createStaticVNode("<div class=\"entry-icon workflow\" data-v-db1692c2><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" data-v-db1692c2><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z\" data-v-db1692c2></path></svg></div><div class=\"entry-content\" data-v-db1692c2><span class=\"entry-title\" data-v-db1692c2>Scheduler</span><span class=\"entry-desc\" data-v-db1692c2>Run agent tasks on a timer (browser only)</span></div><svg class=\"entry-arrow\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" data-v-db1692c2><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 5l7 7-7 7\" data-v-db1692c2></path></svg>", 3)])]),
+							createBaseVNode("button", {
+								class: "entry-item",
+								onClick: _cache[90] || (_cache[90] = ($event) => openBuilderWindow())
+							}, [..._cache[91] || (_cache[91] = [createStaticVNode("<div class=\"entry-icon workflow\" data-v-db1692c2><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" data-v-db1692c2><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M4 6h4v4H4zM16 14h4v4h-4zM8 8h4a2 2 0 012 2v4a2 2 0 002 2\" data-v-db1692c2></path></svg></div><div class=\"entry-content\" data-v-db1692c2><span class=\"entry-title\" data-v-db1692c2>Workflows</span><span class=\"entry-desc\" data-v-db1692c2>Build and edit automation flows visually</span></div><svg class=\"entry-arrow\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" data-v-db1692c2><path stroke-linecap=\"round\" stroke-linejoin=\"round\" d=\"M9 5l7 7-7 7\" data-v-db1692c2></path></svg>", 3)])]),
 							!unref(scalemaxOnly) ? (openBlock(), createElementBlock("button", {
 								key: 0,
 								class: "entry-item",
@@ -4352,7 +4336,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 						"stroke-linejoin": "round",
 						"stroke-width": "2",
 						d: "M3 5h12M9 3v2m1.5 2C10 12 6 15 3 17m6-5c1.5 3 3 4 6 6M17 20l3.5-8L24 20m-5.5-2h5"
-					})], -1), createTextVNode(" Translate ", -1)])])]), _cache[25] || (_cache[25] = createBaseVNode("p", { class: "footer-text" }, "chrome mcp server for ai", -1))])
+					})], -1), createTextVNode(" Translate ", -1)])])]), _cache[25] || (_cache[25] = createBaseVNode("p", { class: "footer-text" }, "Scalemax Official v" + extensionVersion + " · your AI agent in the browser", -1))])
 				], 512), [[vShow, currentView.value === "home"]]),
 				withDirectives(createVNode(AiProviderPage_default, { onBack: _cache[5] || (_cache[5] = ($event) => currentView.value = "home") }, null, 512), [[vShow, currentView.value === "ai-provider"]]),
 				withDirectives(createVNode(AgentChatPage_default, { onBack: _cache[6] || (_cache[6] = ($event) => currentView.value = "home") }, null, 512), [[vShow, currentView.value === "agent-chat"]]),
@@ -4456,7 +4440,6 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 //#endregion
 //#region entrypoints/popup/main.ts
 preloadAgentTheme().then(() => {
-	chrome.runtime.sendMessage({ type: NativeMessageType.ENSURE_NATIVE }).catch(() => {});
 	createApp(App_default).mount("#app");
 });
 //#endregion

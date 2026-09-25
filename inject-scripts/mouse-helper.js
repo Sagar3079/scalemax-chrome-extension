@@ -4,7 +4,7 @@ window.__MOUSE_HELPER_INITIALIZED__=true;
 // Reported on the ping reply so the background can detect a stale resident copy
 // of this script after an extension update instead of skipping injection.
 const PROTOCOL_VERSION = 1;
-const HOST_ID='__mcp_mouse_host__';
+const HOST_ID='__scalemax_mouse_host__';
 const MOUSE_SVG=`<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" fill="white" stroke="black" stroke-width="1.2" stroke-linejoin="round"/><circle cx="5" cy="5" r="1.2" fill="black"/></svg>`;
 let host=null, shadow=null, cursor=null, trail=null, label=null;
 let pos={x: -100, y: -100};
@@ -122,15 +122,15 @@ chrome.runtime.onMessage.addListener((req,_s,sendResponse)=>{
     let el = null;
     if(ref){
      try{
-      const map = window.__claudeElementMap;
+      const map = window.__scalemaxElementMap;
       const weak = map && map[ref];
       el = weak && typeof weak.deref === 'function' ? weak.deref() : null;
      }catch(e){
       el = null;
-      console.warn('[mcp-mouse] error resolving ref "'+ref+'":', e);
+      console.warn('[scalemax-mouse] error resolving ref "'+ref+'":', e);
      }
      if(!el){
-      console.warn('[mcp-mouse] ref "'+ref+'" did not resolve (stale ref or element removed). Falling back to selector "'+selector+'", which may match a DIFFERENT element.');
+      console.warn('[scalemax-mouse] ref "'+ref+'" did not resolve (stale ref or element removed). Falling back to selector "'+selector+'", which may match a DIFFERENT element.');
      }
     }
     if(!el && selector){
@@ -138,21 +138,21 @@ chrome.runtime.onMessage.addListener((req,_s,sendResponse)=>{
       el = document.querySelector(selector);
      }catch(e){
       el = null;
-      console.warn('[mcp-mouse] invalid selector "'+selector+'":', e);
+      console.warn('[scalemax-mouse] invalid selector "'+selector+'":', e);
      }
      if(!el){
-      console.warn('[mcp-mouse] selector "'+selector+'" matched no element.');
+      console.warn('[scalemax-mouse] selector "'+selector+'" matched no element.');
      }
     }
     if(!el){
-     console.warn('[mcp-mouse] could not locate a target for the cursor overlay (ref="'+ref+'", selector="'+selector+'"); skipping cursor move.');
+     console.warn('[scalemax-mouse] could not locate a target for the cursor overlay (ref="'+ref+'", selector="'+selector+'"); skipping cursor move.');
      return;
     }
     try{
      const r=el.getBoundingClientRect();
      enqueueMove(r.left+r.width/2, r.top+r.height/2, 'click');
     }catch(e){
-     console.warn('[mcp-mouse] failed to move the cursor overlay (ref="'+ref+'", selector="'+selector+'"):', e);
+     console.warn('[scalemax-mouse] failed to move the cursor overlay (ref="'+ref+'", selector="'+selector+'"):', e);
     }
    }, 60);
   }
@@ -166,5 +166,5 @@ window.addEventListener('mousemove', (e)=>{
 }, {passive:true});
 
 // expose for other helpers
-window.__mcpMouse={ moveTo, clickEffect, enqueueMove, ensureMouse, hide, show };
+window.__scalemaxMouse={ moveTo, clickEffect, enqueueMove, ensureMouse, hide, show };
 }

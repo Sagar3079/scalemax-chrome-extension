@@ -1,138 +1,181 @@
 {
   "extensionName": {
-    "message": "Chrome MCPサーバー"
+    "message": "Scalemax Official",
+    "description": "Extension name"
   },
   "extensionDescription": {
-    "message": "自身のChromeブラウザの機能を外部に公開します"
+    "message": "Scalemax Official — ブラウザだけで動くAIエージェント。お手持ちのOpenAI互換LLMを接続して、ブラウザ上で作業させましょう。",
+    "description": "Extension description"
   },
   "nativeServerConfigLabel": {
-    "message": "ネイティブサーバー設定"
+    "message": "ローカル接続",
+    "description": "Main section header for local connection settings"
   },
   "semanticEngineLabel": {
-    "message": "セマンティックエンジン"
+    "message": "セマンティックエンジン",
+    "description": "Main section header for semantic engine"
   },
   "embeddingModelLabel": {
-    "message": "埋め込みモデル"
+    "message": "埋め込みモデル",
+    "description": "Main section header for model selection"
   },
   "indexDataManagementLabel": {
-    "message": "インデックスデータ管理"
+    "message": "インデックスデータ管理",
+    "description": "Main section header for data management"
   },
   "modelCacheManagementLabel": {
-    "message": "モデルキャッシュ管理"
+    "message": "モデルキャッシュ管理",
+    "description": "Main section header for cache management"
   },
   "statusLabel": {
-    "message": "ステータス"
+    "message": "ステータス",
+    "description": "Generic status label"
   },
   "runningStatusLabel": {
-    "message": "実行ステータス"
+    "message": "実行ステータス",
+    "description": "Server running status label"
   },
   "connectionStatusLabel": {
-    "message": "接続ステータス"
+    "message": "接続ステータス",
+    "description": "Connection status label"
   },
   "lastUpdatedLabel": {
-    "message": "最終更新:"
+    "message": "最終更新:",
+    "description": "Last updated timestamp label"
   },
   "connectButton": {
-    "message": "接続"
+    "message": "接続",
+    "description": "Connect button text"
   },
   "disconnectButton": {
-    "message": "切断"
+    "message": "切断",
+    "description": "Disconnect button text"
   },
   "connectingStatus": {
-    "message": "接続中..."
+    "message": "接続中...",
+    "description": "Connecting status message"
   },
   "connectedStatus": {
-    "message": "接続済み"
+    "message": "接続済み",
+    "description": "Connected status message"
   },
   "disconnectedStatus": {
-    "message": "未接続"
+    "message": "未接続",
+    "description": "Disconnected status message"
   },
   "detectingStatus": {
-    "message": "検出中..."
+    "message": "検出中...",
+    "description": "Detecting status message"
   },
   "serviceRunningStatus": {
-    "message": "サービス実行中 (ポート: $1)",
+    "message": "サービス実行中 (ポート: $PORT$)",
+    "description": "Service running with port number",
     "placeholders": {
       "port": {
         "content": "$1",
-        "example": "12306"
+        "example": "8080"
       }
     }
   },
   "serviceNotConnectedStatus": {
-    "message": "サービス未接続"
+    "message": "サービス未接続",
+    "description": "Service not connected status"
   },
   "connectedServiceNotStartedStatus": {
-    "message": "接続済み、サービス未起動"
+    "message": "接続済み、サービス未起動",
+    "description": "Connected but service not started status"
   },
   "mcpServerConfigLabel": {
-    "message": "MCPサーバー設定"
+    "message": "詳細な接続設定",
+    "description": "Advanced connection settings section label"
   },
   "connectionPortLabel": {
-    "message": "接続ポート"
+    "message": "接続ポート",
+    "description": "Connection port input label"
   },
   "refreshStatusButton": {
-    "message": "ステータス更新"
+    "message": "ステータス更新",
+    "description": "Refresh status button tooltip"
   },
   "copyConfigButton": {
-    "message": "設定をコピー"
+    "message": "設定をコピー",
+    "description": "Copy configuration button text"
   },
   "retryButton": {
-    "message": "再試行"
+    "message": "再試行",
+    "description": "Retry button text"
   },
   "cancelButton": {
-    "message": "キャンセル"
+    "message": "キャンセル",
+    "description": "Cancel button text"
   },
   "confirmButton": {
-    "message": "確認"
+    "message": "確認",
+    "description": "Confirm button text"
   },
   "saveButton": {
-    "message": "保存"
+    "message": "保存",
+    "description": "Save button text"
   },
   "closeButton": {
-    "message": "閉じる"
+    "message": "閉じる",
+    "description": "Close button text"
   },
   "resetButton": {
-    "message": "リセット"
+    "message": "リセット",
+    "description": "Reset button text"
   },
   "initializingStatus": {
-    "message": "初期化中..."
+    "message": "初期化中...",
+    "description": "Initializing progress message"
   },
   "processingStatus": {
-    "message": "処理中..."
+    "message": "処理中...",
+    "description": "Processing progress message"
   },
   "loadingStatus": {
-    "message": "読み込み中..."
+    "message": "読み込み中...",
+    "description": "Loading progress message"
   },
   "clearingStatus": {
-    "message": "クリア中..."
+    "message": "クリア中...",
+    "description": "Clearing progress message"
   },
   "cleaningStatus": {
-    "message": "クリーンアップ中..."
+    "message": "クリーンアップ中...",
+    "description": "Cleaning progress message"
   },
   "downloadingStatus": {
-    "message": "ダウンロード中..."
+    "message": "ダウンロード中...",
+    "description": "Downloading progress message"
   },
   "semanticEngineReadyStatus": {
-    "message": "セマンティックエンジン準備完了"
+    "message": "セマンティックエンジン準備完了",
+    "description": "Semantic engine ready status"
   },
   "semanticEngineInitializingStatus": {
-    "message": "セマンティックエンジン初期化中..."
+    "message": "セマンティックエンジン初期化中...",
+    "description": "Semantic engine initializing status"
   },
   "semanticEngineInitFailedStatus": {
-    "message": "セマンティックエンジンの初期化に失敗しました"
+    "message": "セマンティックエンジンの初期化に失敗しました",
+    "description": "Semantic engine initialization failed status"
   },
   "semanticEngineNotInitStatus": {
-    "message": "セマンティックエンジン未初期化"
+    "message": "セマンティックエンジン未初期化",
+    "description": "Semantic engine not initialized status"
   },
   "initSemanticEngineButton": {
-    "message": "セマンティックエンジンを初期化"
+    "message": "セマンティックエンジンを初期化",
+    "description": "Initialize semantic engine button text"
   },
   "reinitializeButton": {
-    "message": "再初期化"
+    "message": "再初期化",
+    "description": "Reinitialize button text"
   },
   "downloadingModelStatus": {
-    "message": "モデルをダウンロード中... $1%",
+    "message": "モデルをダウンロード中... $PROGRESS$%",
+    "description": "Model download progress with percentage",
     "placeholders": {
       "progress": {
         "content": "$1",
@@ -141,198 +184,435 @@
     }
   },
   "switchingModelStatus": {
-    "message": "モデルを切り替え中..."
+    "message": "モデルを切り替え中...",
+    "description": "Model switching progress message"
   },
   "modelLoadedStatus": {
-    "message": "モデル読み込み完了"
+    "message": "モデル読み込み完了",
+    "description": "Model successfully loaded status"
   },
   "modelFailedStatus": {
-    "message": "モデルの読み込みに失敗しました"
+    "message": "モデルの読み込みに失敗しました",
+    "description": "Model failed to load status"
   },
   "lightweightModelDescription": {
-    "message": "軽量多言語モデル"
+    "message": "軽量多言語モデル",
+    "description": "Description for lightweight model option"
   },
   "betterThanSmallDescription": {
-    "message": "e5-smallよりわずかに大きいが、性能は向上"
+    "message": "e5-smallよりわずかに大きいが、性能は向上",
+    "description": "Description for medium model option"
   },
   "multilingualModelDescription": {
-    "message": "多言語対応セマンティックモデル"
+    "message": "多言語対応セマンティックモデル",
+    "description": "Description for multilingual model option"
   },
   "fastPerformance": {
-    "message": "高速"
+    "message": "高速",
+    "description": "Fast performance indicator"
   },
   "balancedPerformance": {
-    "message": "バランス"
+    "message": "バランス",
+    "description": "Balanced performance indicator"
   },
   "accuratePerformance": {
-    "message": "高精度"
+    "message": "高精度",
+    "description": "Accurate performance indicator"
   },
   "networkErrorMessage": {
-    "message": "ネットワーク接続エラーです。ネットワークを確認して再試行してください"
+    "message": "ネットワーク接続エラーです。ネットワークを確認して再試行してください",
+    "description": "Network connection error message"
   },
   "modelCorruptedErrorMessage": {
-    "message": "モデルファイルが破損しているか不完全です。再ダウンロードしてください"
+    "message": "モデルファイルが破損しているか不完全です。再ダウンロードしてください",
+    "description": "Model corruption error message"
   },
   "unknownErrorMessage": {
-    "message": "不明なエラーです。ネットワークがHuggingFaceにアクセスできるか確認してください"
+    "message": "不明なエラーです。ネットワークがHuggingFaceにアクセスできるか確認してください",
+    "description": "Unknown error fallback message"
   },
   "permissionDeniedErrorMessage": {
-    "message": "権限が拒否されました"
+    "message": "権限が拒否されました",
+    "description": "Permission denied error message"
   },
   "timeoutErrorMessage": {
-    "message": "操作がタイムアウトしました"
+    "message": "操作がタイムアウトしました",
+    "description": "Timeout error message"
   },
   "indexedPagesLabel": {
-    "message": "インデックス化されたページ"
+    "message": "インデックス化されたページ",
+    "description": "Number of indexed pages label"
   },
   "indexSizeLabel": {
-    "message": "インデックスサイズ"
+    "message": "インデックスサイズ",
+    "description": "Index size label"
   },
   "activeTabsLabel": {
-    "message": "アクティブなタブ"
+    "message": "アクティブなタブ",
+    "description": "Number of active tabs label"
   },
   "vectorDocumentsLabel": {
-    "message": "ベクトルドキュメント"
+    "message": "ベクトルドキュメント",
+    "description": "Number of vector documents label"
   },
   "cacheSizeLabel": {
-    "message": "キャッシュサイズ"
+    "message": "キャッシュサイズ",
+    "description": "Cache size label"
   },
   "cacheEntriesLabel": {
-    "message": "キャッシュエントリ"
+    "message": "キャッシュエントリ",
+    "description": "Number of cache entries label"
   },
   "clearAllDataButton": {
-    "message": "全データをクリア"
+    "message": "全データをクリア",
+    "description": "Clear all data button text"
   },
   "clearAllCacheButton": {
-    "message": "全キャッシュをクリア"
+    "message": "全キャッシュをクリア",
+    "description": "Clear all cache button text"
   },
   "cleanExpiredCacheButton": {
-    "message": "期限切れキャッシュをクリーンアップ"
+    "message": "期限切れキャッシュをクリーンアップ",
+    "description": "Clean expired cache button text"
   },
   "exportDataButton": {
-    "message": "データのエクスポート"
+    "message": "データのエクスポート",
+    "description": "Export data button text"
   },
   "importDataButton": {
-    "message": "データのインポート"
+    "message": "データのインポート",
+    "description": "Import data button text"
   },
   "confirmClearDataTitle": {
-    "message": "データクリアの確認"
+    "message": "データクリアの確認",
+    "description": "Clear data confirmation dialog title"
   },
   "settingsTitle": {
-    "message": "設定"
+    "message": "設定",
+    "description": "Settings dialog title"
   },
   "aboutTitle": {
-    "message": "情報"
+    "message": "情報",
+    "description": "About dialog title"
   },
   "helpTitle": {
-    "message": "ヘルプ"
+    "message": "ヘルプ",
+    "description": "Help dialog title"
   },
   "clearDataWarningMessage": {
-    "message": "この操作は、インデックス化されたすべてのウェブページコンテンツとベクトルデータをクリアします。これには以下が含まれます："
+    "message": "この操作は、インデックス化されたすべてのウェブページコンテンツとベクトルデータをクリアします。これには以下が含まれます：",
+    "description": "Clear data warning message"
   },
   "clearDataList1": {
-    "message": "すべてのウェブページテキストコンテンツインデックス"
+    "message": "すべてのウェブページテキストコンテンツインデックス",
+    "description": "First item in clear data list"
   },
   "clearDataList2": {
-    "message": "ベクトル埋め込みデータ"
+    "message": "ベクトル埋め込みデータ",
+    "description": "Second item in clear data list"
   },
   "clearDataList3": {
-    "message": "検索履歴とキャッシュ"
+    "message": "検索履歴とキャッシュ",
+    "description": "Third item in clear data list"
   },
   "clearDataIrreversibleWarning": {
-    "message": "この操作は元に戻せません！クリア後、再度ウェブページを閲覧してインデックスを再構築する必要があります。"
+    "message": "この操作は元に戻せません！クリア後、再度ウェブページを閲覧してインデックスを再構築する必要があります。",
+    "description": "Irreversible operation warning"
   },
   "confirmClearButton": {
-    "message": "クリアを確認"
+    "message": "クリアを確認",
+    "description": "Confirm clear action button"
   },
   "cacheDetailsLabel": {
-    "message": "キャッシュ詳細"
+    "message": "キャッシュ詳細",
+    "description": "Cache details section label"
   },
   "noCacheDataMessage": {
-    "message": "キャッシュデータがありません"
+    "message": "キャッシュデータがありません",
+    "description": "No cache data available message"
   },
   "loadingCacheInfoStatus": {
-    "message": "キャッシュ情報を読み込み中..."
+    "message": "キャッシュ情報を読み込み中...",
+    "description": "Loading cache information status"
   },
   "processingCacheStatus": {
-    "message": "キャッシュを処理中..."
+    "message": "キャッシュを処理中...",
+    "description": "Processing cache status"
   },
   "expiredLabel": {
-    "message": "期限切れ"
+    "message": "期限切れ",
+    "description": "Expired item label"
   },
   "bookmarksBarLabel": {
-    "message": "ブックマークバー"
+    "message": "ブックマークバー",
+    "description": "Bookmarks bar folder name"
   },
   "newTabLabel": {
-    "message": "新しいタブ"
+    "message": "新しいタブ",
+    "description": "New tab label"
   },
   "currentPageLabel": {
-    "message": "現在のページ"
+    "message": "現在のページ",
+    "description": "Current page label"
   },
   "menuLabel": {
-    "message": "メニュー"
+    "message": "メニュー",
+    "description": "Menu accessibility label"
   },
   "navigationLabel": {
-    "message": "ナビゲーション"
+    "message": "ナビゲーション",
+    "description": "Navigation accessibility label"
   },
   "mainContentLabel": {
-    "message": "メインコンテンツ"
+    "message": "メインコンテンツ",
+    "description": "Main content accessibility label"
   },
   "languageSelectorLabel": {
-    "message": "言語"
+    "message": "言語",
+    "description": "Language selector label"
   },
   "themeLabel": {
-    "message": "テーマ"
+    "message": "テーマ",
+    "description": "Theme selector label"
   },
   "lightTheme": {
-    "message": "ライト"
+    "message": "ライト",
+    "description": "Light theme option"
   },
   "darkTheme": {
-    "message": "ダーク"
+    "message": "ダーク",
+    "description": "Dark theme option"
   },
   "autoTheme": {
-    "message": "自動"
+    "message": "自動",
+    "description": "Auto theme option"
   },
   "advancedSettingsLabel": {
-    "message": "詳細設定"
+    "message": "詳細設定",
+    "description": "Advanced settings section label"
   },
   "debugModeLabel": {
-    "message": "デバッグモード"
+    "message": "デバッグモード",
+    "description": "Debug mode toggle label"
   },
   "verboseLoggingLabel": {
-    "message": "詳細ロギング"
+    "message": "詳細ロギング",
+    "description": "Verbose logging toggle label"
   },
   "successNotification": {
-    "message": "操作が正常に完了しました"
+    "message": "操作が正常に完了しました",
+    "description": "Generic success notification"
   },
   "warningNotification": {
-    "message": "警告：続行する前に確認してください"
+    "message": "警告：続行する前に確認してください",
+    "description": "Generic warning notification"
   },
   "infoNotification": {
-    "message": "情報"
+    "message": "情報",
+    "description": "Generic info notification"
   },
   "configCopiedNotification": {
-    "message": "設定がクリップボードにコピーされました"
+    "message": "設定がクリップボードにコピーされました",
+    "description": "Configuration copied success message"
   },
   "dataClearedNotification": {
-    "message": "データが正常にクリアされました"
+    "message": "データが正常にクリアされました",
+    "description": "Data cleared success message"
   },
   "bytesUnit": {
-    "message": "バイト"
+    "message": "バイト",
+    "description": "Bytes unit"
   },
   "kilobytesUnit": {
-    "message": "KB"
+    "message": "KB",
+    "description": "Kilobytes unit"
   },
   "megabytesUnit": {
-    "message": "MB"
+    "message": "MB",
+    "description": "Megabytes unit"
   },
   "gigabytesUnit": {
-    "message": "GB"
+    "message": "GB",
+    "description": "Gigabytes unit"
   },
   "itemsUnit": {
-    "message": "項目"
+    "message": "項目",
+    "description": "Items count unit"
   },
   "pagesUnit": {
-    "message": "ページ"
+    "message": "ページ",
+    "description": "Pages count unit"
+  },
+  "userscriptsManagerTitle": {
+    "message": "ユーザースクリプトマネージャー",
+    "description": "Options page title"
+  },
+  "emergencySwitchLabel": {
+    "message": "緊急停止スイッチ",
+    "description": "Global disable switch"
+  },
+  "createRunSectionTitle": {
+    "message": "作成 / 実行",
+    "description": "Create & run section title"
+  },
+  "nameLabel": {
+    "message": "名前",
+    "description": "Name input label"
+  },
+  "runAtLabel": {
+    "message": "実行タイミング",
+    "description": "runAt select label"
+  },
+  "runAtAuto": {
+    "message": "自動",
+    "description": "runAt auto"
+  },
+  "runAtDocumentStart": {
+    "message": "document_start",
+    "description": "runAt document_start"
+  },
+  "runAtDocumentEnd": {
+    "message": "document_end",
+    "description": "runAt document_end"
+  },
+  "runAtDocumentIdle": {
+    "message": "document_idle",
+    "description": "runAt document_idle"
+  },
+  "worldLabel": {
+    "message": "実行環境",
+    "description": "world select label"
+  },
+  "worldAuto": {
+    "message": "自動",
+    "description": "world auto"
+  },
+  "worldIsolated": {
+    "message": "ISOLATED",
+    "description": "ISOLATED world"
+  },
+  "worldMain": {
+    "message": "MAIN",
+    "description": "MAIN world"
+  },
+  "modeLabel": {
+    "message": "モード",
+    "description": "mode select label"
+  },
+  "modeAuto": {
+    "message": "自動",
+    "description": "mode auto"
+  },
+  "modePersistent": {
+    "message": "永続",
+    "description": "mode persistent"
+  },
+  "modeCss": {
+    "message": "CSS",
+    "description": "mode css"
+  },
+  "modeOnce": {
+    "message": "1回のみ",
+    "description": "mode once"
+  },
+  "allFramesLabel": {
+    "message": "すべてのフレーム",
+    "description": "allFrames checkbox"
+  },
+  "persistLabel": {
+    "message": "永続化",
+    "description": "persist checkbox"
+  },
+  "dnrFallbackLabel": {
+    "message": "DNRフォールバック",
+    "description": "dnr fallback checkbox"
+  },
+  "matchesInputLabel": {
+    "message": "マッチ (カンマ区切り)",
+    "description": "matches input"
+  },
+  "excludesInputLabel": {
+    "message": "除外 (カンマ区切り)",
+    "description": "excludes input"
+  },
+  "tagsInputLabel": {
+    "message": "タグ (カンマ区切り)",
+    "description": "tags input"
+  },
+  "scriptLabel": {
+    "message": "スクリプト",
+    "description": "script textarea label"
+  },
+  "applyButton": {
+    "message": "適用",
+    "description": "apply button"
+  },
+  "runOnceButton": {
+    "message": "1回実行 (CDP)",
+    "description": "run once button"
+  },
+  "listSectionTitle": {
+    "message": "一覧",
+    "description": "list section title"
+  },
+  "queryLabel": {
+    "message": "検索",
+    "description": "query input label"
+  },
+  "statusAll": {
+    "message": "すべて",
+    "description": "status all"
+  },
+  "statusEnabled": {
+    "message": "有効",
+    "description": "status enabled"
+  },
+  "statusDisabled": {
+    "message": "無効",
+    "description": "status disabled"
+  },
+  "domainLabel": {
+    "message": "ドメイン",
+    "description": "domain filter label"
+  },
+  "exportAllButton": {
+    "message": "すべてエクスポート",
+    "description": "export button"
+  },
+  "tableHeaderName": {
+    "message": "名前",
+    "description": "table header name"
+  },
+  "tableHeaderWorld": {
+    "message": "実行環境",
+    "description": "table header world"
+  },
+  "tableHeaderRunAt": {
+    "message": "実行タイミング",
+    "description": "table header runAt"
+  },
+  "tableHeaderUpdated": {
+    "message": "更新日時",
+    "description": "table header updated"
+  },
+  "deleteButton": {
+    "message": "削除",
+    "description": "delete button"
+  },
+  "placeholderOptional": {
+    "message": "任意",
+    "description": "generic optional placeholder"
+  },
+  "placeholderMatchesExample": {
+    "message": "例: https://*.example.com/*",
+    "description": "matches example placeholder"
+  },
+  "placeholderScriptHint": {
+    "message": "ここにJS/CSS/TMを貼り付け",
+    "description": "script textarea placeholder"
+  },
+  "placeholderDomainHint": {
+    "message": "example.com",
+    "description": "domain filter placeholder"
   }
 }

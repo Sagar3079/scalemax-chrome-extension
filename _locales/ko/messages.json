@@ -1,15 +1,15 @@
 {
   "extensionName": {
-    "message": "chrome-mcp-server",
-    "description": "확장 프로그램 이름"
+    "message": "Scalemax Official",
+    "description": "Extension name"
   },
   "extensionDescription": {
-    "message": "크롬 브라우저와 연동하여 브라우저 기능을 제어하는 MCP 서버입니다.",
-    "description": "확장 프로그램 설명"
+    "message": "Scalemax Official — 브라우저 전용 AI 에이전트. 자신의 OpenAI 호환 LLM을 연결하여 브라우저에서 작업하게 하세요.",
+    "description": "Extension description"
   },
   "nativeServerConfigLabel": {
-    "message": "네이티브 서버 설정",
-    "description": "네이티브 서버 설정의 주 섹션 제목"
+    "message": "로컬 연결",
+    "description": "Main section header for local connection settings"
   },
   "semanticEngineLabel": {
     "message": "시맨틱 엔진",
@@ -73,7 +73,7 @@
     "placeholders": {
       "port": {
         "content": "$1",
-        "example": "12306"
+        "example": "8080"
       }
     }
   },
@@ -86,8 +86,8 @@
     "description": "연결되었지만 서비스가 시작되지 않은 상태"
   },
   "mcpServerConfigLabel": {
-    "message": "MCP 서버 설정",
-    "description": "MCP 서버 설정 섹션 레이블"
+    "message": "고급 연결 설정",
+    "description": "Advanced connection settings section label"
   },
   "connectionPortLabel": {
     "message": "연결 포트",
@@ -442,5 +442,177 @@
   "pagesUnit": {
     "message": "페이지",
     "description": "페이지 수 단위"
+  },
+  "userscriptsManagerTitle": {
+    "message": "사용자 스크립트 관리자",
+    "description": "Options page title"
+  },
+  "emergencySwitchLabel": {
+    "message": "긴급 스위치",
+    "description": "Global disable switch"
+  },
+  "createRunSectionTitle": {
+    "message": "생성 / 실행",
+    "description": "Create & run section title"
+  },
+  "nameLabel": {
+    "message": "이름",
+    "description": "Name input label"
+  },
+  "runAtLabel": {
+    "message": "실행 시점",
+    "description": "runAt select label"
+  },
+  "runAtAuto": {
+    "message": "자동",
+    "description": "runAt auto"
+  },
+  "runAtDocumentStart": {
+    "message": "document_start",
+    "description": "runAt document_start"
+  },
+  "runAtDocumentEnd": {
+    "message": "document_end",
+    "description": "runAt document_end"
+  },
+  "runAtDocumentIdle": {
+    "message": "document_idle",
+    "description": "runAt document_idle"
+  },
+  "worldLabel": {
+    "message": "실행 환경",
+    "description": "world select label"
+  },
+  "worldAuto": {
+    "message": "자동",
+    "description": "world auto"
+  },
+  "worldIsolated": {
+    "message": "ISOLATED",
+    "description": "ISOLATED world"
+  },
+  "worldMain": {
+    "message": "MAIN",
+    "description": "MAIN world"
+  },
+  "modeLabel": {
+    "message": "모드",
+    "description": "mode select label"
+  },
+  "modeAuto": {
+    "message": "자동",
+    "description": "mode auto"
+  },
+  "modePersistent": {
+    "message": "영구",
+    "description": "mode persistent"
+  },
+  "modeCss": {
+    "message": "CSS",
+    "description": "mode css"
+  },
+  "modeOnce": {
+    "message": "1회",
+    "description": "mode once"
+  },
+  "allFramesLabel": {
+    "message": "모든 프레임",
+    "description": "allFrames checkbox"
+  },
+  "persistLabel": {
+    "message": "유지",
+    "description": "persist checkbox"
+  },
+  "dnrFallbackLabel": {
+    "message": "DNR 대체",
+    "description": "dnr fallback checkbox"
+  },
+  "matchesInputLabel": {
+    "message": "일치 패턴 (쉼표로 구분)",
+    "description": "matches input"
+  },
+  "excludesInputLabel": {
+    "message": "제외 패턴 (쉼표로 구분)",
+    "description": "excludes input"
+  },
+  "tagsInputLabel": {
+    "message": "태그 (쉼표로 구분)",
+    "description": "tags input"
+  },
+  "scriptLabel": {
+    "message": "스크립트",
+    "description": "script textarea label"
+  },
+  "applyButton": {
+    "message": "적용",
+    "description": "apply button"
+  },
+  "runOnceButton": {
+    "message": "한 번 실행 (CDP)",
+    "description": "run once button"
+  },
+  "listSectionTitle": {
+    "message": "목록",
+    "description": "list section title"
+  },
+  "queryLabel": {
+    "message": "검색어",
+    "description": "query input label"
+  },
+  "statusAll": {
+    "message": "전체",
+    "description": "status all"
+  },
+  "statusEnabled": {
+    "message": "활성화됨",
+    "description": "status enabled"
+  },
+  "statusDisabled": {
+    "message": "비활성화됨",
+    "description": "status disabled"
+  },
+  "domainLabel": {
+    "message": "도메인",
+    "description": "domain filter label"
+  },
+  "exportAllButton": {
+    "message": "모두 내보내기",
+    "description": "export button"
+  },
+  "tableHeaderName": {
+    "message": "이름",
+    "description": "table header name"
+  },
+  "tableHeaderWorld": {
+    "message": "실행 환경",
+    "description": "table header world"
+  },
+  "tableHeaderRunAt": {
+    "message": "실행 시점",
+    "description": "table header runAt"
+  },
+  "tableHeaderUpdated": {
+    "message": "업데이트됨",
+    "description": "table header updated"
+  },
+  "deleteButton": {
+    "message": "삭제",
+    "description": "delete button"
+  },
+  "placeholderOptional": {
+    "message": "선택 사항",
+    "description": "generic optional placeholder"
+  },
+  "placeholderMatchesExample": {
+    "message": "예: https://*.example.com/*",
+    "description": "matches example placeholder"
+  },
+  "placeholderScriptHint": {
+    "message": "여기에 JS/CSS/TM 붙여넣기",
+    "description": "script textarea placeholder"
+  },
+  "placeholderDomainHint": {
+    "message": "example.com",
+    "description": "domain filter placeholder"
   }
 }

@@ -188,9 +188,16 @@
     }
     const parentLabel = el.closest('label');
     if (parentLabel) return parentLabel.textContent?.trim() || '';
+    // Never surface secret field values (passwords / OTP codes).
+    const sensitive =
+      el.tagName === 'INPUT' &&
+      (String(el.type || '').toLowerCase() === 'password' ||
+        /(^|\s)(current-password|new-password|one-time-code)(\s|$)/i.test(
+          el.getAttribute('autocomplete') || '',
+        ));
     return (
       el.getAttribute('placeholder') ||
-      el.getAttribute('value') ||
+      (sensitive ? '' : el.getAttribute('value')) ||
       el.textContent?.trim() ||
       el.getAttribute('title') ||
       ''

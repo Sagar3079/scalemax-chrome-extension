@@ -19,8 +19,8 @@
   const REF_MAP_LIMIT = 1000; // limit size of the ref map to keep payload small
 
   // Keep a weak map from ref id to elements
-  if (!window.__claudeElementMap) window.__claudeElementMap = {};
-  if (!window.__claudeRefCounter) window.__claudeRefCounter = 0;
+  if (!window.__scalemaxElementMap) window.__scalemaxElementMap = {};
+  if (!window.__scalemaxRefCounter) window.__scalemaxRefCounter = 0;
 
   // --- Ref epoch ------------------------------------------------------------
   // The ref map and counter live on `window`, so a navigation wipes the map and
@@ -30,8 +30,8 @@
   // ref to a per-document epoch token makes that mismatch detectable, so we can
   // tell the caller "the page navigated, re-read it" instead of acting blindly.
   // Note: crypto.randomUUID is only available in secure contexts, hence the fallback.
-  window.__claudeRefEpoch =
-    window.__claudeRefEpoch ||
+  window.__scalemaxRefEpoch =
+    window.__scalemaxRefEpoch ||
     (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
       ? crypto.randomUUID().slice(0, 8)
       : String(Date.now()).slice(-8));
@@ -41,7 +41,7 @@
    * @returns {string}
    */
   function mintRefId() {
-    return `ref_${window.__claudeRefEpoch}_${++window.__claudeRefCounter}`;
+    return `ref_${window.__scalemaxRefEpoch}_${++window.__scalemaxRefCounter}`;
   }
 
   /**
@@ -66,7 +66,7 @@
    */
   function refMissError(ref) {
     const epoch = refEpochOf(ref);
-    if (epoch && epoch !== window.__claudeRefEpoch) {
+    if (epoch && epoch !== window.__scalemaxRefEpoch) {
       return `ref "${ref}" is from a previous page load (the page navigated). Call chrome_read_page again to get fresh refs.`;
     }
     return `ref "${ref}" not found or expired`;
@@ -150,7 +150,14 @@
       const type = input.getAttribute('type') || '';
       const val = input.getAttribute('value');
       if (type === 'submit' && val && val.trim()) return val.trim();
-      if (input.value && input.value.length < 50 && input.value.trim()) return input.value.trim();
+      // Never surface secret field values (passwords / OTP codes) in the tree.
+      const sensitive =
+        String(input.type || type).toLowerCase() === 'password' ||
+        /(^|\s)(current-password|new-password|one-time-code)(\s|$)/i.test(
+          input.getAttribute('autocomplete') || '',
+        );
+      if (!sensitive && input.value && input.value.length < 50 && input.value.trim())
+        return input.value.trim();
     }
     if (['button', 'a', 'summary'].includes(tag)) {
       let text = '';
@@ -592,15 +599,15 @@
       const role = inferRole(el);
       let label = inferLabel(el);
       let refId = null;
-      for (const k in window.__claudeElementMap) {
-        if (window.__claudeElementMap[k].deref && window.__claudeElementMap[k].deref() === el) {
+      for (const k in window.__scalemaxElementMap) {
+        if (window.__scalemaxElementMap[k].deref && window.__scalemaxElementMap[k].deref() === el) {
           refId = k;
           break;
         }
       }
       if (!refId) {
         refId = mintRefId();
-        window.__claudeElementMap[refId] = new WeakRef(el);
+        window.__scalemaxElementMap[refId] = new WeakRef(el);
       }
       const rect = /** @type {HTMLElement} */ (el).getBoundingClientRect();
       const cx = Math.round(rect.left + rect.width / 2);
@@ -705,9 +712,9 @@
       }
 
       if (root) traverse(root, 0, cfg, out, refMap, state);
-      for (const k in window.__claudeElementMap) {
-        if (!window.__claudeElementMap[k].deref || !window.__claudeElementMap[k].deref())
-          delete window.__claudeElementMap[k];
+      for (const k in window.__scalemaxElementMap) {
+        if (!window.__scalemaxElementMap[k].deref || !window.__scalemaxElementMap[k].deref())
+          delete window.__scalemaxElementMap[k];
       }
       const pageContent = out
         .filter((line) => !/^\s*- generic \[ref=ref_\d+\]$/.test(line))
@@ -754,7 +761,7 @@
   }
 
   function resolveRef(ref) {
-    const map = window.__claudeElementMap || {};
+    const map = window.__scalemaxElementMap || {};
     const weak = map[ref];
     return weak && typeof weak.deref === 'function' ? weak.deref() : null;
   }
@@ -787,6 +794,68 @@
     };
   }
 
+  // ============================================================================
+  // Cross-frame bridge auth
+  // ============================================================================
+  // Frame-to-frame requests travel over window.postMessage, which page scripts can also
+  // send. The requesting helper therefore mints a one-time token in chrome.storage.local
+  // (readable only by extension contexts), bound to the target frame's id; the receiving
+  // helper consumes it before acting, so pages cannot forge bridge requests.
+  const BRIDGE_TOKEN_PREFIX = '__scalemax_fb_';
+  const BRIDGE_TOKEN_TTL_MS = 15000;
+
+  function bridgeFrameId(target) {
+    try {
+      const id = chrome.runtime.getFrameId(target);
+      return typeof id === 'number' && id >= 0 ? id : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function mintBridgeToken(targetWindow) {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    const token = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    await chrome.storage.local.set({
+      [BRIDGE_TOKEN_PREFIX + token]: {
+        fid: bridgeFrameId(targetWindow),
+        exp: Date.now() + BRIDGE_TOKEN_TTL_MS,
+      },
+    });
+    setTimeout(() => {
+      try {
+        chrome.storage.local.remove(BRIDGE_TOKEN_PREFIX + token);
+      } catch {}
+    }, BRIDGE_TOKEN_TTL_MS);
+    return token;
+  }
+
+  async function consumeBridgeToken(token) {
+    if (typeof token !== 'string' || !/^[0-9a-f]{32}$/.test(token)) return false;
+    const key = BRIDGE_TOKEN_PREFIX + token;
+    let entry = null;
+    try {
+      entry = (await chrome.storage.local.get(key))[key];
+    } catch {
+      return false;
+    }
+    if (!entry) return false;
+    // A token minted for another frame is left in place (and ignored) rather than consumed.
+    if (typeof entry.fid === 'number') {
+      const self = bridgeFrameId(window);
+      if (self !== null && self !== entry.fid) return false;
+    }
+    try {
+      await chrome.storage.local.remove(key);
+    } catch {}
+    return entry.exp > Date.now();
+  }
+
+  function bridgeReplyOrigin(ev) {
+    return ev && ev.origin && ev.origin !== 'null' ? ev.origin : '*';
+  }
+
   function forwardHoverRefToChildren(ref) {
     return new Promise((resolve) => {
       const frames = Array.from(document.querySelectorAll('iframe, frame'));
@@ -795,22 +864,43 @@
         return;
       }
       const reqId = `hover_ref_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+      const windows = new Set();
+      let pending = 0;
+      let lastFailure = null;
+      let done = false;
+      const finish = (result) => {
+        if (done) return;
+        done = true;
+        window.removeEventListener('message', listener, true);
+        resolve(result);
+      };
       const listener = (ev) => {
         const data = ev?.data;
         if (!data || data.type !== 'rr-bridge-hover-ref-result' || data.reqId !== reqId) return;
-        window.removeEventListener('message', listener, true);
-        resolve(data.result);
+        if (!windows.has(ev.source)) return;
+        windows.delete(ev.source);
+        const result = data.result && typeof data.result === 'object' ? data.result : null;
+        if (result && result.success) return finish(result);
+        lastFailure = result || lastFailure;
+        if (--pending <= 0) finish(lastFailure || { success: false, error: `ref "${ref}" not found in child frames` });
       };
       window.addEventListener('message', listener, true);
       setTimeout(() => {
-        window.removeEventListener('message', listener, true);
-        resolve({ success: false, error: `ref "${ref}" not found in child frames` });
+        finish(lastFailure || { success: false, error: `ref "${ref}" not found in child frames` });
       }, 1500);
       for (const frame of frames) {
-        try {
-          frame.contentWindow?.postMessage({ type: 'rr-bridge-hover-ref', reqId, ref }, '*');
-        } catch {}
+        const cw = frame.contentWindow;
+        if (!cw) continue;
+        windows.add(cw);
+        pending++;
+        mintBridgeToken(cw)
+          .then((token) => cw.postMessage({ type: 'rr-bridge-hover-ref', reqId, ref, token }, '*'))
+          .catch(() => {
+            windows.delete(cw);
+            if (--pending <= 0) finish(lastFailure || { success: false, error: `ref "${ref}" not found in child frames` });
+          });
       }
+      if (!pending) finish({ success: false, error: `ref "${ref}" not found` });
     });
   }
 
@@ -846,7 +936,7 @@
               boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
             });
             const title = document.createElement('div');
-            title.textContent = 'Record-Replay 运行日志';
+            title.textContent = 'Record-Replay run log';
             Object.assign(title.style, { fontWeight: 'bold', marginBottom: '6px' });
             const body = document.createElement('div');
             body.id = '__rr_overlay_body';
@@ -896,7 +986,7 @@
             pointerEvents: 'none',
           });
           const tip = document.createElement('div');
-          tip.textContent = '点击选取元素（Esc 取消）';
+          tip.textContent = 'Click to pick an element (Esc to cancel)';
           Object.assign(tip.style, {
             position: 'fixed',
             top: '10px',
@@ -1036,15 +1126,15 @@
             }
             // create ref
             try {
-              if (!window.__claudeElementMap) window.__claudeElementMap = {};
-              if (!window.__claudeRefCounter) window.__claudeRefCounter = 0;
+              if (!window.__scalemaxElementMap) window.__scalemaxElementMap = {};
+              if (!window.__scalemaxRefCounter) window.__scalemaxRefCounter = 0;
             } catch {}
             let refId = null;
             try {
-              for (const k in window.__claudeElementMap) {
+              for (const k in window.__scalemaxElementMap) {
                 if (
-                  window.__claudeElementMap[k].deref &&
-                  window.__claudeElementMap[k].deref() === el
+                  window.__scalemaxElementMap[k].deref &&
+                  window.__scalemaxElementMap[k].deref() === el
                 ) {
                   refId = k;
                   break;
@@ -1052,7 +1142,7 @@
               }
               if (!refId) {
                 refId = mintRefId();
-                window.__claudeElementMap[refId] = new WeakRef(el);
+                window.__scalemaxElementMap[refId] = new WeakRef(el);
               }
             } catch {}
             const cands = computeCandidates(el);
@@ -1200,18 +1290,31 @@
                 }, BRIDGE_TIMEOUT_MS);
 
                 window.addEventListener('message', listener, true);
-                cw.postMessage(
-                  {
-                    type: 'rr-bridge-ensure-ref',
-                    reqId,
-                    selector: innerSel,
-                    useText: !!request.useText,
-                    isXPath: !!request.isXPath,
-                    tagName: String(request.tagName || ''),
-                    allowMultiple: !!request.allowMultiple,
-                  },
-                  '*',
-                );
+                mintBridgeToken(cw)
+                  .then((token) =>
+                    cw.postMessage(
+                      {
+                        type: 'rr-bridge-ensure-ref',
+                        reqId,
+                        token,
+                        selector: innerSel,
+                        useText: !!request.useText,
+                        isXPath: !!request.isXPath,
+                        tagName: String(request.tagName || ''),
+                        allowMultiple: !!request.allowMultiple,
+                      },
+                      '*',
+                    ),
+                  )
+                  .catch((e) => {
+                    if (responded) return;
+                    responded = true;
+                    cleanup();
+                    sendResponse({
+                      success: false,
+                      error: 'iframe bridge unavailable: ' + String(e && e.message ? e.message : e),
+                    });
+                  });
                 return true; // async response via message bridge
               }
             } catch (e) {
@@ -1352,15 +1455,15 @@
             return true;
           }
           let refId = null;
-          for (const k in window.__claudeElementMap) {
-            if (window.__claudeElementMap[k].deref && window.__claudeElementMap[k].deref() === el) {
+          for (const k in window.__scalemaxElementMap) {
+            if (window.__scalemaxElementMap[k].deref && window.__scalemaxElementMap[k].deref() === el) {
               refId = k;
               break;
             }
           }
           if (!refId) {
             refId = mintRefId();
-            window.__claudeElementMap[refId] = new WeakRef(el);
+            window.__scalemaxElementMap[refId] = new WeakRef(el);
           }
           const rect = /** @type {HTMLElement} */ (el).getBoundingClientRect();
           sendResponse({
@@ -1434,7 +1537,7 @@
               if (!key) continue;
               const label = v.label || key;
               const def = v.default || '';
-              const promptText = `请输入参数 ${label} (${key})`;
+              const promptText = `Enter value for ${label} (${key})`;
               let val = window.prompt(promptText, def);
               if (typeof val !== 'string') val = def;
               values[key] = val;
@@ -1469,14 +1572,14 @@
             fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
           });
           const title = document.createElement('div');
-          title.textContent = '请输入回放参数';
+          title.textContent = 'Enter replay parameters';
           Object.assign(title.style, { fontSize: '16px', fontWeight: '600', marginBottom: '12px' });
           const form = document.createElement('form');
           for (const v of vars) {
             const row = document.createElement('div');
             Object.assign(row.style, { marginBottom: '10px' });
             const label = document.createElement('label');
-            label.textContent = `${v.label || v.key}${v.sensitive ? ' (敏感)' : ''}`;
+            label.textContent = `${v.label || v.key}${v.sensitive ? ' (sensitive)' : ''}`;
             Object.assign(label.style, {
               display: 'block',
               marginBottom: '6px',
@@ -1502,7 +1605,7 @@
           Object.assign(actions.style, { display: 'flex', gap: '8px', marginTop: '12px' });
           const ok = document.createElement('button');
           ok.type = 'submit';
-          ok.textContent = '确定';
+          ok.textContent = 'OK';
           Object.assign(ok.style, {
             background: '#0969da',
             color: '#fff',
@@ -1513,7 +1616,7 @@
           });
           const cancel = document.createElement('button');
           cancel.type = 'button';
-          cancel.textContent = '取消';
+          cancel.textContent = 'Cancel';
           Object.assign(cancel.style, {
             background: '#f3f4f6',
             color: '#111',
@@ -1557,7 +1660,7 @@
       if (request && request.action === 'resolveRef') {
         const ref = request.ref;
         try {
-          const map = window.__claudeElementMap;
+          const map = window.__scalemaxElementMap;
           const weak = map && map[ref];
           const el = weak && typeof weak.deref === 'function' ? weak.deref() : null;
           if (!el || !(el instanceof Element)) {
@@ -1648,7 +1751,7 @@
             sendResponse({ success: false, error: 'ref and fingerprint are required' });
             return true;
           }
-          const map = window.__claudeElementMap;
+          const map = window.__scalemaxElementMap;
           const weak = map && map[ref];
           const el = weak && typeof weak.deref === 'function' ? weak.deref() : null;
           if (!el || !(el instanceof Element)) {
@@ -1684,7 +1787,7 @@
       if (request && request.action === 'focusByRef') {
         try {
           const ref = String(request.ref || '');
-          const map = window.__claudeElementMap || {};
+          const map = window.__scalemaxElementMap || {};
           const weak = map[ref];
           const el = weak && typeof weak.deref === 'function' ? weak.deref() : null;
           if (!el || !(el instanceof Element)) {
@@ -1717,10 +1820,8 @@
 
   console.log('Accessibility tree helper script loaded');
   // Cross-frame bridge: child listens for ensure-ref requests from parent (composite selector)
-  try {
-    window.addEventListener(
-      'message',
-      (ev) => {
+  // Requests must come from the parent window and carry a valid one-time bridge token.
+  function handleBridgeRequest(ev) {
         try {
           const data = ev && ev.data;
           // Handle hover-ref bridge requests from parent frame
@@ -1729,7 +1830,7 @@
               .then((result) => {
                 ev.source?.postMessage(
                   { type: 'rr-bridge-hover-ref-result', reqId: data.reqId, result },
-                  '*',
+                  bridgeReplyOrigin(ev),
                 );
               })
               .catch((error) => {
@@ -1739,7 +1840,7 @@
                     reqId: data.reqId,
                     result: { success: false, error: error?.message || String(error) },
                   },
-                  '*',
+                  bridgeReplyOrigin(ev),
                 );
               });
             return;
@@ -1751,7 +1852,7 @@
               ev.source &&
                 ev.source.postMessage(
                   { type: 'rr-bridge-ensure-ref-result', reqId, ...payload },
-                  '*',
+                  bridgeReplyOrigin(ev),
                 );
             } catch {}
           };
@@ -1875,11 +1976,11 @@
               respond({ success: false, error: 'Element not found in child frame' });
               return;
             }
-            if (!window.__claudeElementMap) window.__claudeElementMap = {};
-            if (!window.__claudeRefCounter) window.__claudeRefCounter = 0;
+            if (!window.__scalemaxElementMap) window.__scalemaxElementMap = {};
+            if (!window.__scalemaxRefCounter) window.__scalemaxRefCounter = 0;
             let refId = null;
-            for (const k in window.__claudeElementMap) {
-              const w = window.__claudeElementMap[k];
+            for (const k in window.__scalemaxElementMap) {
+              const w = window.__scalemaxElementMap[k];
               if (w && typeof w.deref === 'function' && w.deref && w.deref() === el) {
                 refId = k;
                 break;
@@ -1887,7 +1988,7 @@
             }
             if (!refId) {
               refId = mintRefId();
-              window.__claudeElementMap[refId] = new WeakRef(el);
+              window.__scalemaxElementMap[refId] = new WeakRef(el);
             }
             const rect = el.getBoundingClientRect();
             respond({
@@ -1902,6 +2003,22 @@
           } catch (e) {
             respond({ success: false, error: String(e && e.message ? e.message : e) });
           }
+        } catch {}
+  }
+  try {
+    window.addEventListener(
+      'message',
+      (ev) => {
+        try {
+          const data = ev && ev.data;
+          if (!data || (data.type !== 'rr-bridge-hover-ref' && data.type !== 'rr-bridge-ensure-ref'))
+            return;
+          if (window.parent === window || ev.source !== window.parent) return;
+          consumeBridgeToken(data.token)
+            .then((ok) => {
+              if (ok) handleBridgeRequest(ev);
+            })
+            .catch(() => {});
         } catch {}
       },
       true,

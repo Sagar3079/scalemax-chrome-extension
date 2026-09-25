@@ -525,7 +525,7 @@ var Se = /* @__PURE__ */ Z(/* @__PURE__ */ defineComponent({
 						X.value = !1;
 					}, 1e3);
 				} catch (t) {
-					console.error("复制失败:", t);
+					console.error("Copy failed:", t);
 				}
 			});
 		}

@@ -713,7 +713,7 @@ function useAgentProjects(options) {
 				}
 				let allowCreate = false;
 				if (validation.needsCreation) {
-					if (!confirm(`目录 "${validation.absolute}" 不存在，是否创建？\n\nThe directory "${validation.absolute}" does not exist. Create it?`)) return null;
+					if (!confirm(`The directory "${validation.absolute}" does not exist. Create it?`)) return null;
 					allowCreate = true;
 				}
 				const url = `http://127.0.0.1:${serverPort}/agent/projects`;
@@ -898,7 +898,7 @@ function useAgentProjects(options) {
 				const normalizedPath = normalizePathForComparison(validation.absolute);
 				const existingProject = projects.value.find((p) => normalizePathForComparison(p.rootPath) === normalizedPath);
 				if (existingProject) {
-					if (confirm(`目录 "${validation.absolute}" 已存在对应的项目：${existingProject.name}\n\n是否切换到该项目？\n\nA project already exists for "${validation.absolute}": ${existingProject.name}\nSwitch to that project?`)) {
+					if (confirm(`A project already exists for "${validation.absolute}": ${existingProject.name}\nSwitch to that project?`)) {
 						selectedProjectId.value = existingProject.id;
 						yield saveSelectedProjectId();
 						yield loadChatHistory(existingProject.id);
@@ -908,7 +908,7 @@ function useAgentProjects(options) {
 				}
 				let allowCreate = false;
 				if (validation.needsCreation) {
-					if (!confirm(`目录 "${validation.absolute}" 不存在，是否创建？\n\nThe directory "${validation.absolute}" does not exist. Create it?`)) return null;
+					if (!confirm(`The directory "${validation.absolute}" does not exist. Create it?`)) return null;
 					allowCreate = true;
 				}
 				const url = `http://127.0.0.1:${serverPort}/agent/projects`;
@@ -17815,7 +17815,7 @@ var De = /* @__PURE__ */ Z(/* @__PURE__ */ defineComponent({
 			onClick: s
 		}, [createBaseVNode("span", {
 			href: t,
-			title: `查看脚注 ${e.node.id}`,
+			title: `View footnote ${e.node.id}`,
 			class: "footnote-link cursor-pointer"
 		}, "[" + toDisplayString(e.node.id) + "]", 9, $r)], 8, Ir));
 	}
@@ -18779,7 +18779,7 @@ var cn = /* @__PURE__ */ Z(/* @__PURE__ */ defineComponent({
 		return (s, a) => (openBlock(), createElementBlock("a", {
 			class: "footnote-anchor text-sm text-[#0366d6] hover:underline cursor-pointer",
 			href: `#fnref-${e.node.id}`,
-			title: `返回引用 ${e.node.id}`,
+			title: `Back to reference ${e.node.id}`,
 			onClick: t
 		}, " ↩︎ ", 8, ga));
 	}
@@ -24201,7 +24201,7 @@ var _hoisted_22$5 = {
 };
 var _hoisted_23$5 = {
 	class: "flex items-center gap-2 cursor-pointer",
-	title: "Enable local Chrome MCP server integration"
+	title: "Enable local browser tools integration"
 };
 var _hoisted_24$5 = ["checked"];
 var _hoisted_25$5 = { class: "px-3 py-2" };
@@ -24236,7 +24236,7 @@ var AgentProjectMenu_default = /* @__PURE__ */ defineComponent({
 		"model:update",
 		"reasoning-effort:update",
 		"ccr:update",
-		"chrome-mcp:update",
+		"scalemax:update",
 		"save"
 	],
 	setup(__props, { emit: __emit }) {
@@ -24291,7 +24291,7 @@ var AgentProjectMenu_default = /* @__PURE__ */ defineComponent({
 			emit("ccr:update", event.target.checked);
 		}
 		function handleChromeMcpChange(event) {
-			emit("chrome-mcp:update", event.target.checked);
+			emit("scalemax:update", event.target.checked);
 		}
 		function handleModelChange(event) {
 			const newModel = event.target.value;
@@ -24426,7 +24426,7 @@ var AgentProjectMenu_default = /* @__PURE__ */ defineComponent({
 				}, null, 40, _hoisted_24$5), _cache[10] || (_cache[10] = createBaseVNode("span", {
 					class: "text-xs",
 					style: { color: "var(--ac-text, #1a1a1a)" }
-				}, " Enable Chrome MCP Server ", -1))])])) : createCommentVNode("", true),
+				}, " Enable browser tools ", -1))])])) : createCommentVNode("", true),
 				createBaseVNode("div", _hoisted_25$5, [createBaseVNode("button", {
 					class: "w-full px-3 py-1.5 text-xs rounded transition-colors hover:opacity-90 cursor-pointer",
 					style: {
@@ -27365,7 +27365,7 @@ var AgentChat_default = /* @__PURE__ */ defineComponent({
 					model: model.value,
 					"reasoning-effort": reasoningEffort.value,
 					"use-ccr": useCcr.value,
-					"enable-chrome-mcp": enableChromeMcp.value,
+					"enable-browser-tools": enableChromeMcp.value,
 					engines: unref(server).engines.value,
 					"is-picking": isPickingDirectory.value,
 					"is-saving": isSavingPreference.value,
@@ -27386,7 +27386,7 @@ var AgentChat_default = /* @__PURE__ */ defineComponent({
 					"model",
 					"reasoning-effort",
 					"use-ccr",
-					"enable-chrome-mcp",
+					"enable-browser-tools",
 					"engines",
 					"is-picking",
 					"is-saving",
@@ -28020,7 +28020,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 			_loadSessionList = _asyncToGenerator(function* () {
 				loadingList.value = true;
 				try {
-					const r = yield callBackground("potato_session_list");
+					const r = yield callBackground("scalemax_session_list");
 					sessions.value = r.ok ? r.sessions || [] : [];
 					if (!r.ok && r.error) errorMsg.value = r.error;
 					loadPreviews(sessions.value);
@@ -28041,7 +28041,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 					var _ref = _asyncToGenerator(function* (s) {
 						try {
 							var _r$session;
-							const firstUser = (_r$session = (yield callBackground("potato_session_get", { id: s.id })).session) === null || _r$session === void 0 ? void 0 : _r$session.messages.find((m) => m.role === "user" && m.content);
+							const firstUser = (_r$session = (yield callBackground("scalemax_session_get", { id: s.id })).session) === null || _r$session === void 0 ? void 0 : _r$session.messages.find((m) => m.role === "user" && m.content);
 							sessionPreviews.value = _objectSpread2(_objectSpread2({}, sessionPreviews.value), {}, { [s.id]: (firstUser === null || firstUser === void 0 ? void 0 : firstUser.content) ? String(firstUser.content) : "" });
 						} catch (_unused) {
 							sessionPreviews.value = _objectSpread2(_objectSpread2({}, sessionPreviews.value), {}, { [s.id]: "" });
@@ -28188,7 +28188,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 		function _loadCurrentSession() {
 			_loadCurrentSession = _asyncToGenerator(function* (id) {
 				const generation = ++sessionLoadGeneration;
-				const r = yield callBackground("potato_session_get", { id });
+				const r = yield callBackground("scalemax_session_get", { id });
 				if (disposed || generation !== sessionLoadGeneration || currentId.value !== id) return null;
 				if (r.ok) {
 					applySessionSnapshot(id, r.session || null);
@@ -28226,7 +28226,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				creating.value = true;
 				errorMsg.value = "";
 				try {
-					const r = yield callBackground("potato_session_create");
+					const r = yield callBackground("scalemax_session_create");
 					if (r.ok && r.session) {
 						yield loadSessionList();
 						yield openSession(r.session.id);
@@ -28258,7 +28258,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				const title = renameDraft.value.trim();
 				renamingId.value = null;
 				if (!title || title === s.title) return;
-				const r = yield callBackground("potato_session_rename", {
+				const r = yield callBackground("scalemax_session_rename", {
 					id: s.id,
 					title
 				});
@@ -28283,7 +28283,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 		function _confirmDelete() {
 			_confirmDelete = _asyncToGenerator(function* (id) {
 				confirmDeleteId.value = null;
-				const r = yield callBackground("potato_session_delete", {
+				const r = yield callBackground("scalemax_session_delete", {
 					id,
 					closeTab: true
 				});
@@ -28331,7 +28331,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 							stopPollingFor(sid);
 							return;
 						}
-						const r = yield callBackground("potato_session_get", { id: sid });
+						const r = yield callBackground("scalemax_session_get", { id: sid });
 						if (disposed || pollGenerations.get(sid) !== generation) return;
 						if (r.ok) {
 							applySessionSnapshot(sid, r.session || null);
@@ -28396,7 +28396,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 					var _r$result;
 					// The response channel is only a convenience. After 15s the UI detaches
 					// and follows durable session polling, so MV3 channel loss cannot freeze it.
-					const r = yield callBackground("potato_session_run", { payload }, 15000, (lateResponse) => {
+					const r = yield callBackground("scalemax_session_run", { payload }, 15000, (lateResponse) => {
 						if (!disposed) handleRunAcknowledgement(sid, lateResponse);
 					});
 					handleRunAcknowledgement(sid, r);
@@ -28471,7 +28471,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				if (!pollTimers.has(sid)) startPolling(sid);
 				let delivered = false;
 				try {
-					const r = yield callBackground("potato_session_stop", { sessionId: sid });
+					const r = yield callBackground("scalemax_session_stop", { sessionId: sid });
 					delivered = !!r.ok;
 					if (!r.ok) errorMsg.value = r.error || "Could not deliver the stop request.";
 				} catch (e) {
@@ -28516,7 +28516,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				let targetLang = "en";
 				try {
 					const settingsResp = yield new Promise((resolve) => {
-						chrome.runtime.sendMessage({ type: "potato_translate_settings_get" }, (resp) => resolve(resp || {}));
+						chrome.runtime.sendMessage({ type: "scalemax_translate_settings_get" }, (resp) => resolve(resp || {}));
 					});
 					if (settingsResp && settingsResp.ok && settingsResp.settings && settingsResp.settings.targetLang) targetLang = settingsResp.settings.targetLang;
 				} catch (_unusedSettings) {}
@@ -28616,7 +28616,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 			_loadSkills = _asyncToGenerator(function* () {
 				loadingSkills.value = true;
 				try {
-					const r = yield callBackground("potato_skill_list");
+					const r = yield callBackground("scalemax_skill_list");
 					if (r.ok) skills.value = r.skills || [];
 					else if (r.error) errorMsg.value = r.error;
 				} finally {
@@ -28660,7 +28660,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				if (!name || !task || savingSkill.value) return;
 				savingSkill.value = true;
 				try {
-					const r = yield callBackground("potato_skill_save", {
+					const r = yield callBackground("scalemax_skill_save", {
 						name,
 						task
 					});
@@ -28687,7 +28687,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 		function _confirmDeleteSkillAction() {
 			_confirmDeleteSkillAction = _asyncToGenerator(function* (sk) {
 				confirmDeleteSkillId.value = null;
-				const r = yield callBackground("potato_skill_delete", { id: sk.id });
+				const r = yield callBackground("scalemax_skill_delete", { id: sk.id });
 				if (r.ok) skills.value = skills.value.filter((s) => s.id !== sk.id);
 				else if (r.error) errorMsg.value = r.error;
 			});
@@ -28704,7 +28704,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				showSkills.value = false;
 				errorMsg.value = "";
 				try {
-					const created = yield callBackground("potato_session_create");
+					const created = yield callBackground("scalemax_session_create");
 					if (!created.ok || !created.session) {
 						errorMsg.value = created.error || "Failed to create session";
 						return;
@@ -30362,14 +30362,14 @@ var WorkflowsView_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 		*/
 		function getRunStatusText(run) {
 			if (run.status) return {
-				queued: "排队中",
-				running: "运行中",
-				paused: "已暂停",
-				succeeded: "成功",
-				failed: "失败",
-				canceled: "已取消"
+				queued: "Queued",
+				running: "Running",
+				paused: "Paused",
+				succeeded: "Succeeded",
+				failed: "Failed",
+				canceled: "Canceled"
 			}[run.status] || run.status;
-			return run.success ? "成功" : "失败";
+			return run.success ? "Succeeded" : "Failed";
 		}
 		function formatTime(dateStr) {
 			return new Date(dateStr).toLocaleString();
@@ -30551,7 +30551,7 @@ var WorkflowsView_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 									color: getRunStatusColor(run)
 								})
 							}, toDisplayString(getRunStatusText(run)), 5)) : createCommentVNode("", true)
-						]), createBaseVNode("span", _hoisted_25$1, toDisplayString(formatTime(run.startedAt)), 1)]), __props.openRunId === run.id ? (openBlock(), createElementBlock("div", _hoisted_26$1, [run.entries.length === 0 && run.status ? (openBlock(), createElementBlock("div", _hoisted_27$1, [createBaseVNode("div", _hoisted_28$1, [createBaseVNode("span", null, "状态: " + toDisplayString(getRunStatusText(run)), 1), run.finishedAt ? (openBlock(), createElementBlock("span", _hoisted_29$1, "• 耗时: " + toDisplayString(Math.round((new Date(run.finishedAt).getTime() - new Date(run.startedAt).getTime()) / 1e3)) + "s", 1)) : createCommentVNode("", true)])])) : createCommentVNode("", true), (openBlock(true), createElementBlock(Fragment, null, renderList(run.entries, (entry, idx) => {
+						]), createBaseVNode("span", _hoisted_25$1, toDisplayString(formatTime(run.startedAt)), 1)]), __props.openRunId === run.id ? (openBlock(), createElementBlock("div", _hoisted_26$1, [run.entries.length === 0 && run.status ? (openBlock(), createElementBlock("div", _hoisted_27$1, [createBaseVNode("div", _hoisted_28$1, [createBaseVNode("span", null, "Status: " + toDisplayString(getRunStatusText(run)), 1), run.finishedAt ? (openBlock(), createElementBlock("span", _hoisted_29$1, "• Duration: " + toDisplayString(Math.round((new Date(run.finishedAt).getTime() - new Date(run.startedAt).getTime()) / 1e3)) + "s", 1)) : createCommentVNode("", true)])])) : createCommentVNode("", true), (openBlock(true), createElementBlock(Fragment, null, renderList(run.entries, (entry, idx) => {
 							return openBlock(), createElementBlock("div", {
 								key: idx,
 								class: "text-xs py-1",
@@ -31076,7 +31076,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 				const u = new URL(currentUrl.value);
 				return bindings.some((b) => {
 					const bindingType = b.kind || b.type;
-					if (bindingType === "domain") return u.hostname.includes(b.value);
+					if (bindingType === "domain") return ((h, d) => h === d || h.endsWith("." + d))(u.hostname.toLowerCase(), String(b.value || "").trim().toLowerCase().replace(/^\*?\./, ""));
 					if (bindingType === "path") return u.pathname.startsWith(b.value);
 					if (bindingType === "url") return (u.href || "").startsWith(b.value);
 					return false;
@@ -31377,15 +31377,16 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			if (tabParam === "element-markers") {
 				activeTab.value = "element-markers";
 				yield loadMarkers();
-			} else if (tabParam === "agent-chat") activeTab.value = "agent-chat";
+			} else if (tabParam === "agent-chat") activeTab.value = "browser-agent";
 			else if (tabParam === "workflows") activeTab.value = "workflows";
 			else if (tabParam === "browser-agent") activeTab.value = "browser-agent";
 			try {
-				const wanted = (yield chrome.storage.local.get("potato_sidepanel_tab"))["potato_sidepanel_tab"];
+				const wanted = (yield chrome.storage.local.get("scalemax_sidepanel_tab"))["scalemax_sidepanel_tab"];
 				if (wanted === "browser-agent" || wanted === "agent-chat" || wanted === "workflows" || wanted === "element-markers") {
-					activeTab.value = wanted;
+					// The local-server AgentChat is not part of the browser-only build.
+					activeTab.value = wanted === "agent-chat" ? "browser-agent" : wanted;
 					if (wanted === "element-markers") yield loadMarkers();
-					yield chrome.storage.local.remove("potato_sidepanel_tab");
+					yield chrome.storage.local.remove("scalemax_sidepanel_tab");
 				}
 			} catch (_unused7) {}
 		}));
@@ -31631,7 +31632,6 @@ function init() {
 function _init() {
 	_init = _asyncToGenerator(function* () {
 		yield preloadAgentTheme();
-		chrome.runtime.sendMessage({ type: NativeMessageType.ENSURE_NATIVE }).catch(() => {});
 		createApp(App_default).mount("#app");
 	});
 	return _init.apply(this, arguments);

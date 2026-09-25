@@ -1173,9 +1173,9 @@ var elementPicker = (function() {
 	* - Shadow root contains styles + UI container
 	* - Theme is synced from chrome.storage.local['agentTheme']
 	*/
-	var DEFAULT_HOST_ID$1 = "__mcp_quick_panel_host__";
-	var UI_CONTAINER_ID = "__mcp_quick_panel_ui__";
-	var ROOT_ID = "__mcp_quick_panel_root__";
+	var DEFAULT_HOST_ID$1 = "__scalemax_quick_panel_host__";
+	var UI_CONTAINER_ID = "__scalemax_quick_panel_ui__";
+	var ROOT_ID = "__scalemax_quick_panel_root__";
 	/** Highest possible z-index to ensure Quick Panel is on top */
 	var DEFAULT_Z_INDEX$1 = 2147483647;
 	/** Storage key for AgentChat theme (owned by sidepanel) */
@@ -1323,7 +1323,7 @@ var elementPicker = (function() {
 		} catch (_unused3) {}
 		const host = document.createElement("div");
 		host.id = hostId;
-		host.setAttribute("data-mcp-quick-panel", "true");
+		host.setAttribute("data-scalemax-quick-panel", "true");
 		setImportantStyle(host, "position", "fixed");
 		setImportantStyle(host, "inset", "0");
 		setImportantStyle(host, "z-index", String(zIndex));
@@ -1450,7 +1450,7 @@ var elementPicker = (function() {
 	* - Countdown timer
 	* - Cancel/Confirm actions
 	*/
-	var DEFAULT_HOST_ID = "__mcp_element_picker_host__";
+	var DEFAULT_HOST_ID = "__scalemax_element_picker_host__";
 	var DEFAULT_Z_INDEX = 2147483647;
 	var ELEMENT_PICKER_STYLES = `
   /* Overlay positioning - bottom-right corner */
@@ -2270,6 +2270,17 @@ var elementPicker = (function() {
 				controller = null;
 				currentSessionId = null;
 			});
+			// When the page is restored from the back/forward cache this script does
+			// not run again, so re-attach the listener removed in `pagehide` above
+			// (the controller is re-created lazily by ensureController()).
+			window.addEventListener("pageshow", (event) => {
+				if (!event.persisted) return;
+				try {
+					if (!chrome.runtime.onMessage.hasListener(handleMessage)) chrome.runtime.onMessage.addListener(handleMessage);
+				} catch (err) {
+					console.warn("[ElementPicker] Failed to re-attach message listener after bfcache restore:", err);
+				}
+			});
 		}
 	});
 	//#endregion
@@ -2562,7 +2573,7 @@ var elementPicker = (function() {
 		return i;
 	}
 	//#endregion
-	//#region \0virtual:wxt-content-script-isolated-world-entrypoint?C:/Users/pc/Downloads/Opus-4.8-Unleashed/ClaudeJB/chrome-mcp/base-mcp-chrome/app/chrome-extension/entrypoints/element-picker.content.ts
+	//#region \0virtual:wxt-content-script-isolated-world-entrypoint?entrypoints/element-picker.content.ts
 	var _excluded = ["main"];
 	/** Wrapper around `console` with a "[wxt]" prefix */
 	var logger = {

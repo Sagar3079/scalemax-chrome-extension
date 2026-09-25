@@ -459,7 +459,7 @@ function autoChainEdges(nodes) {
 function summarizeNode(n) {
 	var _n$config, _n$config2, _n$config3, _n$config4, _n$config5, _n$config6, _n$config7, _n$config8, _n$config9, _n$config10, _n$config11, _n$config12, _n$config13, _n$config14, _n$config$value, _n$config15, _n$config16, _n$config17, _n$config18, _n$config19, _n$config$frame$index, _n$config20, _n$config21, _n$config22, _n$config23, _n$config24, _n$config25, _n$config26, _n$config27, _n$config28, _n$config31, _n$config38;
 	if (!n) return "";
-	if (n.type === STEP_TYPES.CLICK || n.type === STEP_TYPES.FILL) return ((_n$config = n.config) === null || _n$config === void 0 || (_n$config = _n$config.target) === null || _n$config === void 0 || (_n$config = _n$config.candidates) === null || _n$config === void 0 || (_n$config = _n$config[0]) === null || _n$config === void 0 ? void 0 : _n$config.value) || "未配置选择器";
+	if (n.type === STEP_TYPES.CLICK || n.type === STEP_TYPES.FILL) return ((_n$config = n.config) === null || _n$config === void 0 || (_n$config = _n$config.target) === null || _n$config === void 0 || (_n$config = _n$config.candidates) === null || _n$config === void 0 || (_n$config = _n$config[0]) === null || _n$config === void 0 ? void 0 : _n$config.value) || "No selector configured";
 	if (n.type === STEP_TYPES.NAVIGATE) return ((_n$config2 = n.config) === null || _n$config2 === void 0 ? void 0 : _n$config2.url) || "";
 	if (n.type === STEP_TYPES.KEY) return ((_n$config3 = n.config) === null || _n$config3 === void 0 ? void 0 : _n$config3.keys) || "";
 	if (n.type === STEP_TYPES.DELAY) return `${Number(((_n$config4 = n.config) === null || _n$config4 === void 0 ? void 0 : _n$config4.ms) || 0)}ms`;
@@ -478,14 +478,14 @@ function summarizeNode(n) {
 	if (n.type === STEP_TYPES.ASSERT) return JSON.stringify(((_n$config28 = n.config) === null || _n$config28 === void 0 ? void 0 : _n$config28.assert) || {});
 	if (n.type === STEP_TYPES.IF) {
 		var _n$config29, _n$config30;
-		return `if/else 分支数 ${Array.isArray((_n$config29 = n.config) === null || _n$config29 === void 0 ? void 0 : _n$config29.branches) ? n.config.branches.length : 0}${((_n$config30 = n.config) === null || _n$config30 === void 0 ? void 0 : _n$config30.else) === false ? "" : " + else"}`;
+		return `if/else branches: ${Array.isArray((_n$config29 = n.config) === null || _n$config29 === void 0 ? void 0 : _n$config29.branches) ? n.config.branches.length : 0}${((_n$config30 = n.config) === null || _n$config30 === void 0 ? void 0 : _n$config30.else) === false ? "" : " + else"}`;
 	}
 	if (n.type === STEP_TYPES.SCRIPT) return (((_n$config31 = n.config) === null || _n$config31 === void 0 ? void 0 : _n$config31.code) || "").slice(0, 30);
 	if (n.type === STEP_TYPES.DRAG) {
 		var _n$config32, _n$config33;
 		const a = ((_n$config32 = n.config) === null || _n$config32 === void 0 || (_n$config32 = _n$config32.start) === null || _n$config32 === void 0 || (_n$config32 = _n$config32.candidates) === null || _n$config32 === void 0 || (_n$config32 = _n$config32[0]) === null || _n$config32 === void 0 ? void 0 : _n$config32.value) || "";
 		const b = ((_n$config33 = n.config) === null || _n$config33 === void 0 || (_n$config33 = _n$config33.end) === null || _n$config33 === void 0 || (_n$config33 = _n$config33.candidates) === null || _n$config33 === void 0 || (_n$config33 = _n$config33[0]) === null || _n$config33 === void 0 ? void 0 : _n$config33.value) || "";
-		return a || b ? `${a} -> ${b}` : "拖拽";
+		return a || b ? `${a} -> ${b}` : "Drag";
 	}
 	if (n.type === STEP_TYPES.SCROLL) {
 		var _n$config34, _n$config37;
@@ -513,73 +513,73 @@ function validateNode(n) {
 		case STEP_TYPES.DBLCLICK:
 		case "fill":
 			var _c$target;
-			if (!!!(c === null || c === void 0 || (_c$target = c.target) === null || _c$target === void 0 || (_c$target = _c$target.candidates) === null || _c$target === void 0 ? void 0 : _c$target.length)) errs.push("缺少目标选择器候选");
-			if (n.type === "fill" && (!("value" in c) || c.value === void 0)) errs.push("缺少输入值");
+			if (!!!(c === null || c === void 0 || (_c$target = c.target) === null || _c$target === void 0 || (_c$target = _c$target.candidates) === null || _c$target === void 0 ? void 0 : _c$target.length)) errs.push("Missing target selector candidates");
+			if (n.type === "fill" && (!("value" in c) || c.value === void 0)) errs.push("Missing input value");
 			break;
 		case STEP_TYPES.WAIT:
-			if (!(c === null || c === void 0 ? void 0 : c.condition)) errs.push("缺少等待条件");
+			if (!(c === null || c === void 0 ? void 0 : c.condition)) errs.push("Missing wait condition");
 			break;
 		case STEP_TYPES.ASSERT:
-			if (!(c === null || c === void 0 ? void 0 : c.assert)) errs.push("缺少断言条件");
+			if (!(c === null || c === void 0 ? void 0 : c.assert)) errs.push("Missing assertion");
 			break;
 		case STEP_TYPES.NAVIGATE:
-			if (!(c === null || c === void 0 ? void 0 : c.url)) errs.push("缺少 URL");
+			if (!(c === null || c === void 0 ? void 0 : c.url)) errs.push("Missing URL");
 			break;
 		case STEP_TYPES.HTTP:
-			if (!(c === null || c === void 0 ? void 0 : c.url)) errs.push("HTTP: 缺少 URL");
+			if (!(c === null || c === void 0 ? void 0 : c.url)) errs.push("HTTP: missing URL");
 			if ((c === null || c === void 0 ? void 0 : c.assign) && typeof c.assign === "object") {
 				const pathRe = /^[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+|\[\d+\])*$/;
 				for (const v of Object.values(c.assign)) {
 					const s = String(v);
-					if (!pathRe.test(s)) errs.push(`Assign: 路径非法 ${s}`);
+					if (!pathRe.test(s)) errs.push(`Assign: invalid path ${s}`);
 				}
 			}
 			break;
 		case STEP_TYPES.HANDLE_DOWNLOAD: break;
 		case STEP_TYPES.EXTRACT:
-			if (!(c === null || c === void 0 ? void 0 : c.saveAs)) errs.push("Extract: 需填写保存变量名");
-			if (!(c === null || c === void 0 ? void 0 : c.selector) && !(c === null || c === void 0 ? void 0 : c.js)) errs.push("Extract: 需提供 selector 或 js");
+			if (!(c === null || c === void 0 ? void 0 : c.saveAs)) errs.push("Extract: variable name is required");
+			if (!(c === null || c === void 0 ? void 0 : c.selector) && !(c === null || c === void 0 ? void 0 : c.js)) errs.push("Extract: provide a selector or JS");
 			break;
 		case STEP_TYPES.SWITCH_TAB:
-			if (!(c === null || c === void 0 ? void 0 : c.tabId) && !(c === null || c === void 0 ? void 0 : c.urlContains) && !(c === null || c === void 0 ? void 0 : c.titleContains)) errs.push("SwitchTab: 需提供 tabId 或 URL/标题包含");
+			if (!(c === null || c === void 0 ? void 0 : c.tabId) && !(c === null || c === void 0 ? void 0 : c.urlContains) && !(c === null || c === void 0 ? void 0 : c.titleContains)) errs.push("SwitchTab: provide a tabId, URL match, or title match");
 			break;
 		case STEP_TYPES.SCREENSHOT: break;
 		case STEP_TYPES.TRIGGER_EVENT:
 			var _c$target2;
-			if (!!!(c === null || c === void 0 || (_c$target2 = c.target) === null || _c$target2 === void 0 || (_c$target2 = _c$target2.candidates) === null || _c$target2 === void 0 ? void 0 : _c$target2.length)) errs.push("缺少目标选择器候选");
-			if (!String((c === null || c === void 0 ? void 0 : c.event) || "").trim()) errs.push("需提供事件类型");
+			if (!!!(c === null || c === void 0 || (_c$target2 = c.target) === null || _c$target2 === void 0 || (_c$target2 = _c$target2.candidates) === null || _c$target2 === void 0 ? void 0 : _c$target2.length)) errs.push("Missing target selector candidates");
+			if (!String((c === null || c === void 0 ? void 0 : c.event) || "").trim()) errs.push("Event type is required");
 			break;
 		case STEP_TYPES.IF: {
 			const arr = Array.isArray(c === null || c === void 0 ? void 0 : c.branches) ? c.branches : [];
-			if (arr.length === 0) errs.push("需添加至少一个条件分支");
+			if (arr.length === 0) errs.push("Add at least one condition branch");
 			for (let i = 0; i < arr.length; i++) {
 				var _arr$i;
-				if (!String(((_arr$i = arr[i]) === null || _arr$i === void 0 ? void 0 : _arr$i.expr) || "").trim()) errs.push(`分支${i + 1}: 需填写条件表达式`);
+				if (!String(((_arr$i = arr[i]) === null || _arr$i === void 0 ? void 0 : _arr$i.expr) || "").trim()) errs.push(`Branch ${i + 1}: condition expression is required`);
 			}
 			break;
 		}
 		case STEP_TYPES.SET_ATTRIBUTE:
 			var _c$target3;
-			if (!!!(c === null || c === void 0 || (_c$target3 = c.target) === null || _c$target3 === void 0 || (_c$target3 = _c$target3.candidates) === null || _c$target3 === void 0 ? void 0 : _c$target3.length)) errs.push("缺少目标选择器候选");
-			if (!String((c === null || c === void 0 ? void 0 : c.name) || "").trim()) errs.push("需提供属性名");
+			if (!!!(c === null || c === void 0 || (_c$target3 = c.target) === null || _c$target3 === void 0 || (_c$target3 = _c$target3.candidates) === null || _c$target3 === void 0 ? void 0 : _c$target3.length)) errs.push("Missing target selector candidates");
+			if (!String((c === null || c === void 0 ? void 0 : c.name) || "").trim()) errs.push("Attribute name is required");
 			break;
 		case STEP_TYPES.LOOP_ELEMENTS:
-			if (!String((c === null || c === void 0 ? void 0 : c.selector) || "").trim()) errs.push("需提供元素选择器");
-			if (!String((c === null || c === void 0 ? void 0 : c.subflowId) || "").trim()) errs.push("需提供子流 ID");
+			if (!String((c === null || c === void 0 ? void 0 : c.selector) || "").trim()) errs.push("Element selector is required");
+			if (!String((c === null || c === void 0 ? void 0 : c.subflowId) || "").trim()) errs.push("Subflow ID is required");
 			break;
 		case STEP_TYPES.SWITCH_FRAME: break;
 		case STEP_TYPES.EXECUTE_FLOW:
-			if (!String((c === null || c === void 0 ? void 0 : c.flowId) || "").trim()) errs.push("需选择要执行的工作流");
+			if (!String((c === null || c === void 0 ? void 0 : c.flowId) || "").trim()) errs.push("Select a workflow to run");
 			break;
 		case STEP_TYPES.CLOSE_TAB: break;
 		case STEP_TYPES.SCRIPT: {
 			const hasAssign = (c === null || c === void 0 ? void 0 : c.assign) && Object.keys(c.assign).length > 0;
-			if (((c === null || c === void 0 ? void 0 : c.saveAs) || hasAssign) && !String((c === null || c === void 0 ? void 0 : c.code) || "").trim()) errs.push("Script: 配置了保存/映射但缺少代码");
+			if (((c === null || c === void 0 ? void 0 : c.saveAs) || hasAssign) && !String((c === null || c === void 0 ? void 0 : c.code) || "").trim()) errs.push("Script: save/mapping is set but code is missing");
 			if (hasAssign) {
 				const pathRe = /^[A-Za-z0-9_]+(?:\.[A-Za-z0-9_]+|\[\d+\])*$/;
 				for (const v of Object.values(c.assign || {})) {
 					const s = String(v);
-					if (!pathRe.test(s)) errs.push(`Assign: 路径非法 ${s}`);
+					if (!pathRe.test(s)) errs.push(`Assign: invalid path ${s}`);
 				}
 			}
 			break;
@@ -9779,26 +9779,26 @@ function iconComp(t) {
 }
 function getTypeLabel(type) {
 	return {
-		trigger: "触发器",
-		click: "点击",
-		fill: "填充",
-		navigate: "导航",
-		wait: "等待",
-		extract: "提取",
+		trigger: "Trigger",
+		click: "Click",
+		fill: "Fill",
+		navigate: "Navigate",
+		wait: "Wait",
+		extract: "Extract",
 		http: "HTTP",
-		script: "脚本",
-		if: "条件",
-		foreach: "循环",
-		assert: "断言",
-		key: "键盘",
-		drag: "拖拽",
-		dblclick: "双击",
-		openTab: "打开标签",
-		switchTab: "切换标签",
-		closeTab: "关闭标签",
-		delay: "延迟",
-		scroll: "滚动",
-		while: "循环"
+		script: "Script",
+		if: "Condition",
+		foreach: "Loop",
+		assert: "Assert",
+		key: "Keyboard",
+		drag: "Drag",
+		dblclick: "Double click",
+		openTab: "Open tab",
+		switchTab: "Switch tab",
+		closeTab: "Close tab",
+		delay: "Delay",
+		scroll: "Scroll",
+		while: "Loop"
 	}[String(type || "")] || type || "";
 }
 function nodeSubtitle(node) {
@@ -9989,7 +9989,7 @@ var NodeIf_default = /* @__PURE__ */ defineComponent({
 					return openBlock(), createElementBlock("div", {
 						key: b.id,
 						class: "case-row"
-					}, [createBaseVNode("div", _hoisted_8$5, toDisplayString(b.name || `条件${idx + 1}`), 1), createVNode(unref(_sfc_main$f), {
+					}, [createBaseVNode("div", _hoisted_8$5, toDisplayString(b.name || `Condition ${idx + 1}`), 1), createVNode(unref(_sfc_main$f), {
 						type: "source",
 						position: unref(Position).Right,
 						id: `case:${b.id}`,
@@ -10255,7 +10255,7 @@ var FieldExpression_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/*
 				if (v.trim()) evalExpression(v, { vars: {} });
 				err.value = "";
 			} catch (e) {
-				err.value = "表达式解析错误";
+				err.value = "Invalid expression";
 			}
 			emit("update:modelValue", v);
 		}
@@ -10343,12 +10343,12 @@ var FieldSelector_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 						currentWindow: true
 					});
 					const tabId = tabs === null || tabs === void 0 || (_tabs$ = tabs[0]) === null || _tabs$ === void 0 ? void 0 : _tabs$.id;
-					if (!tabId) throw new Error("未找到活动页签");
+					if (!tabId) throw new Error("No active tab found");
 					yield ensurePickerInjected(tabId);
 					const res = yield chrome.tabs.sendMessage(tabId, { action: "rr_picker_start" });
 					if (!res || !res.success) {
 						if (res === null || res === void 0 ? void 0 : res.cancelled) return;
-						throw new Error((res === null || res === void 0 ? void 0 : res.error) || "拾取失败");
+						throw new Error((res === null || res === void 0 ? void 0 : res.error) || "Pick failed");
 					}
 					const candidates = Array.isArray(res.candidates) ? res.candidates : [];
 					const prefer = [
@@ -10369,7 +10369,7 @@ var FieldSelector_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					if (sel) {
 						text.value = sel;
 						emit("update:modelValue", sel);
-					} else err.value = "未生成有效选择器，请手动输入";
+					} else err.value = "Could not generate a valid selector; enter one manually";
 				} catch (e) {
 					err.value = (e === null || e === void 0 ? void 0 : e.message) || String(e);
 				}
@@ -10386,10 +10386,10 @@ var FieldSelector_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				}, null, 40, _hoisted_3$9), createBaseVNode("button", {
 					class: "btn-mini",
 					type: "button",
-					title: "从页面拾取",
+					title: "Pick from page",
 					onClick: onPick
-				}, "拾取")]),
-				_cache[0] || (_cache[0] = createBaseVNode("div", { class: "help" }, "可输入 CSS 选择器，或点击“拾取”在页面中选择元素", -1)),
+				}, "Pick")]),
+				_cache[0] || (_cache[0] = createBaseVNode("div", { class: "help" }, "Enter a CSS selector, or click \"Pick\" to select an element on the page", -1)),
 				err.value ? (openBlock(), createElementBlock("div", _hoisted_4$9, toDisplayString(err.value), 1)) : createCommentVNode("", true)
 			]);
 		};
@@ -10509,7 +10509,7 @@ var FieldKeySequence_default = /* @__PURE__ */ defineComponent({
 		const props = __props;
 		const emit = __emit;
 		const text = ref((_props$modelValue = props.modelValue) !== null && _props$modelValue !== void 0 ? _props$modelValue : "");
-		const placeholder = ((_props$field = props.field) === null || _props$field === void 0 ? void 0 : _props$field.placeholder) || "Backspace Enter 或 cmd+a";
+		const placeholder = ((_props$field = props.field) === null || _props$field === void 0 ? void 0 : _props$field.placeholder) || "Backspace Enter or cmd+a";
 		function onInput(ev) {
 			var _ev$target$value, _ev$target;
 			const v = String((_ev$target$value = ev === null || ev === void 0 || (_ev$target = ev.target) === null || _ev$target === void 0 ? void 0 : _ev$target.value) !== null && _ev$target$value !== void 0 ? _ev$target$value : "");
@@ -10526,7 +10526,7 @@ var FieldKeySequence_default = /* @__PURE__ */ defineComponent({
 				placeholder: unref(placeholder),
 				value: text.value,
 				onInput
-			}, null, 40, _hoisted_2$8), _cache[0] || (_cache[0] = createBaseVNode("div", { class: "help" }, "示例：Backspace Enter 或 cmd+a", -1))]);
+			}, null, 40, _hoisted_2$8), _cache[0] || (_cache[0] = createBaseVNode("div", { class: "help" }, "Example: Backspace Enter or cmd+a", -1))]);
 		};
 	}
 });
@@ -10843,7 +10843,7 @@ var PropertyFormRenderer_default = /*#__PURE__*/ _plugin_vue_export_helper_defau
 			var _props$node3;
 			const cfg = ((_props$node3 = props.node) === null || _props$node3 === void 0 ? void 0 : _props$node3.config) || {};
 			const out = [];
-			for (const f of schema.value) if (f.required && (cfg[f.key] === void 0 || cfg[f.key] === "")) out.push(`${f.label} 必填`);
+			for (const f of schema.value) if (f.required && (cfg[f.key] === void 0 || cfg[f.key] === "")) out.push(`${f.label} is required`);
 			try {
 				var _spec$value3, _spec$value3$validate;
 				const more = ((_spec$value3 = spec.value) === null || _spec$value3 === void 0 || (_spec$value3$validate = _spec$value3.validate) === null || _spec$value3$validate === void 0 ? void 0 : _spec$value3$validate.call(_spec$value3, cfg)) || [];
@@ -10966,13 +10966,13 @@ var PropertyFormRenderer_default = /*#__PURE__*/ _plugin_vue_export_helper_defau
 						err.value = "";
 						emit("update:modelValue", v);
 					} catch (e) {
-						err.value = "JSON 格式错误";
+						err.value = "Invalid JSON";
 					}
 				});
 				return () => h("div", null, [h("textarea", {
 					class: "form-input",
 					rows: 6,
-					placeholder: "输入 JSON",
+					placeholder: "Enter JSON",
 					value: text.value,
 					onInput: (e) => {
 						var _e$target$value, _e$target4;
@@ -11067,16 +11067,16 @@ var PropertyFormRenderer_default = /*#__PURE__*/ _plugin_vue_export_helper_defau
 					class: "btn-mini",
 					type: "button",
 					onClick: () => remove(i)
-				}, "删除")])), h("button", {
+				}, "Delete")])), h("button", {
 					class: "btn",
 					type: "button",
 					onClick: add
-				}, "新增")]);
+				}, "Add")]);
 			}
 		});
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock("div", _hoisted_1$8, [
-				_cache[1] || (_cache[1] = createBaseVNode("div", { class: "section-title" }, "配置", -1)),
+				_cache[1] || (_cache[1] = createBaseVNode("div", { class: "section-title" }, "Configuration", -1)),
 				(openBlock(true), createElementBlock(Fragment, null, renderList(schema.value, (field) => {
 					return openBlock(), createElementBlock("div", {
 						key: field.key,
@@ -11098,7 +11098,7 @@ var PropertyFormRenderer_default = /*#__PURE__*/ _plugin_vue_export_helper_defau
 						field.help ? (openBlock(), createElementBlock("div", _hoisted_4$6, toDisplayString(field.help), 1)) : createCommentVNode("", true)
 					], 8, _hoisted_2$6);
 				}), 128)),
-				errors.value.length ? (openBlock(), createElementBlock("div", _hoisted_5$5, [_cache[0] || (_cache[0] = createBaseVNode("div", { class: "error-title" }, "⚠️ 配置错误", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(errors.value, (e) => {
+				errors.value.length ? (openBlock(), createElementBlock("div", _hoisted_5$5, [_cache[0] || (_cache[0] = createBaseVNode("div", { class: "error-title" }, "⚠️ Configuration errors", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(errors.value, (e) => {
 					return openBlock(), createElementBlock("div", {
 						key: e,
 						class: "error-item"
@@ -11133,7 +11133,7 @@ var PropertyFromSpec_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/
 				key: 0,
 				node: __props.node,
 				variables: __props.variables
-			}, null, 8, ["node", "variables"])) : (openBlock(), createElementBlock("div", _hoisted_1$7, [..._cache[0] || (_cache[0] = [createBaseVNode("div", { class: "section-title" }, "未找到节点规范", -1), createBaseVNode("div", { class: "help" }, "该节点尚未提供 NodeSpec，已回退到默认属性面板。", -1)])]));
+			}, null, 8, ["node", "variables"])) : (openBlock(), createElementBlock("div", _hoisted_1$7, [..._cache[0] || (_cache[0] = [createBaseVNode("div", { class: "section-title" }, "Node spec not found", -1), createBaseVNode("div", { class: "help" }, "This node has no NodeSpec yet; showing the default properties panel.", -1)])]));
 		};
 	}
 }), [["__scopeId", "data-v-3b99708c"]]);
@@ -11424,7 +11424,7 @@ function useBuilderStore(initial) {
 	}
 	function onConnect(sourceId, targetId, label = "default") {
 		if (sourceId === targetId) {
-			toast("不能连接到自身", "warn");
+			toast("A node cannot connect to itself", "warn");
 			return;
 		}
 		try {
@@ -11435,12 +11435,12 @@ function useBuilderStore(initial) {
 			const dstIo = getIoConstraint(dst.type);
 			const incoming = edges.filter((e) => e.to === targetId).length;
 			if (dstIo.inputs !== "any" && incoming >= dstIo.inputs) {
-				toast(`该节点最多允许 ${dstIo.inputs} 条入边`, "warn");
+				toast(`This node allows at most ${dstIo.inputs} incoming edge(s)`, "warn");
 				return;
 			}
 			if (srcIo.outputs !== "any") {
 				if (edges.filter((e) => e.from === sourceId).length >= srcIo.outputs) {
-					toast(`该节点最多允许 ${srcIo.outputs} 条出边`, "warn");
+					toast(`This node allows at most ${srcIo.outputs} outgoing edge(s)`, "warn");
 					return;
 				}
 			}
@@ -11719,7 +11719,7 @@ function useBuilderStore(initial) {
 			} catch (e) {
 				try {
 					layoutFallback();
-					toast("ELK 自动布局不可用，已使用备用布局", "warn");
+					toast("ELK auto-layout unavailable; used fallback layout", "warn");
 				} catch (_unused3) {}
 			}
 		});
@@ -12443,8 +12443,8 @@ var PropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 			const n = props.node;
 			if (!n || n.type !== "extract") return [];
 			const errs = [];
-			if (!((_n$config6 = n.config) === null || _n$config6 === void 0 ? void 0 : _n$config6.saveAs)) errs.push("需填写保存变量名");
-			if (!((_n$config7 = n.config) === null || _n$config7 === void 0 ? void 0 : _n$config7.selector) && !((_n$config8 = n.config) === null || _n$config8 === void 0 ? void 0 : _n$config8.js)) errs.push("需提供 selector 或 js");
+			if (!((_n$config6 = n.config) === null || _n$config6 === void 0 ? void 0 : _n$config6.saveAs)) errs.push("Variable name is required");
+			if (!((_n$config7 = n.config) === null || _n$config7 === void 0 ? void 0 : _n$config7.selector) && !((_n$config8 = n.config) === null || _n$config8 === void 0 ? void 0 : _n$config8.js)) errs.push("Provide a selector or JS");
 			return errs;
 		});
 		computed(() => {
@@ -12586,10 +12586,10 @@ var PropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 		});
 		return (_ctx, _cache) => {
 			return openBlock(), createElementBlock("aside", _hoisted_1$3, [__props.node ? (openBlock(), createElementBlock("div", _hoisted_2$3, [
-				createBaseVNode("div", _hoisted_3$3, [createBaseVNode("div", null, [_cache[3] || (_cache[3] = createBaseVNode("div", { class: "header-title" }, "节点属性", -1)), createBaseVNode("div", _hoisted_4$3, toDisplayString(__props.node.id), 1)]), createBaseVNode("button", {
+				createBaseVNode("div", _hoisted_3$3, [createBaseVNode("div", null, [_cache[3] || (_cache[3] = createBaseVNode("div", { class: "header-title" }, "Node properties", -1)), createBaseVNode("div", _hoisted_4$3, toDisplayString(__props.node.id), 1)]), createBaseVNode("button", {
 					class: "btn-delete",
 					type: "button",
-					title: "删除节点",
+					title: "Delete node",
 					onClick: withModifiers(onRemove, ["stop"])
 				}, [..._cache[4] || (_cache[4] = [createBaseVNode("svg", {
 					width: "16",
@@ -12602,10 +12602,10 @@ var PropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					"stroke-width": "1.8",
 					"stroke-linecap": "round"
 				})], -1)])])]),
-				createBaseVNode("div", _hoisted_5$3, [createBaseVNode("div", _hoisted_6$3, [_cache[5] || (_cache[5] = createBaseVNode("label", { class: "form-label" }, "节点名称", -1)), withDirectives(createBaseVNode("input", {
+				createBaseVNode("div", _hoisted_5$3, [createBaseVNode("div", _hoisted_6$3, [_cache[5] || (_cache[5] = createBaseVNode("label", { class: "form-label" }, "Node name", -1)), withDirectives(createBaseVNode("input", {
 					class: "form-input",
 					"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => __props.node.name = $event),
-					placeholder: "输入节点名称"
+					placeholder: "Enter node name"
 				}, null, 512), [[vModelText, __props.node.name]])])]),
 				_cache[10] || (_cache[10] = createBaseVNode("div", { class: "divider" }, null, -1)),
 				__props.node ? (openBlock(), createBlock(PropertyFromSpec_default, {
@@ -12615,13 +12615,13 @@ var PropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				}, null, 8, ["node", "variables"])) : createCommentVNode("", true),
 				_cache[11] || (_cache[11] = createBaseVNode("div", { class: "divider" }, null, -1)),
 				createBaseVNode("div", _hoisted_7$3, [
-					_cache[8] || (_cache[8] = createBaseVNode("div", { class: "section-title" }, "通用设置", -1)),
-					createBaseVNode("div", _hoisted_8$3, [_cache[6] || (_cache[6] = createBaseVNode("label", { class: "form-label" }, "超时 (ms)", -1)), withDirectives(createBaseVNode("input", {
+					_cache[8] || (_cache[8] = createBaseVNode("div", { class: "section-title" }, "General", -1)),
+					createBaseVNode("div", _hoisted_8$3, [_cache[6] || (_cache[6] = createBaseVNode("label", { class: "form-label" }, "Timeout (ms)", -1)), withDirectives(createBaseVNode("input", {
 						class: "form-input",
 						type: "number",
 						"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => __props.node.config.timeoutMs = $event),
 						min: "0",
-						placeholder: "默认使用全局超时"
+						placeholder: "Defaults to global timeout"
 					}, null, 512), [[
 						vModelText,
 						__props.node.config.timeoutMs,
@@ -12631,9 +12631,9 @@ var PropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					createBaseVNode("div", _hoisted_9$3, [createBaseVNode("label", _hoisted_10$3, [withDirectives(createBaseVNode("input", {
 						type: "checkbox",
 						"onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => __props.node.config.screenshotOnFail = $event)
-					}, null, 512), [[vModelCheckbox, __props.node.config.screenshotOnFail]]), _cache[7] || (_cache[7] = createBaseVNode("span", null, "失败时截图", -1))])])
+					}, null, 512), [[vModelCheckbox, __props.node.config.screenshotOnFail]]), _cache[7] || (_cache[7] = createBaseVNode("span", null, "Screenshot on failure", -1))])])
 				]),
-				nodeErrors.value.length > 0 ? (openBlock(), createElementBlock("div", _hoisted_11$3, [_cache[9] || (_cache[9] = createBaseVNode("div", { class: "error-title" }, "⚠️ 配置错误", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(nodeErrors.value, (e) => {
+				nodeErrors.value.length > 0 ? (openBlock(), createElementBlock("div", _hoisted_11$3, [_cache[9] || (_cache[9] = createBaseVNode("div", { class: "error-title" }, "⚠️ Configuration errors", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(nodeErrors.value, (e) => {
 					return openBlock(), createElementBlock("div", {
 						key: e,
 						class: "error-item"
@@ -12661,9 +12661,9 @@ var PropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				"stroke-linecap": "round",
 				opacity: "0.3"
 			})], -1), createBaseVNode("div", { class: "empty-text" }, [
-				createTextVNode("选择一个节点"),
+				createTextVNode("Select a node"),
 				createBaseVNode("br"),
-				createTextVNode("查看和编辑属性")
+				createTextVNode("to view and edit its properties")
 			], -1)])]))]);
 		};
 	}
@@ -12745,7 +12745,7 @@ var EdgePropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(
 				createBaseVNode("div", _hoisted_3$2, [createBaseVNode("div", null, [_cache[0] || (_cache[0] = createBaseVNode("div", { class: "header-title" }, "Edge", -1)), createBaseVNode("div", _hoisted_4$2, toDisplayString(__props.edge.id), 1)]), createBaseVNode("button", {
 					class: "btn-delete",
 					type: "button",
-					title: "删除边",
+					title: "Delete edge",
 					onClick: withModifiers(onRemove, ["stop"])
 				}, [..._cache[1] || (_cache[1] = [createBaseVNode("svg", {
 					width: "16",
@@ -12772,7 +12772,7 @@ var EdgePropertyPanel_default = /*#__PURE__*/ _plugin_vue_export_helper_default(
 					class: "text-xs text-slate-500",
 					style: { "padding": "0 20px" }
 				}, " Inspect connection only. Editing of branch/handles will be supported in a later pass. ")], -1))
-			])) : (openBlock(), createElementBlock("div", _hoisted_13$2, [..._cache[8] || (_cache[8] = [createBaseVNode("div", { class: "empty-text" }, "未选择边", -1)])]))]);
+			])) : (openBlock(), createElementBlock("div", _hoisted_13$2, [..._cache[8] || (_cache[8] = [createBaseVNode("div", { class: "empty-text" }, "No edge selected", -1)])]))]);
 		};
 	}
 }), [["__scopeId", "data-v-56a83e5b"]]);
@@ -13253,7 +13253,7 @@ var _hoisted_6 = { class: "text-[var(--rr-text)]" };
 var _hoisted_7 = { class: "right" };
 var _hoisted_8 = {
 	class: "top-btn import",
-	title: "导入 JSON"
+	title: "Import JSON"
 };
 var _hoisted_9 = ["disabled"];
 var _hoisted_10 = ["data-state"];
@@ -13323,7 +13323,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						const { flow: flowV2, warnings } = flowV3ToV2ForBuilder(flowV3);
 						warnings.forEach((w) => pushToast(w, "warn"));
 						store.initFromFlow(flowV2);
-						title.value = `编辑：${flowV2.name || flowV2.id}`;
+						title.value = `Edit: ${flowV2.name || flowV2.id}`;
 						if (q.focus) setTimeout(() => {
 							try {
 								store.selectNode(q.focus);
@@ -13332,11 +13332,11 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 							} catch (_unused3) {}
 						}, 0);
 					} else {
-						pushToast(`工作流 "${q.flowId}" 未找到，已创建新工作流`, "warn");
+						pushToast(`Workflow "${q.flowId}" not found; created a new workflow`, "warn");
 						initEmptyFlow();
 					}
 				} catch (e) {
-					pushToast(`加载工作流失败：${e instanceof Error ? e.message : String(e)}`, "error");
+					pushToast(`Failed to load workflow: ${e instanceof Error ? e.message : String(e)}`, "error");
 					initEmptyFlow();
 				}
 				else if (q.new === "1") initEmptyFlow();
@@ -13350,7 +13350,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 			const now = Date.now();
 			const empty = {
 				id: `flow_${now}`,
-				name: "新建工作流",
+				name: "New workflow",
 				version: 1,
 				steps: [],
 				variables: [],
@@ -13360,7 +13360,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 				}
 			};
 			store.initFromFlow(empty);
-			title.value = "新建工作流";
+			title.value = "New workflow";
 		}
 		const selectedId = computed(() => {
 			var _store$activeNodeId$v, _store$activeNodeId;
@@ -13427,7 +13427,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 					} catch (_unused6) {}
 					return saved;
 				} catch (e) {
-					pushToast(`保存失败：${e instanceof Error ? e.message : String(e)}`, "error");
+					pushToast(`Save failed: ${e instanceof Error ? e.message : String(e)}`, "error");
 					return null;
 				}
 			});
@@ -13517,8 +13517,8 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						const cron = scheduleToCron(s);
 						if (!cron) {
 							const scheduleType = String((s === null || s === void 0 ? void 0 : s.type) || "unknown");
-							if (scheduleType === "once") pushToast(`节点 ${n.id} 的定时 #${i + 1}: V3 暂不支持一次性定时（once），已跳过`, "warn");
-							else pushToast(`节点 ${n.id} 的定时 #${i + 1}: 无法转换为 cron（type=${scheduleType}），已跳过`, "warn");
+							if (scheduleType === "once") pushToast(`Node ${n.id} schedule #${i + 1}: one-time (once) schedules are not supported in V3 yet; skipped`, "warn");
+							else pushToast(`Node ${n.id} schedule #${i + 1}: cannot convert to cron (type=${scheduleType}); skipped`, "warn");
 							return;
 						}
 						triggersNeeded.push({
@@ -13566,7 +13566,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 					});
 					URL.revokeObjectURL(url);
 				} catch (e) {
-					pushToast(`导出失败：${e instanceof Error ? e.message : String(e)}`, "error");
+					pushToast(`Export failed: ${e instanceof Error ? e.message : String(e)}`, "error");
 				}
 			});
 			return _exportFlow.apply(this, arguments);
@@ -13584,7 +13584,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 					const txt = yield file.text();
 					const candidates = extractFlowCandidates(JSON.parse(txt));
 					if (!candidates.length) {
-						pushToast("导入失败：未找到工作流数据", "error");
+						pushToast("Import failed: no workflow data found", "error");
 						return;
 					}
 					const first = candidates[0];
@@ -13593,18 +13593,18 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						const { flow: flowV2, warnings } = flowV3ToV2ForBuilder(yield rpc.request("rr_v3.saveFlow", { flow: first }));
 						warnings.forEach((w) => pushToast(w, "warn"));
 						store.initFromFlow(flowV2);
-						title.value = `编辑：${flowV2.name || flowV2.id}`;
+						title.value = `Edit: ${flowV2.name || flowV2.id}`;
 						try {
 							yield syncTriggersAndSchedules(flowV2.id, flowV2.nodes || []);
 						} catch (_unused7) {}
 					} else {
 						store.initFromFlow(first);
 						if (Array.isArray(first === null || first === void 0 ? void 0 : first.steps) && (!Array.isArray(first === null || first === void 0 ? void 0 : first.nodes) || first.nodes.length === 0)) store.importFromSteps();
-						title.value = `编辑：${store.flowLocal.name || store.flowLocal.id}`;
+						title.value = `Edit: ${store.flowLocal.name || store.flowLocal.id}`;
 						yield save();
 					}
 				} catch (e) {
-					pushToast(`导入失败：${e instanceof Error ? e.message : String(e)}`, "error");
+					pushToast(`Import failed: ${e instanceof Error ? e.message : String(e)}`, "error");
 				} finally {
 					input.value = "";
 				}
@@ -13626,7 +13626,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 					const startNodeId = (node === null || node === void 0 ? void 0 : node.type) === "trigger" ? void 0 : selectedId.value;
 					yield rpc.request("rr_v3.enqueueRun", _objectSpread2({ flowId: saved.id }, startNodeId ? { startNodeId } : {}));
 				} catch (e) {
-					pushToast(`运行失败：${e instanceof Error ? e.message : String(e)}`, "error");
+					pushToast(`Run failed: ${e instanceof Error ? e.message : String(e)}`, "error");
 				}
 			});
 			return _runFromSelected.apply(this, arguments);
@@ -13644,7 +13644,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 					yield rpc.ensureConnected();
 					yield rpc.request("rr_v3.enqueueRun", { flowId: saved.id });
 				} catch (e) {
-					pushToast(`运行失败：${e instanceof Error ? e.message : String(e)}`, "error");
+					pushToast(`Run failed: ${e instanceof Error ? e.message : String(e)}`, "error");
 				}
 			});
 			return _runAll.apply(this, arguments);
@@ -13681,7 +13681,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 		});
 		onUnmounted(() => document.removeEventListener("keydown", onKey));
 		const saveState = ref("idle");
-		const saveLabel = computed(() => saveState.value === "saving" ? "保存中…" : saveState.value === "saved" ? "已保存" : "");
+		const saveLabel = computed(() => saveState.value === "saving" ? "Saving…" : saveState.value === "saved" ? "Saved" : "");
 		let saveTimer = null;
 		let statusTimer = null;
 		function scheduleAutoSave() {
@@ -13736,10 +13736,10 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 				class: "builder-page rr-theme",
 				"data-theme": theme.value
 			}, [
-				fallbackNotice.value ? (openBlock(), createElementBlock("div", _hoisted_2, [createBaseVNode("span", null, "已应用回退建议：提升 " + toDisplayString(fallbackNotice.value.type) + " 优先级", 1), createBaseVNode("button", {
+				fallbackNotice.value ? (openBlock(), createElementBlock("div", _hoisted_2, [createBaseVNode("span", null, "Applied fallback suggestion: raised " + toDisplayString(fallbackNotice.value.type) + " priority", 1), createBaseVNode("button", {
 					class: "mini",
 					onClick: undoFallbackPromotion
-				}, "撤销")])) : createCommentVNode("", true),
+				}, "Undo")])) : createCommentVNode("", true),
 				createBaseVNode("div", _hoisted_3, [
 					createVNode(Canvas_default, {
 						nodes: unref(store).nodes,
@@ -13769,11 +13769,11 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						"onConnect",
 						"onNodeDragged"
 					]),
-					createBaseVNode("div", _hoisted_4, [createBaseVNode("div", _hoisted_5, [createBaseVNode("strong", _hoisted_6, toDisplayString(title.value), 1), _cache[8] || (_cache[8] = createBaseVNode("span", { class: "tip" }, "工作流可视化编排", -1))]), createBaseVNode("div", _hoisted_7, [
+					createBaseVNode("div", _hoisted_4, [createBaseVNode("div", _hoisted_5, [createBaseVNode("strong", _hoisted_6, toDisplayString(title.value), 1), _cache[8] || (_cache[8] = createBaseVNode("span", { class: "tip" }, "Visual workflow editor", -1))]), createBaseVNode("div", _hoisted_7, [
 						createBaseVNode("button", {
 							class: "top-btn",
 							onClick: exportFlow,
-							title: "导出 JSON"
+							title: "Export JSON"
 						}, [..._cache[9] || (_cache[9] = [createBaseVNode("svg", {
 							width: "14",
 							height: "14",
@@ -13781,7 +13781,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 							fill: "none",
 							stroke: "currentColor",
 							"stroke-width": "2"
-						}, [createBaseVNode("path", { d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" })], -1), createTextVNode(" 导出 ", -1)])]),
+						}, [createBaseVNode("path", { d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3" })], -1), createTextVNode(" Export ", -1)])]),
 						createBaseVNode("label", _hoisted_8, [
 							_cache[10] || (_cache[10] = createBaseVNode("svg", {
 								width: "14",
@@ -13791,7 +13791,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 								stroke: "currentColor",
 								"stroke-width": "2"
 							}, [createBaseVNode("path", { d: "M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" })], -1)),
-							_cache[11] || (_cache[11] = createTextVNode(" 导入 ", -1)),
+							_cache[11] || (_cache[11] = createTextVNode(" Import ", -1)),
 							createBaseVNode("input", {
 								type: "file",
 								accept: "application/json",
@@ -13801,7 +13801,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						createBaseVNode("button", {
 							class: "top-btn",
 							onClick: openRename,
-							title: "重命名工作流"
+							title: "Rename workflow"
 						}, [..._cache[12] || (_cache[12] = [createBaseVNode("svg", {
 							width: "14",
 							height: "14",
@@ -13813,7 +13813,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						createBaseVNode("button", {
 							class: normalizeClass(["top-btn", { active: triggerPanelVisible.value }]),
 							onClick: _cache[0] || (_cache[0] = ($event) => triggerPanelVisible.value = !triggerPanelVisible.value),
-							title: "管理触发器"
+							title: "Manage triggers"
 						}, [..._cache[13] || (_cache[13] = [createBaseVNode("svg", {
 							width: "14",
 							height: "14",
@@ -13827,7 +13827,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 							class: "top-btn",
 							disabled: !selectedId.value,
 							onClick: runFromSelected,
-							title: "从选中节点回放"
+							title: "Replay from selected node"
 						}, [..._cache[14] || (_cache[14] = [createBaseVNode("svg", {
 							width: "14",
 							height: "14",
@@ -13835,11 +13835,11 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 							fill: "none",
 							stroke: "currentColor",
 							"stroke-width": "2"
-						}, [createBaseVNode("polygon", { points: "5 3 19 12 5 21 5 3" })], -1), createTextVNode(" 从选中运行 ", -1)])], 8, _hoisted_9),
+						}, [createBaseVNode("polygon", { points: "5 3 19 12 5 21 5 3" })], -1), createTextVNode(" Run from selected ", -1)])], 8, _hoisted_9),
 						createBaseVNode("button", {
 							class: "top-btn primary",
 							onClick: runAll,
-							title: "从头回放整流"
+							title: "Replay entire flow from start"
 						}, [..._cache[15] || (_cache[15] = [createBaseVNode("svg", {
 							width: "14",
 							height: "14",
@@ -13847,7 +13847,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 							fill: "none",
 							stroke: "currentColor",
 							"stroke-width": "2"
-						}, [createBaseVNode("polygon", { points: "5 3 19 12 5 21 5 3" })], -1), createTextVNode(" 运行 ", -1)])]),
+						}, [createBaseVNode("polygon", { points: "5 3 19 12 5 21 5 3" })], -1), createTextVNode(" Run ", -1)])]),
 						_cache[18] || (_cache[18] = createBaseVNode("span", { class: "divider-vert" }, null, -1)),
 						createBaseVNode("span", {
 							class: "status",
@@ -13867,7 +13867,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 							createBaseVNode("path", { d: "M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" }),
 							createBaseVNode("polyline", { points: "17 21 17 13 7 13 7 21" }),
 							createBaseVNode("polyline", { points: "7 3 7 8 15 8" })
-						], -1), createTextVNode(" 保存 ", -1)])])
+						], -1), createTextVNode(" Save ", -1)])])
 					])]),
 					createVNode(Sidebar_default, {
 						class: "floating-sidebar",
@@ -13930,7 +13930,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						createBaseVNode("button", {
 							class: "toolbar-btn",
 							onClick: _cache[2] || (_cache[2] = (...args) => unref(store).undo && unref(store).undo(...args)),
-							title: "撤销 (⌘/Ctrl+Z)"
+							title: "Undo (⌘/Ctrl+Z)"
 						}, [..._cache[19] || (_cache[19] = [createBaseVNode("svg", {
 							width: "16",
 							height: "16",
@@ -13942,7 +13942,7 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						createBaseVNode("button", {
 							class: "toolbar-btn",
 							onClick: _cache[3] || (_cache[3] = (...args) => unref(store).redo && unref(store).redo(...args)),
-							title: "重做 (⌘/Ctrl+Shift+Z)"
+							title: "Redo (⌘/Ctrl+Shift+Z)"
 						}, [..._cache[20] || (_cache[20] = [createBaseVNode("svg", {
 							width: "16",
 							height: "16",
@@ -13955,12 +13955,12 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 						createBaseVNode("button", {
 							class: "toolbar-btn",
 							onClick: _cache[4] || (_cache[4] = (...args) => unref(store).layoutAuto && unref(store).layoutAuto(...args)),
-							title: "自动排版"
+							title: "Auto layout"
 						}, [..._cache[21] || (_cache[21] = [createStaticVNode("<svg width=\"16\" height=\"16\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" data-v-c6f14693><rect x=\"3\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\" data-v-c6f14693></rect><rect x=\"14\" y=\"3\" width=\"7\" height=\"7\" rx=\"1\" data-v-c6f14693></rect><rect x=\"14\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\" data-v-c6f14693></rect><rect x=\"3\" y=\"14\" width=\"7\" height=\"7\" rx=\"1\" data-v-c6f14693></rect></svg>", 1)])]),
 						createBaseVNode("button", {
 							class: "toolbar-btn",
 							onClick: fitAll,
-							title: "自适应视图"
+							title: "Fit view"
 						}, [..._cache[22] || (_cache[22] = [createBaseVNode("svg", {
 							width: "16",
 							height: "16",
@@ -13979,21 +13979,21 @@ createApp(/* @__PURE__ */ _plugin_vue_export_helper_default(/* @__PURE__ */ defi
 					}, toDisplayString(t.message), 9, _hoisted_13);
 				}), 128))])
 			], 8, _hoisted_1), renameVisible.value ? (openBlock(), createElementBlock("div", _hoisted_14, [createBaseVNode("div", _hoisted_15, [
-				createBaseVNode("div", _hoisted_16, [_cache[24] || (_cache[24] = createBaseVNode("div", { class: "title" }, "重命名工作流", -1)), createBaseVNode("button", {
+				createBaseVNode("div", _hoisted_16, [_cache[24] || (_cache[24] = createBaseVNode("div", { class: "title" }, "Rename workflow", -1)), createBaseVNode("button", {
 					class: "close",
 					onClick: _cache[5] || (_cache[5] = ($event) => renameVisible.value = false)
 				}, "✕")]),
-				createBaseVNode("div", _hoisted_17, [createBaseVNode("div", _hoisted_18, [_cache[25] || (_cache[25] = createBaseVNode("label", null, "名称", -1)), withDirectives(createBaseVNode("input", {
+				createBaseVNode("div", _hoisted_17, [createBaseVNode("div", _hoisted_18, [_cache[25] || (_cache[25] = createBaseVNode("label", null, "Name", -1)), withDirectives(createBaseVNode("input", {
 					"onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => renameName.value = $event),
-					placeholder: "工作流名称"
-				}, null, 512), [[vModelText, renameName.value]])]), createBaseVNode("div", _hoisted_19, [_cache[26] || (_cache[26] = createBaseVNode("label", null, "描述", -1)), withDirectives(createBaseVNode("textarea", {
+					placeholder: "Workflow name"
+				}, null, 512), [[vModelText, renameName.value]])]), createBaseVNode("div", _hoisted_19, [_cache[26] || (_cache[26] = createBaseVNode("label", null, "Description", -1)), withDirectives(createBaseVNode("textarea", {
 					"onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => renameDesc.value = $event),
-					placeholder: "可选描述"
+					placeholder: "Optional description"
 				}, null, 512), [[vModelText, renameDesc.value]])])]),
 				createBaseVNode("div", { class: "rr-footer" }, [createBaseVNode("button", {
 					class: "primary",
 					onClick: applyRename
-				}, "保存")])
+				}, "Save")])
 			])])) : createCommentVNode("", true)], 64);
 		};
 	}

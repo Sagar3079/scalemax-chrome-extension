@@ -1,13 +1,17 @@
 /* eslint-disable */
 
+// The IIFE's return value (this file's completion value) is the per-injection channel
+// nonce; the background reads it from chrome.scripting.executeScript's InjectionResult
+// and hands it only to the MAIN-world script it injects next (see CHANNEL NONCE below).
 (() => {
-  // Prevent duplicate injection of the bridge itself.
-  if (window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_LOADED__) return;
+  // Prevent duplicate injection of the bridge itself (report the live bridge's nonce).
+  if (window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_LOADED__)
+    return window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_NONCE__;
   window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_LOADED__ = true;
   const EVENT_NAME = {
-    RESPONSE: 'chrome-mcp:response',
-    CLEANUP: 'chrome-mcp:cleanup',
-    EXECUTE: 'chrome-mcp:execute',
+    RESPONSE: 'scalemax:response',
+    CLEANUP: 'scalemax:cleanup',
+    EXECUTE: 'scalemax:execute',
   };
 
   // Keep in sync with the 30000ms convention used in inject-scripts/network-helper.js.
@@ -18,8 +22,8 @@
    *
    * This bridge lives in the ISOLATED world and talks to the MAIN world over
    * `window` CustomEvents. Page scripts share that MAIN world, so they can
-   * observe every `chrome-mcp:execute` event (including its requestId) and can
-   * synthesise `chrome-mcp:response` events. There is no browser primitive that
+   * observe every `scalemax:execute` event (including its requestId) and can
+   * synthesise `scalemax:response` events. There is no browser primitive that
    * lets an ISOLATED-world listener prove a CustomEvent came from our own
    * MAIN-world handler rather than from page code, so this channel CANNOT be
    * made fully authentic.
@@ -27,6 +31,10 @@
    * The checks below are therefore hardening, not authentication:
    *   - malformed / cross-target events are dropped,
    *   - requestIds are unguessable (crypto.randomUUID) and single-use,
+   *   - responses must carry the per-injection channel nonce (below); note a
+   *     hostile page that listens for `scalemax:response` can still learn it
+   *     from the first legitimate response,
+   *   - page-dispatched `scalemax:cleanup` events cannot tear the bridge down,
    *   - every request is bounded by a timeout so nothing leaks.
    *
    * The real mitigation lives upstream: the background MUST treat every value
@@ -34,19 +42,36 @@
    * must never hand it to the LLM (or to privileged APIs) as if it were
    * extension-authored data.
    */
-  // requestId -> { sendResponse, timeoutId }
-  const pendingRequests = new Map();
-
-  const newRequestId = () => {
+  /**
+   * CHANNEL NONCE — generated here in the ISOLATED world (invisible to page
+   * scripts) and returned to the background as this file's executeScript
+   * result. The background passes it only to the MAIN-world script it injects,
+   * which must echo it as `detail.nonce` on every `scalemax:response`. Responses
+   * without the nonce are ignored. Lifecycle (cleanup) is driven exclusively by
+   * the background over chrome.runtime, never by window events, so page scripts
+   * cannot tear the bridge down.
+   */
+  const randomToken = () => {
     try {
       if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return `req-${crypto.randomUUID()}`;
+        return crypto.randomUUID();
+      }
+      if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+        const bytes = crypto.getRandomValues(new Uint8Array(16));
+        return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
       }
     } catch (e) {
       // Fall through to the legacy scheme below.
     }
-    return `req-${Date.now()}-${Math.random()}`;
+    return `${Date.now()}-${Math.random()}-${Math.random()}`;
   };
+  const channelNonce = randomToken();
+  window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_NONCE__ = channelNonce;
+
+  // requestId -> { sendResponse, timeoutId }
+  const pendingRequests = new Map();
+
+  const newRequestId = () => `req-${randomToken()}`;
 
   /**
    * Atomically remove a pending entry and clear its timer.
@@ -78,10 +103,12 @@
   const messageHandler = (request, _sender, sendResponse) => {
     // --- Lifecycle Command ---
     if (request.type === EVENT_NAME.CLEANUP) {
+      // Let the MAIN-world script release its resources, then tear the bridge down.
       window.dispatchEvent(new CustomEvent(EVENT_NAME.CLEANUP));
+      cleanupBridge();
       // Acknowledge cleanup signal received, but don't hold the connection.
       sendResponse({ success: true });
-      return true;
+      return false;
     }
 
     // --- Execution Command for MAIN world ---
@@ -134,6 +161,9 @@
     // from another target) inside the page.
     if (event.target !== window) return;
 
+    // Only the MAIN-world script the background injected knows the channel nonce.
+    if (detail.nonce !== channelNonce) return;
+
     const requestId = detail.requestId;
     if (typeof requestId !== 'string' || requestId === '') return;
 
@@ -158,14 +188,16 @@
   window.addEventListener('pagehide', pagehideHandler);
 
   // --- Self Cleanup ---
-  // When the cleanup signal arrives, this bridge must also clean itself up.
-  const cleanupHandler = () => {
+  // Invoked only from the chrome.runtime cleanup command above. A `scalemax:cleanup`
+  // window event is NOT honoured here: page scripts can dispatch those at will.
+  function cleanupBridge() {
     settleAllPending('Bridge was cleaned up before the MAIN world responded');
     chrome.runtime.onMessage.removeListener(messageHandler);
     window.removeEventListener(EVENT_NAME.RESPONSE, responseHandler);
     window.removeEventListener('pagehide', pagehideHandler);
-    window.removeEventListener(EVENT_NAME.CLEANUP, cleanupHandler);
     delete window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_LOADED__;
-  };
-  window.addEventListener(EVENT_NAME.CLEANUP, cleanupHandler);
+    delete window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_NONCE__;
+  }
+
+  return channelNonce;
 })();
