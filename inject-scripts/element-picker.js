@@ -3,7 +3,7 @@
  * Element Picker Inject Script
  *
  * Injected script to let the user manually pick elements for chrome_request_element_selection.
- * - Writes refs into window.__claudeElementMap (compatible with accessibility-tree-helper.js)
+ * - Writes refs into window.__scalemaxElementMap (compatible with accessibility-tree-helper.js)
  * - Generates stable CSS selectors (prefers id/data-testid/etc.)
  * - Supports iframe picking by reporting selection via chrome.runtime.sendMessage (background reads sender.frameId)
  */
@@ -424,8 +424,8 @@
 
   function ensureRefForElement(el) {
     try {
-      if (!window.__claudeElementMap) window.__claudeElementMap = {};
-      if (!window.__claudeRefCounter) window.__claudeRefCounter = 0;
+      if (!window.__scalemaxElementMap) window.__scalemaxElementMap = {};
+      if (!window.__scalemaxRefCounter) window.__scalemaxRefCounter = 0;
     } catch {
       // Best effort
     }
@@ -433,8 +433,8 @@
     // Check if element already has a ref
     let refId = null;
     try {
-      for (const k in window.__claudeElementMap) {
-        const w = window.__claudeElementMap[k];
+      for (const k in window.__scalemaxElementMap) {
+        const w = window.__scalemaxElementMap[k];
         if (w && w.deref && w.deref() === el) {
           refId = k;
           break;
@@ -447,8 +447,8 @@
     // Create new ref if needed
     if (!refId) {
       try {
-        refId = `ref_${++window.__claudeRefCounter}`;
-        window.__claudeElementMap[refId] = new WeakRef(el);
+        refId = `ref_${++window.__scalemaxRefCounter}`;
+        window.__scalemaxElementMap[refId] = new WeakRef(el);
       } catch {
         // Continue
       }

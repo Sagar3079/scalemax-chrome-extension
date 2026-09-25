@@ -45,13 +45,34 @@ function findWacContext(){
  }
  return null;
 }
+// Frame-to-frame probes use window.postMessage, which pages can also send. The prober mints a
+// one-time token in chrome.storage.local (extension-only), bound to the target frame id; the
+// probed helper consumes it before answering, so page scripts cannot drive or spoof the probe.
+const FB_PREFIX='__scalemax_fb_';
+function fbFrameId(t){ try{ const id=chrome.runtime.getFrameId(t); return typeof id==='number'&&id>=0?id:null; }catch(e){ return null; } }
+async function fbMint(win){
+ const b=new Uint8Array(16); crypto.getRandomValues(b);
+ const token=Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');
+ await chrome.storage.local.set({[FB_PREFIX+token]:{fid:fbFrameId(win),exp:Date.now()+15000}});
+ setTimeout(()=>{ try{ chrome.storage.local.remove(FB_PREFIX+token); }catch(e){} },15000);
+ return token;
+}
+async function fbConsume(token){
+ if(typeof token!=='string'||!/^[0-9a-f]{32}$/.test(token)) return false;
+ const k=FB_PREFIX+token; let e=null;
+ try{ e=(await chrome.storage.local.get(k))[k]; }catch(err){ return false; }
+ if(!e) return false;
+ if(typeof e.fid==='number'){ const me=fbFrameId(window); if(me!==null&&me!==e.fid) return false; }
+ try{ await chrome.storage.local.remove(k); }catch(err){}
+ return e.exp>Date.now();
+}
 async function detectWacAsync(){
  const sync=findWacContext();
  if(sync) return sync;
  return new Promise((resolve)=>{
   let done=false;
   const reqId='wac_probe_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-  const results=[];
+  const probed=new Set();
   const timer=setTimeout(()=>{
    if(done) return; done=true; window.removeEventListener('message',onMsg);
    const direct=findWacContext();
@@ -60,14 +81,16 @@ async function detectWacAsync(){
   },600);
   function onMsg(ev){
    if(!ev.data || ev.data.type!=='wac_probe_result' || ev.data.reqId!==reqId) return;
-   if(ev.data.isWac){
+   if(!probed.has(ev.source)) return;
+   if(ev.data.isWac && typeof ev.data.innerSelector==='string'){
     if(!done){ done=true; clearTimeout(timer); window.removeEventListener('message',onMsg);
      let frameEl=null;
      try{
       const frames=Array.from(document.querySelectorAll('iframe'));
       for(const f of frames){ if(f.contentWindow===ev.source){ frameEl=f; break; } }
      }catch(e){}
-     resolve({frame:frameEl,frameSelector:ev.data.frameSelector||null,innerSelector:ev.data.innerSelector,compositeSelector:ev.data.compositeSelector,element:null,isWac:true,confidence:'probe',frameElement:frameEl});
+     const isel=ev.data.innerSelector.slice(0,512);
+     resolve({frame:frameEl,frameSelector:null,innerSelector:isel,compositeSelector:isel,element:null,isWac:true,confidence:'probe',frameElement:frameEl});
     }
    }
   }
@@ -75,7 +98,11 @@ async function detectWacAsync(){
   let frames=[];
   try{
    frames=Array.from(document.querySelectorAll('iframe'));
-   for(const f of frames){ try{ f.contentWindow.postMessage({type:'wac_probe',reqId},'*'); }catch(e){} }
+   for(const f of frames){
+    const cw=f.contentWindow; if(!cw) continue;
+    probed.add(cw);
+    fbMint(cw).then(token=>cw.postMessage({type:'wac_probe',reqId,token},'*')).catch(()=>{});
+   }
   }catch(e){}
   if(frames.length===0){ clearTimeout(timer); window.removeEventListener('message',onMsg); resolve({isWac:false,reason:'no iframe'}); }
  });
@@ -110,8 +137,8 @@ async function wacFill(value, selector, ref){
   if(direct) targetEl=direct.element;
  }
  if(!targetEl){
-  if(ref && window.__claudeElementMap){
-   try{ const w=window.__claudeElementMap[ref]; targetEl=w && w.deref ? w.deref() : null; }catch(e){}
+  if(ref && window.__scalemaxElementMap){
+   try{ const w=window.__scalemaxElementMap[ref]; targetEl=w && w.deref ? w.deref() : null; }catch(e){}
   }
   if(!targetEl && selector){
    try{ targetEl=document.querySelector(selector); }catch(e){}
@@ -181,11 +208,17 @@ chrome.runtime.onMessage.addListener((request,_sender,sendResponse)=>{
 });
 window.addEventListener('message',(ev)=>{
  if(!ev.data || ev.data.type!=='wac_probe') return;
- const found=findWacInDocument(document);
- if(found){
-  try{ ev.source.postMessage({type:'wac_probe_result',reqId:ev.data.reqId,isWac:true,innerSelector:found.selector,compositeSelector:found.selector},'*'); }catch(e){}
- } else {
-  try{ ev.source.postMessage({type:'wac_probe_result',reqId:ev.data.reqId,isWac:false},'*'); }catch(e){}
- }
+ // Only our parent frame's helper may probe, and only with a valid one-time token.
+ if(window.parent===window || ev.source!==window.parent) return;
+ const src=ev.source, origin=ev.origin&&ev.origin!=='null'?ev.origin:'*', reqId=ev.data.reqId;
+ fbConsume(ev.data.token).then(ok=>{
+  if(!ok) return;
+  const found=findWacInDocument(document);
+  if(found){
+   try{ src.postMessage({type:'wac_probe_result',reqId,isWac:true,innerSelector:found.selector,compositeSelector:found.selector},origin); }catch(e){}
+  } else {
+   try{ src.postMessage({type:'wac_probe_result',reqId,isWac:false},origin); }catch(e){}
+  }
+ }).catch(()=>{});
 });
 }

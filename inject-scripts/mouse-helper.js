@@ -122,7 +122,7 @@ chrome.runtime.onMessage.addListener((req,_s,sendResponse)=>{
     let el = null;
     if(ref){
      try{
-      const map = window.__claudeElementMap;
+      const map = window.__scalemaxElementMap;
       const weak = map && map[ref];
       el = weak && typeof weak.deref === 'function' ? weak.deref() : null;
      }catch(e){

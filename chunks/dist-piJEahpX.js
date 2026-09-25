@@ -201,7 +201,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.NAVIGATE,
 		version: 1,
 		display: {
-			label: "导航",
+			label: "Navigate",
 			iconClass: "icon-navigate",
 			category: "Actions"
 		},
@@ -215,13 +215,13 @@ function registerBuiltinSpecs() {
 			type: "string",
 			required: true,
 			placeholder: "https://example.com",
-			help: "目标地址，支持变量模板 {var}",
+			help: "Destination URL; supports {var} templates",
 			default: ""
 		}],
 		defaults: { url: "" },
 		validate: (cfg) => {
 			const errs = [];
-			if (!cfg || !cfg.url || String(cfg.url).trim() === "") errs.push("URL 必填");
+			if (!cfg || !cfg.url || String(cfg.url).trim() === "") errs.push("URL is required");
 			return errs;
 		}
 	});
@@ -229,7 +229,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.CLICK,
 		version: 1,
 		display: {
-			label: "点击",
+			label: "Click",
 			iconClass: "icon-click",
 			category: "Actions"
 		},
@@ -240,39 +240,39 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "target",
-				label: "目标",
+				label: "Target",
 				type: "json",
 				widget: "targetlocator",
-				help: "选择或输入元素选择器"
+				help: "Pick or enter an element selector"
 			},
 			{
 				key: "before",
-				label: "执行前",
+				label: "Before",
 				type: "object",
 				fields: [{
 					key: "scrollIntoView",
-					label: "滚动到可见",
+					label: "Scroll into view",
 					type: "boolean",
 					default: true
 				}, {
 					key: "waitForSelector",
-					label: "等待选择器",
+					label: "Wait for selector",
 					type: "boolean",
 					default: true
 				}]
 			},
 			{
 				key: "after",
-				label: "执行后",
+				label: "After",
 				type: "object",
 				fields: [{
 					key: "waitForNavigation",
-					label: "等待导航完成",
+					label: "Wait for navigation",
 					type: "boolean",
 					default: false
 				}, {
 					key: "waitForNetworkIdle",
-					label: "等待网络空闲",
+					label: "Wait for network idle",
 					type: "boolean",
 					default: false
 				}]
@@ -290,7 +290,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.DBLCLICK,
 		version: 1,
 		display: {
-			label: "双击",
+			label: "Double click",
 			iconClass: "icon-click",
 			category: "Actions"
 		},
@@ -301,38 +301,38 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "target",
-				label: "目标",
+				label: "Target",
 				type: "json",
 				widget: "targetlocator"
 			},
 			{
 				key: "before",
-				label: "执行前",
+				label: "Before",
 				type: "object",
 				fields: [{
 					key: "scrollIntoView",
-					label: "滚动到可见",
+					label: "Scroll into view",
 					type: "boolean",
 					default: true
 				}, {
 					key: "waitForSelector",
-					label: "等待选择器",
+					label: "Wait for selector",
 					type: "boolean",
 					default: true
 				}]
 			},
 			{
 				key: "after",
-				label: "执行后",
+				label: "After",
 				type: "object",
 				fields: [{
 					key: "waitForNavigation",
-					label: "等待导航完成",
+					label: "Wait for navigation",
 					type: "boolean",
 					default: false
 				}, {
 					key: "waitForNetworkIdle",
-					label: "等待网络空闲",
+					label: "Wait for network idle",
 					type: "boolean",
 					default: false
 				}]
@@ -350,7 +350,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.FILL,
 		version: 1,
 		display: {
-			label: "填充",
+			label: "Fill",
 			iconClass: "icon-fill",
 			category: "Actions"
 		},
@@ -360,15 +360,15 @@ function registerBuiltinSpecs() {
 		},
 		schema: [{
 			key: "target",
-			label: "目标",
+			label: "Target",
 			type: "json",
 			widget: "targetlocator"
 		}, {
 			key: "value",
-			label: "输入值",
+			label: "Value",
 			type: "string",
 			required: true,
-			help: "支持 {var} 模板"
+			help: "Supports {var} templates"
 		}],
 		defaults: { value: "" }
 	});
@@ -376,7 +376,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.KEY,
 		version: 1,
 		display: {
-			label: "键盘",
+			label: "Keyboard",
 			iconClass: "icon-key",
 			category: "Actions"
 		},
@@ -386,14 +386,14 @@ function registerBuiltinSpecs() {
 		},
 		schema: [{
 			key: "keys",
-			label: "按键序列",
+			label: "Key sequence",
 			type: "string",
 			widget: "keysequence",
 			required: true,
-			help: "如 Backspace Enter 或 cmd+a"
+			help: "e.g. Backspace Enter or cmd+a"
 		}, {
 			key: "target",
-			label: "焦点目标(可选)",
+			label: "Focus target (optional)",
 			type: "json",
 			widget: "targetlocator"
 		}],
@@ -403,7 +403,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.SCROLL,
 		version: 1,
 		display: {
-			label: "滚动",
+			label: "Scroll",
 			iconClass: "icon-scroll",
 			category: "Actions"
 		},
@@ -414,19 +414,19 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "mode",
-				label: "模式",
+				label: "Mode",
 				type: "select",
 				options: [
 					{
-						label: "元素",
+						label: "Element",
 						value: "element"
 					},
 					{
-						label: "偏移",
+						label: "Offset",
 						value: "offset"
 					},
 					{
-						label: "容器",
+						label: "Container",
 						value: "container"
 					}
 				],
@@ -434,13 +434,13 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "target",
-				label: "目标(当元素/容器)",
+				label: "Target (element/container mode)",
 				type: "json",
 				widget: "targetlocator"
 			},
 			{
 				key: "offset",
-				label: "偏移",
+				label: "Offset",
 				type: "object",
 				fields: [{
 					key: "x",
@@ -465,7 +465,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.DRAG,
 		version: 1,
 		display: {
-			label: "拖拽",
+			label: "Drag",
 			iconClass: "icon-drag",
 			category: "Actions"
 		},
@@ -476,23 +476,23 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "start",
-				label: "起点",
+				label: "Start",
 				type: "json",
 				widget: "targetlocator"
 			},
 			{
 				key: "end",
-				label: "终点",
+				label: "End",
 				type: "json",
 				widget: "targetlocator"
 			},
 			{
 				key: "path",
-				label: "路径坐标",
+				label: "Path points",
 				type: "array",
 				item: {
 					key: "p",
-					label: "点",
+					label: "Point",
 					type: "object",
 					fields: [{
 						key: "x",
@@ -512,7 +512,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.WAIT,
 		version: 1,
 		display: {
-			label: "等待",
+			label: "Wait",
 			iconClass: "icon-wait",
 			category: "Actions"
 		},
@@ -522,9 +522,9 @@ function registerBuiltinSpecs() {
 		},
 		schema: [{
 			key: "condition",
-			label: "条件(JSON)",
+			label: "Condition (JSON)",
 			type: "json",
-			help: "如 {\"sleep\":1000} 或 {\"text\":\"Hello\",\"appear\":true}"
+			help: "e.g. {\"sleep\":1000} or {\"text\":\"Hello\",\"appear\":true}"
 		}],
 		defaults: { condition: { sleep: 500 } }
 	});
@@ -532,7 +532,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.ASSERT,
 		version: 1,
 		display: {
-			label: "断言",
+			label: "Assert",
 			iconClass: "icon-assert",
 			category: "Actions"
 		},
@@ -542,24 +542,24 @@ function registerBuiltinSpecs() {
 		},
 		schema: [{
 			key: "assert",
-			label: "断言(JSON)",
+			label: "Assertion (JSON)",
 			type: "json",
-			help: "如 {\"exists\":\"#id\"} / {\"visible\":\".btn\"}"
+			help: "e.g. {\"exists\":\"#id\"} / {\"visible\":\".btn\"}"
 		}, {
 			key: "failStrategy",
-			label: "失败策略",
+			label: "On failure",
 			type: "select",
 			options: [
 				{
-					label: "停止",
+					label: "Stop",
 					value: "stop"
 				},
 				{
-					label: "警告",
+					label: "Warn",
 					value: "warn"
 				},
 				{
-					label: "重试",
+					label: "Retry",
 					value: "retry"
 				}
 			],
@@ -582,7 +582,7 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "method",
-				label: "方法",
+				label: "Method",
 				type: "select",
 				options: [
 					"GET",
@@ -604,27 +604,27 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "headers",
-				label: "请求头(JSON)",
+				label: "Headers (JSON)",
 				type: "json"
 			},
 			{
 				key: "body",
-				label: "请求体(JSON)",
+				label: "Body (JSON)",
 				type: "json"
 			},
 			{
 				key: "formData",
-				label: "表单(JSON)",
+				label: "Form (JSON)",
 				type: "json"
 			},
 			{
 				key: "saveAs",
-				label: "保存为变量",
+				label: "Save as variable",
 				type: "string"
 			},
 			{
 				key: "assign",
-				label: "映射(JSON)",
+				label: "Mapping (JSON)",
 				type: "json"
 			}
 		],
@@ -634,7 +634,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.EXTRACT,
 		version: 1,
 		display: {
-			label: "提取",
+			label: "Extract",
 			iconClass: "icon-extract",
 			category: "Tools"
 		},
@@ -645,38 +645,38 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "selector",
-				label: "选择器",
+				label: "Selector",
 				type: "string",
 				widget: "selector"
 			},
 			{
 				key: "attr",
-				label: "属性",
+				label: "Attribute",
 				type: "select",
 				options: [
 					{
-						label: "文本(text)",
+						label: "Text (text)",
 						value: "text"
 					},
 					{
-						label: "文本(textContent)",
+						label: "Text (textContent)",
 						value: "textContent"
 					},
 					{
-						label: "自定义属性名",
+						label: "Custom attribute name",
 						value: "attr"
 					}
 				]
 			},
 			{
 				key: "js",
-				label: "自定义JS",
+				label: "Custom JS",
 				type: "string",
-				help: "在页面中执行并返回值"
+				help: "Runs in the page and returns a value"
 			},
 			{
 				key: "saveAs",
-				label: "保存变量",
+				label: "Save to variable",
 				type: "string",
 				required: true
 			}
@@ -687,7 +687,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.SCREENSHOT,
 		version: 1,
 		display: {
-			label: "截图",
+			label: "Screenshot",
 			iconClass: "icon-screenshot",
 			category: "Tools"
 		},
@@ -698,18 +698,18 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "selector",
-				label: "目标选择器",
+				label: "Target selector",
 				type: "string"
 			},
 			{
 				key: "fullPage",
-				label: "整页截图",
+				label: "Full page",
 				type: "boolean",
 				default: false
 			},
 			{
 				key: "saveAs",
-				label: "保存变量",
+				label: "Save to variable",
 				type: "string"
 			}
 		],
@@ -719,7 +719,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.TRIGGER_EVENT,
 		version: 1,
 		display: {
-			label: "触发事件",
+			label: "Trigger event",
 			iconClass: "icon-trigger",
 			category: "Tools"
 		},
@@ -730,25 +730,25 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "target",
-				label: "目标",
+				label: "Target",
 				type: "json",
 				widget: "targetlocator"
 			},
 			{
 				key: "event",
-				label: "事件类型",
+				label: "Event type",
 				type: "string",
 				required: true
 			},
 			{
 				key: "bubbles",
-				label: "冒泡",
+				label: "Bubbles",
 				type: "boolean",
 				default: true
 			},
 			{
 				key: "cancelable",
-				label: "可取消",
+				label: "Cancelable",
 				type: "boolean",
 				default: false
 			}
@@ -759,7 +759,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.SET_ATTRIBUTE,
 		version: 1,
 		display: {
-			label: "设置属性",
+			label: "Set attribute",
 			iconClass: "icon-attr",
 			category: "Tools"
 		},
@@ -770,24 +770,24 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "target",
-				label: "目标",
+				label: "Target",
 				type: "json",
 				widget: "targetlocator"
 			},
 			{
 				key: "name",
-				label: "属性名",
+				label: "Attribute name",
 				type: "string",
 				required: true
 			},
 			{
 				key: "value",
-				label: "属性值",
+				label: "Attribute value",
 				type: "string"
 			},
 			{
 				key: "remove",
-				label: "移除属性",
+				label: "Remove attribute",
 				type: "boolean",
 				default: false
 			}
@@ -798,7 +798,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.LOOP_ELEMENTS,
 		version: 1,
 		display: {
-			label: "循环元素",
+			label: "Loop elements",
 			iconClass: "icon-loop",
 			category: "Tools"
 		},
@@ -809,25 +809,25 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "selector",
-				label: "选择器",
+				label: "Selector",
 				type: "string",
 				required: true
 			},
 			{
 				key: "saveAs",
-				label: "列表变量名",
+				label: "List variable name",
 				type: "string",
 				default: "elements"
 			},
 			{
 				key: "itemVar",
-				label: "项变量名",
+				label: "Item variable name",
 				type: "string",
 				default: "item"
 			},
 			{
 				key: "subflowId",
-				label: "子流程ID",
+				label: "Subflow ID",
 				type: "string",
 				required: true
 			}
@@ -841,7 +841,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.SWITCH_FRAME,
 		version: 1,
 		display: {
-			label: "切换Frame",
+			label: "Switch frame",
 			iconClass: "icon-frame",
 			category: "Tools"
 		},
@@ -851,15 +851,15 @@ function registerBuiltinSpecs() {
 		},
 		schema: [{
 			key: "frame",
-			label: "frame定位",
+			label: "Frame locator",
 			type: "object",
 			fields: [{
 				key: "index",
-				label: "索引",
+				label: "Index",
 				type: "number"
 			}, {
 				key: "urlContains",
-				label: "URL包含",
+				label: "URL contains",
 				type: "string"
 			}]
 		}],
@@ -869,7 +869,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.HANDLE_DOWNLOAD,
 		version: 1,
 		display: {
-			label: "下载处理",
+			label: "Handle download",
 			iconClass: "icon-download",
 			category: "Tools"
 		},
@@ -880,24 +880,24 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "filenameContains",
-				label: "文件名包含",
+				label: "Filename contains",
 				type: "string"
 			},
 			{
 				key: "waitForComplete",
-				label: "等待完成",
+				label: "Wait for completion",
 				type: "boolean",
 				default: true
 			},
 			{
 				key: "timeoutMs",
-				label: "超时(ms)",
+				label: "Timeout (ms)",
 				type: "number",
 				default: 6e4
 			},
 			{
 				key: "saveAs",
-				label: "保存变量",
+				label: "Save to variable",
 				type: "string"
 			}
 		],
@@ -910,7 +910,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.SCRIPT,
 		version: 1,
 		display: {
-			label: "脚本",
+			label: "Script",
 			iconClass: "icon-script",
 			category: "Tools"
 		},
@@ -921,7 +921,7 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "world",
-				label: "执行上下文",
+				label: "Execution context",
 				type: "select",
 				options: [{
 					label: "ISOLATED",
@@ -934,14 +934,14 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "code",
-				label: "脚本代码",
+				label: "Script code",
 				type: "string",
 				widget: "code",
 				required: true
 			},
 			{
 				key: "when",
-				label: "执行时机",
+				label: "Run at",
 				type: "select",
 				options: [{
 					label: "before",
@@ -954,12 +954,12 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "assign",
-				label: "映射(JSON)",
+				label: "Mapping (JSON)",
 				type: "json"
 			},
 			{
 				key: "saveAs",
-				label: "保存变量",
+				label: "Save to variable",
 				type: "string"
 			}
 		],
@@ -972,7 +972,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.OPEN_TAB,
 		version: 1,
 		display: {
-			label: "打开标签",
+			label: "Open tab",
 			iconClass: "icon-openTab",
 			category: "Tabs"
 		},
@@ -986,7 +986,7 @@ function registerBuiltinSpecs() {
 			type: "string"
 		}, {
 			key: "newWindow",
-			label: "新窗口",
+			label: "New window",
 			type: "boolean",
 			default: false
 		}],
@@ -996,7 +996,7 @@ function registerBuiltinSpecs() {
 		type: "executeFlow",
 		version: 1,
 		display: {
-			label: "执行子流程",
+			label: "Run subflow",
 			iconClass: "icon-exec",
 			category: "Flow"
 		},
@@ -1007,19 +1007,19 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "flowId",
-				label: "流程ID",
+				label: "Flow ID",
 				type: "string",
 				required: true
 			},
 			{
 				key: "inline",
-				label: "内联执行",
+				label: "Run inline",
 				type: "boolean",
 				default: false
 			},
 			{
 				key: "args",
-				label: "参数(JSON)",
+				label: "Arguments (JSON)",
 				type: "json"
 			}
 		],
@@ -1029,7 +1029,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.SWITCH_TAB,
 		version: 1,
 		display: {
-			label: "切换标签",
+			label: "Switch tab",
 			iconClass: "icon-switchTab",
 			category: "Tabs"
 		},
@@ -1045,12 +1045,12 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "urlContains",
-				label: "URL包含",
+				label: "URL contains",
 				type: "string"
 			},
 			{
 				key: "titleContains",
-				label: "标题包含",
+				label: "Title contains",
 				type: "string"
 			}
 		],
@@ -1060,7 +1060,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.CLOSE_TAB,
 		version: 1,
 		display: {
-			label: "关闭标签",
+			label: "Close tab",
 			iconClass: "icon-closeTab",
 			category: "Tabs"
 		},
@@ -1088,7 +1088,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.IF,
 		version: 1,
 		display: {
-			label: "条件",
+			label: "Condition",
 			iconClass: "icon-if",
 			category: "Logic"
 		},
@@ -1099,13 +1099,13 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "condition",
-				label: "条件表达式(JSON)",
+				label: "Condition expression (JSON)",
 				type: "json",
-				help: "如 {\"expression\":\"vars.a>0\"} 等"
+				help: "e.g. {\"expression\":\"vars.a>0\"}"
 			},
 			{
 				key: "branches",
-				label: "分支",
+				label: "Branches",
 				type: "array",
 				item: {
 					key: "b",
@@ -1119,12 +1119,12 @@ function registerBuiltinSpecs() {
 						},
 						{
 							key: "name",
-							label: "名称",
+							label: "Name",
 							type: "string"
 						},
 						{
 							key: "expr",
-							label: "表达式",
+							label: "Expression",
 							type: "string"
 						}
 					]
@@ -1132,7 +1132,7 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "else",
-				label: "启用 else",
+				label: "Enable else",
 				type: "boolean",
 				default: true
 			}
@@ -1143,7 +1143,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.FOREACH,
 		version: 1,
 		display: {
-			label: "循环",
+			label: "Loop",
 			iconClass: "icon-foreach",
 			category: "Logic"
 		},
@@ -1154,28 +1154,28 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "listVar",
-				label: "列表变量",
+				label: "List variable",
 				type: "string",
 				required: true
 			},
 			{
 				key: "itemVar",
-				label: "项变量",
+				label: "Item variable",
 				type: "string",
 				default: "item"
 			},
 			{
 				key: "subflowId",
-				label: "子流程ID",
+				label: "Subflow ID",
 				type: "string",
 				required: true
 			},
 			{
 				key: "concurrency",
-				label: "并发数",
+				label: "Concurrency",
 				type: "number",
 				default: 1,
-				help: "并发执行子流程（浅拷贝变量，不自动合并）"
+				help: "Runs subflows concurrently (variables are shallow-copied, not merged back)"
 			}
 		],
 		defaults: { itemVar: "item" }
@@ -1184,7 +1184,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.WHILE,
 		version: 1,
 		display: {
-			label: "循环",
+			label: "Loop",
 			iconClass: "icon-while",
 			category: "Logic"
 		},
@@ -1195,18 +1195,18 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "condition",
-				label: "条件(JSON)",
+				label: "Condition (JSON)",
 				type: "json"
 			},
 			{
 				key: "subflowId",
-				label: "子流程ID",
+				label: "Subflow ID",
 				type: "string",
 				required: true
 			},
 			{
 				key: "maxIterations",
-				label: "最大次数",
+				label: "Max iterations",
 				type: "number",
 				default: 100
 			}
@@ -1217,7 +1217,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.DELAY,
 		version: 1,
 		display: {
-			label: "延迟",
+			label: "Delay",
 			iconClass: "icon-delay",
 			category: "Actions"
 		},
@@ -1227,7 +1227,7 @@ function registerBuiltinSpecs() {
 		},
 		schema: [{
 			key: "sleep",
-			label: "延迟",
+			label: "Delay",
 			type: "number",
 			widget: "duration",
 			required: true,
@@ -1239,7 +1239,7 @@ function registerBuiltinSpecs() {
 		type: STEP_TYPES.TRIGGER,
 		version: 1,
 		display: {
-			label: "触发器",
+			label: "Trigger",
 			iconClass: "icon-trigger",
 			category: "Flow"
 		},
@@ -1250,53 +1250,53 @@ function registerBuiltinSpecs() {
 		schema: [
 			{
 				key: "enabled",
-				label: "启用",
+				label: "Enabled",
 				type: "boolean",
 				default: true
 			},
 			{
 				key: "description",
-				label: "描述",
+				label: "Description",
 				type: "string"
 			},
 			{
 				key: "modes",
-				label: "模式",
+				label: "Mode",
 				type: "object",
 				fields: [
 					{
 						key: "manual",
-						label: "手动",
+						label: "Manual",
 						type: "boolean",
 						default: true
 					},
 					{
 						key: "url",
-						label: "URL 触发",
+						label: "URL trigger",
 						type: "boolean",
 						default: false
 					},
 					{
 						key: "contextMenu",
-						label: "右键菜单",
+						label: "Context menu",
 						type: "boolean",
 						default: false
 					},
 					{
 						key: "command",
-						label: "快捷键",
+						label: "Shortcut",
 						type: "boolean",
 						default: false
 					},
 					{
 						key: "dom",
-						label: "DOM 事件",
+						label: "DOM event",
 						type: "boolean",
 						default: false
 					},
 					{
 						key: "schedule",
-						label: "定时",
+						label: "Schedule",
 						type: "boolean",
 						default: false
 					}
@@ -1304,19 +1304,19 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "url",
-				label: "URL 规则",
+				label: "URL rules",
 				type: "object",
 				fields: [{
 					key: "rules",
-					label: "规则列表",
+					label: "Rules",
 					type: "array",
 					item: {
 						key: "rule",
-						label: "规则",
+						label: "Rule",
 						type: "object",
 						fields: [{
 							key: "kind",
-							label: "类型",
+							label: "Type",
 							type: "select",
 							options: [
 								{
@@ -1324,18 +1324,18 @@ function registerBuiltinSpecs() {
 									value: "url"
 								},
 								{
-									label: "域名",
+									label: "Domain",
 									value: "domain"
 								},
 								{
-									label: "路径",
+									label: "Path",
 									value: "path"
 								}
 							],
 							default: "url"
 						}, {
 							key: "value",
-							label: "值",
+							label: "Value",
 							type: "string"
 						}]
 					}
@@ -1343,7 +1343,7 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "contextMenu",
-				label: "右键菜单",
+				label: "Context menu",
 				type: "object",
 				fields: [{
 					key: "title",
@@ -1352,57 +1352,57 @@ function registerBuiltinSpecs() {
 					default: "Run workflow"
 				}, {
 					key: "enabled",
-					label: "启用",
+					label: "Enabled",
 					type: "boolean",
 					default: false
 				}]
 			},
 			{
 				key: "command",
-				label: "快捷键",
+				label: "Shortcut",
 				type: "object",
 				fields: [{
 					key: "commandKey",
-					label: "快捷键",
+					label: "Shortcut",
 					type: "string"
 				}, {
 					key: "enabled",
-					label: "启用",
+					label: "Enabled",
 					type: "boolean",
 					default: false
 				}]
 			},
 			{
 				key: "dom",
-				label: "DOM 事件",
+				label: "DOM event",
 				type: "object",
 				fields: [
 					{
 						key: "selector",
-						label: "选择器",
+						label: "Selector",
 						type: "string"
 					},
 					{
 						key: "appear",
-						label: "出现",
+						label: "Appear",
 						type: "boolean",
 						default: true
 					},
 					{
 						key: "once",
-						label: "一次",
+						label: "Once",
 						type: "boolean",
 						default: true
 					},
 					{
 						key: "debounceMs",
-						label: "防抖(ms)",
+						label: "Debounce (ms)",
 						type: "number",
 						default: 800
 					},
 					{
 						key: "enabled",
-						label: "启用",
+						label: "Enabled",
 						type: "boolean",
 						default: false
 					}
@@ -1410,11 +1410,11 @@ function registerBuiltinSpecs() {
 			},
 			{
 				key: "schedules",
-				label: "定时",
+				label: "Schedule",
 				type: "array",
 				item: {
 					key: "sched",
-					label: "计划",
+					label: "Schedules",
 					type: "object",
 					fields: [
 						{
@@ -1424,31 +1424,31 @@ function registerBuiltinSpecs() {
 						},
 						{
 							key: "type",
-							label: "类型",
+							label: "Type",
 							type: "select",
 							options: [
 								{
-									label: "一次",
+									label: "Once",
 									value: "once"
 								},
 								{
-									label: "间隔",
+									label: "Interval",
 									value: "interval"
 								},
 								{
-									label: "每日",
+									label: "Daily",
 									value: "daily"
 								}
 							]
 						},
 						{
 							key: "when",
-							label: "时间(ISO/cron)",
+							label: "Time (ISO/cron)",
 							type: "string"
 						},
 						{
 							key: "enabled",
-							label: "启用",
+							label: "Enabled",
 							type: "boolean",
 							default: true
 						}

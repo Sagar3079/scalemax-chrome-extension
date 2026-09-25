@@ -1,15 +1,15 @@
 {
   "extensionName": {
-    "message": "chrome-mcp-server",
-    "description": "Erweiterungsname"
+    "message": "Scalemax Official",
+    "description": "Extension name"
   },
   "extensionDescription": {
-    "message": "Stellt Browser-Funktionen mit Ihrem eigenen Chrome zur Verfügung",
-    "description": "Erweiterungsbeschreibung"
+    "message": "Scalemax Official – KI-Agent nur im Browser. Nutzen Sie Ihr eigenes OpenAI-kompatibles LLM und lassen Sie es im Browser arbeiten.",
+    "description": "Extension description"
   },
   "nativeServerConfigLabel": {
-    "message": "Native Server-Konfiguration",
-    "description": "Hauptabschnittstitel für Native Server-Einstellungen"
+    "message": "Lokale Verbindung",
+    "description": "Main section header for local connection settings"
   },
   "semanticEngineLabel": {
     "message": "Semantische Engine",
@@ -73,7 +73,7 @@
     "placeholders": {
       "port": {
         "content": "$1",
-        "example": "12306"
+        "example": "8080"
       }
     }
   },
@@ -86,8 +86,8 @@
     "description": "Verbunden aber Service nicht gestartet Status"
   },
   "mcpServerConfigLabel": {
-    "message": "MCP Server-Konfiguration",
-    "description": "MCP Server-Konfigurationsabschnittslabel"
+    "message": "Erweiterte Verbindungseinstellungen",
+    "description": "Advanced connection settings section label"
   },
   "connectionPortLabel": {
     "message": "Verbindungsport",
@@ -442,5 +442,177 @@
   "pagesUnit": {
     "message": "Seiten",
     "description": "Seiten Zähleinheit"
+  },
+  "userscriptsManagerTitle": {
+    "message": "Userscript-Verwaltung",
+    "description": "Options page title"
+  },
+  "emergencySwitchLabel": {
+    "message": "Notschalter",
+    "description": "Global disable switch"
+  },
+  "createRunSectionTitle": {
+    "message": "Erstellen / Ausführen",
+    "description": "Create & run section title"
+  },
+  "nameLabel": {
+    "message": "Name",
+    "description": "Name input label"
+  },
+  "runAtLabel": {
+    "message": "Ausführungszeitpunkt",
+    "description": "runAt select label"
+  },
+  "runAtAuto": {
+    "message": "automatisch",
+    "description": "runAt auto"
+  },
+  "runAtDocumentStart": {
+    "message": "document_start",
+    "description": "runAt document_start"
+  },
+  "runAtDocumentEnd": {
+    "message": "document_end",
+    "description": "runAt document_end"
+  },
+  "runAtDocumentIdle": {
+    "message": "document_idle",
+    "description": "runAt document_idle"
+  },
+  "worldLabel": {
+    "message": "Ausführungskontext",
+    "description": "world select label"
+  },
+  "worldAuto": {
+    "message": "automatisch",
+    "description": "world auto"
+  },
+  "worldIsolated": {
+    "message": "ISOLATED",
+    "description": "ISOLATED world"
+  },
+  "worldMain": {
+    "message": "MAIN",
+    "description": "MAIN world"
+  },
+  "modeLabel": {
+    "message": "Modus",
+    "description": "mode select label"
+  },
+  "modeAuto": {
+    "message": "automatisch",
+    "description": "mode auto"
+  },
+  "modePersistent": {
+    "message": "dauerhaft",
+    "description": "mode persistent"
+  },
+  "modeCss": {
+    "message": "CSS",
+    "description": "mode css"
+  },
+  "modeOnce": {
+    "message": "einmalig",
+    "description": "mode once"
+  },
+  "allFramesLabel": {
+    "message": "Alle Frames",
+    "description": "allFrames checkbox"
+  },
+  "persistLabel": {
+    "message": "Dauerhaft speichern",
+    "description": "persist checkbox"
+  },
+  "dnrFallbackLabel": {
+    "message": "DNR-Fallback",
+    "description": "dnr fallback checkbox"
+  },
+  "matchesInputLabel": {
+    "message": "Übereinstimmungen (kommagetrennt)",
+    "description": "matches input"
+  },
+  "excludesInputLabel": {
+    "message": "Ausschlüsse (kommagetrennt)",
+    "description": "excludes input"
+  },
+  "tagsInputLabel": {
+    "message": "Tags (kommagetrennt)",
+    "description": "tags input"
+  },
+  "scriptLabel": {
+    "message": "Skript",
+    "description": "script textarea label"
+  },
+  "applyButton": {
+    "message": "Anwenden",
+    "description": "apply button"
+  },
+  "runOnceButton": {
+    "message": "Einmal ausführen (CDP)",
+    "description": "run once button"
+  },
+  "listSectionTitle": {
+    "message": "Liste",
+    "description": "list section title"
+  },
+  "queryLabel": {
+    "message": "Suche",
+    "description": "query input label"
+  },
+  "statusAll": {
+    "message": "alle",
+    "description": "status all"
+  },
+  "statusEnabled": {
+    "message": "aktiviert",
+    "description": "status enabled"
+  },
+  "statusDisabled": {
+    "message": "deaktiviert",
+    "description": "status disabled"
+  },
+  "domainLabel": {
+    "message": "Domain",
+    "description": "domain filter label"
+  },
+  "exportAllButton": {
+    "message": "Alle exportieren",
+    "description": "export button"
+  },
+  "tableHeaderName": {
+    "message": "Name",
+    "description": "table header name"
+  },
+  "tableHeaderWorld": {
+    "message": "Ausführungskontext",
+    "description": "table header world"
+  },
+  "tableHeaderRunAt": {
+    "message": "Ausführungszeitpunkt",
+    "description": "table header runAt"
+  },
+  "tableHeaderUpdated": {
+    "message": "Aktualisiert",
+    "description": "table header updated"
+  },
+  "deleteButton": {
+    "message": "Löschen",
+    "description": "delete button"
+  },
+  "placeholderOptional": {
+    "message": "optional",
+    "description": "generic optional placeholder"
+  },
+  "placeholderMatchesExample": {
+    "message": "z. B. https://*.example.com/*",
+    "description": "matches example placeholder"
+  },
+  "placeholderScriptHint": {
+    "message": "JS/CSS/TM hier einfügen",
+    "description": "script textarea placeholder"
+  },
+  "placeholderDomainHint": {
+    "message": "example.com",
+    "description": "domain filter placeholder"
   }
 }

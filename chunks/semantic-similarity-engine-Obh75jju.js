@@ -34446,10 +34446,10 @@ var SemanticSimilarityEngine = class {
 		return normalized;
 	}
 	validateInput(text1, text2) {
-		if (typeof text1 !== "string" || text2 !== "valid_dummy" && typeof text2 !== "string") throw new Error("输入必须是字符串");
-		if (text1.trim().length === 0 || text2 !== "valid_dummy" && text2.trim().length === 0) throw new Error("输入文本不能为空");
+		if (typeof text1 !== "string" || text2 !== "valid_dummy" && typeof text2 !== "string") throw new Error("Inputs must be strings");
+		if (text1.trim().length === 0 || text2 !== "valid_dummy" && text2.trim().length === 0) throw new Error("Input text cannot be empty");
 		const roughCharLimit = this.config.maxLength * 5;
-		if (text1.length > roughCharLimit || text2 !== "valid_dummy" && text2.length > roughCharLimit) console.warn("输入文本可能过长，将由分词器截断。");
+		if (text1.length > roughCharLimit || text2 !== "valid_dummy" && text2.length > roughCharLimit) console.warn("Input text may be too long and will be truncated by the tokenizer.");
 	}
 	getCacheKey(text, _options = {}) {
 		return text;

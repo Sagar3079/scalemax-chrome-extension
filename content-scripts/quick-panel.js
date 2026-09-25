@@ -288,10 +288,9 @@ var quickPanel = (function() {
 		* Send a new instruction to the selected AgentChat session.
 		*
 		* The background layer will:
-		* 1. Read the selected session ID
-		* 2. Open SSE subscription
-		* 3. POST /act to start the request
-		* 4. Stream events back via QUICK_PANEL_AI_EVENT
+		* 1. Resolve (or create) the agent chat session
+		* 2. Start the request with the Scalemax agent
+		* 3. Stream events back via QUICK_PANEL_AI_EVENT
 		*
 		* @param payload - The instruction and optional context
 		* @returns Promise resolving to success with requestId/sessionId, or failure with error
@@ -2980,6 +2979,17 @@ var quickPanel = (function() {
 				if (controller) {
 					controller.dispose();
 					controller = null;
+				}
+			});
+			// When the page is restored from the back/forward cache this script does
+			// not run again, so re-attach the listener removed in `pagehide` above
+			// (the controller is re-created lazily by ensureController()).
+			window.addEventListener("pageshow", (event) => {
+				if (!event.persisted) return;
+				try {
+					if (!chrome.runtime.onMessage.hasListener(handleMessage)) chrome.runtime.onMessage.addListener(handleMessage);
+				} catch (err) {
+					console.warn("[QuickPanelContentScript] Failed to re-attach message listener after bfcache restore:", err);
 				}
 			});
 		}

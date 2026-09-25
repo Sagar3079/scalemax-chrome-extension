@@ -10,6 +10,9 @@
 //   scalemax_translate_site_prefs_list -> { ok, prefs: { [hostname]: "always"|"never" } }
 //   scalemax_translate_site_policy_set -> { hostname, policy } -> { ok }
 //
+// Opened in its own tab as `translate-settings.html?tabId=<id>`; the "Current tab"
+// card targets that tab (see resolveTargetTab below), not this settings tab.
+//
 // Message contract with content-scripts/translate.js (via chrome.tabs.sendMessage):
 //   { action: "translate_now", targetLang } -> { success }
 //   { action: "translate_revert" }          -> { success }
@@ -197,26 +200,105 @@
   // Current tab controls
   // ---------------------------------------------------------------------------
 
+  // This page is opened in its own tab (the popup calls chrome.tabs.create), so
+  // `chrome.tabs.query({ active: true, currentWindow: true })` would return this
+  // settings tab itself. Instead, target the tab the user came from: the popup
+  // passes it as `?tabId=<id>`; otherwise fall back to the most recently used
+  // web (http/https) tab, preferring this window.
   let activeTabId = null;
+  const requestedTabId = (() => {
+    try {
+      const raw = new URLSearchParams(location.search).get("tabId");
+      const n = raw == null ? NaN : Number(raw);
+      return Number.isInteger(n) && n >= 0 ? n : null;
+    } catch (e) {
+      return null;
+    }
+  })();
+  let targetTabId = null;
 
+  function isWebUrl(url) {
+    return /^https?:\/\//i.test(url || "");
+  }
+
+  function getTab(tabId) {
+    return new Promise((resolve) => {
+      chrome.tabs.get(tabId, (tab) => {
+        if (chrome.runtime.lastError) { resolve(null); return; }
+        resolve(tab || null);
+      });
+    });
+  }
+
+  function queryTabs(queryInfo) {
+    return new Promise((resolve) => {
+      chrome.tabs.query(queryInfo, (tabs) => {
+        if (chrome.runtime.lastError) { resolve([]); return; }
+        resolve(tabs || []);
+      });
+    });
+  }
+
+  function getSelfTabId() {
+    return new Promise((resolve) => {
+      try {
+        chrome.tabs.getCurrent((tab) => {
+          if (chrome.runtime.lastError) { resolve(null); return; }
+          resolve(tab && typeof tab.id === "number" ? tab.id : null);
+        });
+      } catch (e) {
+        resolve(null);
+      }
+    });
+  }
+
+  function pickMostRecentWebTab(tabs, selfTabId) {
+    let best = null;
+    for (const t of tabs) {
+      if (!t || typeof t.id !== "number" || t.id === selfTabId) continue;
+      if (!isWebUrl(t.url)) continue;
+      if (!best || (t.lastAccessed || 0) > (best.lastAccessed || 0)) best = t;
+    }
+    return best;
+  }
+
+  async function resolveTargetTab() {
+    if (typeof requestedTabId === "number") {
+      const tab = await getTab(requestedTabId);
+      if (tab) { targetTabId = tab.id; return tab; }
+      // The tab we were opened for has been closed; fall back below.
+    }
+    const selfTabId = await getSelfTabId();
+    const tab =
+      pickMostRecentWebTab(await queryTabs({ currentWindow: true }), selfTabId) ||
+      pickMostRecentWebTab(await queryTabs({}), selfTabId);
+    targetTabId = tab ? tab.id : null;
+    return tab;
+  }
+
+  let refreshSeq = 0;
   async function refreshCurrentTab() {
+    const seq = ++refreshSeq;
+    const stale = () => seq !== refreshSeq;
     els.translateNowBtn.disabled = true;
     els.revertNowBtn.disabled = true;
     try {
-      const tabs = await new Promise((resolve) => chrome.tabs.query({ active: true, currentWindow: true }, resolve));
-      const tab = tabs && tabs[0];
+      const tab = await resolveTargetTab();
+      if (stale()) return;
       if (!tab || typeof tab.id !== "number") {
-        els.currentTabInfo.textContent = "No active tab found.";
+        activeTabId = null;
+        els.currentTabInfo.textContent = "No web page tab found. Open the page you want to translate, then reopen this page from the extension popup.";
         return;
       }
       activeTabId = tab.id;
       let hostname = "";
       try { hostname = new URL(tab.url || "").hostname; } catch (e) {}
-      if (!hostname || /^(chrome|chrome-extension|edge|about):/.test(tab.url || "")) {
+      if (!hostname || !isWebUrl(tab.url)) {
         els.currentTabInfo.textContent = "This page can't be translated (browser-internal page).";
         return;
       }
       const status = await sendToTab(activeTabId, { action: "translate_status" });
+      if (stale()) return;
       if (!status || status.success === false) {
         els.currentTabInfo.textContent = hostname + " — translation not available on this page (try reloading it after installing this update).";
         els.translateNowBtn.disabled = false;
@@ -227,9 +309,29 @@
       els.translateNowBtn.disabled = false;
       els.revertNowBtn.disabled = !status.active;
     } catch (e) {
+      if (stale()) return;
       els.currentTabInfo.textContent = "Could not read the active tab: " + (e && e.message || e);
     }
   }
+
+  // Keep the "Current tab" card in sync when the target tab navigates/reloads,
+  // is closed, or when the user switches back to this settings tab.
+  let refreshTimer = null;
+  function scheduleRefresh() {
+    if (refreshTimer) clearTimeout(refreshTimer);
+    refreshTimer = setTimeout(() => { refreshTimer = null; refreshCurrentTab(); }, 250);
+  }
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo) => {
+    if (tabId !== targetTabId) return;
+    if (changeInfo.url || changeInfo.status === "complete") scheduleRefresh();
+  });
+  chrome.tabs.onRemoved.addListener((tabId) => {
+    if (tabId !== targetTabId) return;
+    scheduleRefresh();
+  });
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") scheduleRefresh();
+  });
 
   els.translateNowBtn.addEventListener("click", async () => {
     if (typeof activeTabId !== "number") return;

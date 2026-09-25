@@ -46,8 +46,8 @@ function resolveComposite(selector){
  return null;
 }
 function resolveUniversal(selector, ref){
- if(ref && window.__claudeElementMap){
-  try{ const w=window.__claudeElementMap[ref]; const el=w&&w.deref?w.deref():null; if(el) return {element:el, method:'ref'}; }catch(e){}
+ if(ref && window.__scalemaxElementMap){
+  try{ const w=window.__scalemaxElementMap[ref]; const el=w&&w.deref?w.deref():null; if(el) return {element:el, method:'ref'}; }catch(e){}
  }
  if(selector && selector.includes('|>')){
   const c=resolveComposite(selector);
@@ -115,11 +115,25 @@ function getClickablePoint(el){
  }
  return {x:r.left+r.width/2, y:r.top+r.height/2};
 }
+// Map (x,y) from el's frame viewport to the nearest same-origin ancestor window that
+// hosts the cursor overlay; null when a cross-origin boundary blocks the translation.
+function findMouseOverlay(el, x, y){
+ let w=(el&&el.ownerDocument&&el.ownerDocument.defaultView)||window;
+ try{
+  while(w){
+   if(w.__scalemaxMouse&&typeof w.__scalemaxMouse.moveTo==='function') return {m:w.__scalemaxMouse,x,y};
+   if(w===w.top) return null;
+   const fe=w.frameElement; if(!fe) return null;
+   const r=fe.getBoundingClientRect();
+   x+=r.left+(fe.clientLeft||0); y+=r.top+(fe.clientTop||0);
+   w=w.parent;
+  }
+ }catch(e){}
+ return null;
+}
 function dispatchUniversalClick(el, x, y, opts={}, isDouble=false){
- try{ if(window.__scalemaxMouse) window.__scalemaxMouse.moveTo(x,y,{label:'click'}); else if(window.parent && window.parent.__scalemaxMouse) window.parent.__scalemaxMouse.moveTo(x,y,'click'); }catch(e){}
- const rect=el.getBoundingClientRect();
  if(x===undefined||y===undefined){ const p=getClickablePoint(el); x=p.x; y=p.y; }
- try{ if(window.__scalemaxMouse) window.__scalemaxMouse.moveTo(x,y,{label:'click'}); }catch(e){}
+ try{ const mp=findMouseOverlay(el,x,y); if(mp) mp.m.moveTo(mp.x,mp.y,{label:'click'}); }catch(e){}
  try{ el.focus(); }catch(e){}
  // hover pre-steps
  const base={bubbles:true, cancelable:true, composed:true, view:window, clientX:x, clientY:y, screenX:x, screenY:y, button:opts.button==='right'?2:opts.button==='middle'?1:0, buttons:opts.button==='right'?2:opts.button==='middle'?4:1, altKey:!!opts.altKey, ctrlKey:!!opts.ctrlKey, metaKey:!!opts.metaKey, shiftKey:!!opts.shiftKey, pointerId:1, pointerType:'mouse', isPrimary:true};
@@ -230,6 +244,20 @@ async function typeUniversal(el, text){
  }
  return true;
 }
+// Never expose secrets (passwords, OTP codes) in page snapshots sent to the LLM.
+function isSensitiveInput(el){
+ try{
+  if(!el||el.tagName!=='INPUT') return false;
+  if(String(el.type||'').toLowerCase()==='password') return true;
+  const ac=String(el.getAttribute('autocomplete')||'').toLowerCase();
+  return /(^|\s)(current-password|new-password|one-time-code)(\s|$)/.test(ac);
+ }catch(e){ return false; }
+}
+function safeValue(el){
+ if(!el||el.value===undefined||el.value===null) return el?el.value:undefined;
+ if(isSensitiveInput(el)) return el.value?'••••':'';
+ return el.value;
+}
 function getEyesSnapshot(maxNodes=800){
  const out=[];
  const seen=new Set();
@@ -274,7 +302,7 @@ function getEyesSnapshot(maxNodes=800){
     level:el.getAttribute('aria-level'),
     valuemin:el.getAttribute('aria-valuemin'),
     valuemax:el.getAttribute('aria-valuemax'),
-    valuenow:el.getAttribute('aria-valuenow')||el.value,
+    valuenow:el.getAttribute('aria-valuenow')||safeValue(el),
     invalid:el.getAttribute('aria-invalid'),
     placeholder:el.getAttribute('placeholder')||el.getAttribute('aria-placeholder'),
     href:el.href||el.getAttribute('href'),
@@ -333,20 +361,47 @@ async function universalClick(selector, ref, coords, opts){
   // awaited click
  return {success:true, method:resolved.method, tag:el.tagName, rect:el.getBoundingClientRect()};
 }
-async function probeTypeInFrames(text, selector, ref){
+// Cross-frame probes go through the background (chrome.runtime), never window.postMessage:
+// the page (or any embedded frame) can neither trigger probes nor spoof replies.
+// Only the top frame fans out; the background already iterates frames explicitly for sub-frames.
+function relayToFrames(action, payload, mode, timeoutMs){
  return new Promise(res=>{
-  const frames=Array.from(document.querySelectorAll('iframe'));
-  if(frames.length===0) return res(null);
-  let done=false;
-  const reqId='ut_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-  const timer=setTimeout(()=>{ if(!done){ done=true; window.removeEventListener('message', onMsg); res(null); } }, 900);
-  function onMsg(ev){
-   if(!ev.data||ev.data.type!=='universal_type_result'||ev.data.reqId!==reqId) return;
-   if(ev.data.success && !done){ done=true; clearTimeout(timer); window.removeEventListener('message', onMsg); res(ev.data); }
-  }
-  window.addEventListener('message', onMsg);
-  for(const f of frames){ try{ f.contentWindow.postMessage({type:'universal_type_probe', reqId, text, selector, ref}, '*'); }catch(e){} }
+  if(window!==window.top) return res([]);
+  try{
+   chrome.runtime.sendMessage({type:'scalemax_universal_relay', action, payload, mode, timeoutMs:timeoutMs||900}, (resp)=>{
+    try{ void chrome.runtime.lastError; }catch(e){}
+    res(resp&&resp.ok&&Array.isArray(resp.results)?resp.results.filter(r=>r&&r.response&&typeof r.response==='object'):[]);
+   });
+  }catch(e){ res([]); }
  });
+}
+async function probeTypeInFrames(text, selector, ref){
+ const results=await relayToFrames('universal_type_probe', {text, selector, ref}, 'first-success', 900);
+ const hit=results.find(r=>r.response.success);
+ return hit?{...hit.response, frameId:hit.frameId}:null;
+}
+// A frame whose whole ancestor chain is same-origin is already walked by the top frame's snapshot.
+function coveredByTop(){
+ try{ let w=window; while(w!==w.top){ w=w.parent; void w.document.body; } return true; }catch(e){ return false; }
+}
+async function handleProbe(req){
+ if(req.action==='universal_type_probe'){
+  let target=null;
+  if(req.selector||req.ref){ const r=resolveUniversal(req.selector, req.ref); if(r) target=r.element; }
+  if(!target) target=document.querySelector('[contenteditable]:not([contenteditable="false"]),.ProseMirror,[role="textbox"]');
+  if(!target) return {success:false};
+  const ok=await typeUniversal(target, typeof req.text==='string'?req.text:String(req.text==null?'':req.text));
+  return {success:!!ok, method:ok?'iframe-probe':''};
+ }
+ if(req.action==='universal_eyes_probe'){
+  if(coveredByTop()) return {snapshot:{nodes:[], total:0, truncated:false, covered:true}};
+  const n=Math.max(1, Math.min(Number(req.maxNodes)||400, 2000));
+  return {snapshot:getEyesSnapshot(n)};
+ }
+ if(req.action==='universal_probe'){
+  return {found:!!(typeof req.selector==='string'&&req.selector&&deepQuery(req.selector, document))};
+ }
+ return null;
 }
 async function universalType(selector, ref, text){
  let resolved=resolveUniversal(selector, ref);
@@ -400,28 +455,20 @@ chrome.runtime.onMessage.addListener((req,_s,sendResponse)=>{
   (async()=>{
    try{
     let snap=getEyesSnapshot(req.maxNodes||800);
-    // cross-origin iframe probe
+    // cross-origin iframe probe (via background relay)
     try{
-     const frames=Array.from(document.querySelectorAll('iframe'));
-     const crossNodes=[];
-     if(frames.length>0){
-      const reqId='ue_'+Date.now()+'_'+Math.random().toString(36).slice(2);
-      const pending=new Promise(res=>{
-       let collected=[];
-       let timer=setTimeout(()=>{ window.removeEventListener('message', onMsg); res(collected); }, 650);
-       function onMsg(ev){
-        if(!ev.data||ev.data.type!=='universal_eyes_result'||ev.data.reqId!==reqId) return;
-        if(ev.data.snapshot && Array.isArray(ev.data.snapshot.nodes)) collected.push(...ev.data.snapshot.nodes);
-        if(collected.length>0){ clearTimeout(timer); window.removeEventListener('message', onMsg); res(collected); }
-       }
-       window.addEventListener('message', onMsg);
-       for(const f of frames){ try{ f.contentWindow.postMessage({type:'universal_eyes_probe', reqId, maxNodes: Math.floor((req.maxNodes||800)/2)}, '*'); }catch(e){} }
-      });
-      const extra=await pending;
+     if(window===window.top && document.querySelector('iframe')){
+      const max=req.maxNodes||800;
+      const results=await relayToFrames('universal_eyes_probe', {maxNodes:Math.floor(max/2)}, 'all', 900);
+      const extra=[];
+      for(const r of results){
+       const sn=r.response.snapshot;
+       if(sn && Array.isArray(sn.nodes)) for(const nd of sn.nodes){ if(nd&&typeof nd==='object') extra.push({...nd, frameId:r.frameId}); }
+      }
       if(extra.length>0){
-       snap.nodes=snap.nodes.concat(extra).slice(0, req.maxNodes||800);
+       snap.nodes=snap.nodes.concat(extra).slice(0, max);
        snap.total=snap.nodes.length;
-       snap.truncated=snap.truncated||extra.length>= (req.maxNodes||800)/2;
+       snap.truncated=snap.truncated||extra.length>=max/2;
       }
      }
     }catch(e){}
@@ -430,35 +477,10 @@ chrome.runtime.onMessage.addListener((req,_s,sendResponse)=>{
   })();
   return true;
  }
+ if(req.action==='universal_type_probe' || req.action==='universal_eyes_probe' || req.action==='universal_probe'){
+  handleProbe(req).then(r=>sendResponse(r||{success:false})).catch(e=>sendResponse({success:false, error:e&&e.message}));
+  return true;
+ }
  if(req.action==='universal_ping'){ sendResponse({status:'pong', v:PROTOCOL_VERSION, script:'universal-helper'}); return false; }
-});
-window.addEventListener('message', async (ev)=>{
- if(ev.data&&ev.data.type==='universal_type_probe'){
-  try{
-   let target=null;
-   if(ev.data.selector||ev.data.ref){
-    const r=resolveUniversal(ev.data.selector, ev.data.ref);
-    if(r) target=r.element;
-   }
-   if(!target) target=document.querySelector('[contenteditable],.ProseMirror,[role="textbox"]')||document.body;
-   if(target){
-    const ok=await typeUniversal(target, ev.data.text||'');
-    try{ ev.source.postMessage({type:'universal_type_result', reqId:ev.data.reqId, success:!!ok, method:ok?'iframe-probe':''}, '*'); }catch(e){}
-   } else {
-    try{ ev.source.postMessage({type:'universal_type_result', reqId:ev.data.reqId, success:false}, '*'); }catch(e){}
-   }
-  }catch(e){ try{ ev.source.postMessage({type:'universal_type_result', reqId:ev.data.reqId, success:false, error:e.message}, '*'); }catch(e2){} }
-  return;
- }
- if(ev.data&&ev.data.type==='universal_eyes_probe'){
-  try{
-   const s=getEyesSnapshot(ev.data.maxNodes||400);
-   try{ ev.source.postMessage({type:'universal_eyes_result', reqId:ev.data.reqId, snapshot:s}, '*'); }catch(e){}
-  }catch(e){}
-  return;
- }
- if(!ev.data||ev.data.type!=='universal_probe') return;
- const found=deepQuery(ev.data.selector, document);
- if(found) try{ ev.source.postMessage({type:'universal_probe_result', reqId:ev.data.reqId, found:true},'*'); }catch(e){}
 });
 }

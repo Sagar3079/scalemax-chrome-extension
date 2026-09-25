@@ -40,7 +40,7 @@ if (window.__CLICK_HELPER_INITIALIZED__) {
         // Resolve element from weak map
         let target = null;
         try {
-          const map = window.__claudeElementMap;
+          const map = window.__scalemaxElementMap;
           const weak = map && map[ref];
           target = weak && typeof weak.deref === 'function' ? weak.deref() : null;
         } catch (e) {
@@ -290,9 +290,27 @@ if (window.__CLICK_HELPER_INITIALIZED__) {
     };
   }
 
+  // Map (x,y) from the element's frame viewport to the nearest same-origin ancestor window
+  // hosting the cursor overlay; null when a cross-origin boundary blocks the translation.
+  function findMouseOverlay(element, x, y) {
+    let w = (element && element.ownerDocument && element.ownerDocument.defaultView) || window;
+    try {
+      while (w) {
+        if (w.__scalemaxMouse && typeof w.__scalemaxMouse.moveTo === 'function') return { m: w.__scalemaxMouse, x, y };
+        if (w === w.top) return null;
+        const fe = w.frameElement;
+        if (!fe) return null;
+        const r = fe.getBoundingClientRect();
+        x += r.left + (fe.clientLeft || 0);
+        y += r.top + (fe.clientTop || 0);
+        w = w.parent;
+      }
+    } catch (e) {}
+    return null;
+  }
+
   function dispatchClickSequence(element, x, y, options = {}, isDouble = false) {
-    try{ if(window.__scalemaxMouse) window.__scalemaxMouse.moveTo(x,y,{label:'click'}); else if(window.parent && window.parent.__scalemaxMouse) window.parent.__scalemaxMouse.moveTo(x,y,'click'); }catch(e){}
-    try{ if(window.__scalemaxMouse) window.__scalemaxMouse.clickEffect(x,y); }catch(e){}
+    try{ const mp=findMouseOverlay(element,x,y); if(mp){ mp.m.moveTo(mp.x,mp.y,{label:'click'}); if(typeof mp.m.clickEffect==='function') mp.m.clickEffect(mp.x,mp.y); } }catch(e){}
     try{ element.focus(); }catch(e){}
     const base = normalizeMouseOpts(x, y, options);
     const pbase={...base, pointerId:1, pointerType:'mouse', isPrimary:true, composed:true};

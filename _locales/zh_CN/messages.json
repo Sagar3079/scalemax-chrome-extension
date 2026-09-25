@@ -1,180 +1,180 @@
 {
   "extensionName": {
-    "message": "chrome-mcp-server",
+    "message": "Scalemax Official",
     "description": "Extension name"
   },
   "extensionDescription": {
-    "message": "Exposes browser capabilities with your own chrome",
+    "message": "Scalemax Official — 纯浏览器端 AI 智能体。接入你自己的 OpenAI 兼容大模型，让它在你的浏览器中为你工作。",
     "description": "Extension description"
   },
   "nativeServerConfigLabel": {
-    "message": "Native Server Configuration",
-    "description": "Main section header for native server settings"
+    "message": "本地连接",
+    "description": "Main section header for local connection settings"
   },
   "semanticEngineLabel": {
-    "message": "Semantic Engine",
+    "message": "语义引擎",
     "description": "Main section header for semantic engine"
   },
   "embeddingModelLabel": {
-    "message": "Embedding Model",
+    "message": "嵌入模型",
     "description": "Main section header for model selection"
   },
   "indexDataManagementLabel": {
-    "message": "Index Data Management",
+    "message": "索引数据管理",
     "description": "Main section header for data management"
   },
   "modelCacheManagementLabel": {
-    "message": "Model Cache Management",
+    "message": "模型缓存管理",
     "description": "Main section header for cache management"
   },
   "statusLabel": {
-    "message": "Status",
+    "message": "状态",
     "description": "Generic status label"
   },
   "runningStatusLabel": {
-    "message": "Running Status",
+    "message": "运行状态",
     "description": "Server running status label"
   },
   "connectionStatusLabel": {
-    "message": "Connection Status",
+    "message": "连接状态",
     "description": "Connection status label"
   },
   "lastUpdatedLabel": {
-    "message": "Last Updated:",
+    "message": "最后更新：",
     "description": "Last updated timestamp label"
   },
   "connectButton": {
-    "message": "Connect",
+    "message": "连接",
     "description": "Connect button text"
   },
   "disconnectButton": {
-    "message": "Disconnect",
+    "message": "断开连接",
     "description": "Disconnect button text"
   },
   "connectingStatus": {
-    "message": "Connecting...",
+    "message": "连接中...",
     "description": "Connecting status message"
   },
   "connectedStatus": {
-    "message": "Connected",
+    "message": "已连接",
     "description": "Connected status message"
   },
   "disconnectedStatus": {
-    "message": "Disconnected",
+    "message": "已断开",
     "description": "Disconnected status message"
   },
   "detectingStatus": {
-    "message": "Detecting...",
+    "message": "检测中...",
     "description": "Detecting status message"
   },
   "serviceRunningStatus": {
-    "message": "Service Running (Port: $PORT$)",
+    "message": "服务运行中（端口：$PORT$）",
     "description": "Service running with port number",
     "placeholders": {
       "port": {
         "content": "$1",
-        "example": "12306"
+        "example": "8080"
       }
     }
   },
   "serviceNotConnectedStatus": {
-    "message": "Service Not Connected",
+    "message": "服务未连接",
     "description": "Service not connected status"
   },
   "connectedServiceNotStartedStatus": {
-    "message": "Connected, Service Not Started",
+    "message": "已连接，服务未启动",
     "description": "Connected but service not started status"
   },
   "mcpServerConfigLabel": {
-    "message": "MCP Server Configuration",
-    "description": "MCP server configuration section label"
+    "message": "高级连接设置",
+    "description": "Advanced connection settings section label"
   },
   "connectionPortLabel": {
-    "message": "Connection Port",
+    "message": "连接端口",
     "description": "Connection port input label"
   },
   "refreshStatusButton": {
-    "message": "Refresh Status",
+    "message": "刷新状态",
     "description": "Refresh status button tooltip"
   },
   "copyConfigButton": {
-    "message": "Copy Configuration",
+    "message": "复制配置",
     "description": "Copy configuration button text"
   },
   "retryButton": {
-    "message": "Retry",
+    "message": "重试",
     "description": "Retry button text"
   },
   "cancelButton": {
-    "message": "Cancel",
+    "message": "取消",
     "description": "Cancel button text"
   },
   "confirmButton": {
-    "message": "Confirm",
+    "message": "确认",
     "description": "Confirm button text"
   },
   "saveButton": {
-    "message": "Save",
+    "message": "保存",
     "description": "Save button text"
   },
   "closeButton": {
-    "message": "Close",
+    "message": "关闭",
     "description": "Close button text"
   },
   "resetButton": {
-    "message": "Reset",
+    "message": "重置",
     "description": "Reset button text"
   },
   "initializingStatus": {
-    "message": "Initializing...",
+    "message": "初始化中...",
     "description": "Initializing progress message"
   },
   "processingStatus": {
-    "message": "Processing...",
+    "message": "处理中...",
     "description": "Processing progress message"
   },
   "loadingStatus": {
-    "message": "Loading...",
+    "message": "加载中...",
     "description": "Loading progress message"
   },
   "clearingStatus": {
-    "message": "Clearing...",
+    "message": "清空中...",
     "description": "Clearing progress message"
   },
   "cleaningStatus": {
-    "message": "Cleaning...",
+    "message": "清理中...",
     "description": "Cleaning progress message"
   },
   "downloadingStatus": {
-    "message": "Downloading...",
+    "message": "下载中...",
     "description": "Downloading progress message"
   },
   "semanticEngineReadyStatus": {
-    "message": "Semantic Engine Ready",
+    "message": "语义引擎已就绪",
     "description": "Semantic engine ready status"
   },
   "semanticEngineInitializingStatus": {
-    "message": "Semantic Engine Initializing...",
+    "message": "语义引擎初始化中...",
     "description": "Semantic engine initializing status"
   },
   "semanticEngineInitFailedStatus": {
-    "message": "Semantic Engine Initialization Failed",
+    "message": "语义引擎初始化失败",
     "description": "Semantic engine initialization failed status"
   },
   "semanticEngineNotInitStatus": {
-    "message": "Semantic Engine Not Initialized",
+    "message": "语义引擎未初始化",
     "description": "Semantic engine not initialized status"
   },
   "initSemanticEngineButton": {
-    "message": "Initialize Semantic Engine",
+    "message": "初始化语义引擎",
     "description": "Initialize semantic engine button text"
   },
   "reinitializeButton": {
-    "message": "Reinitialize",
+    "message": "重新初始化",
     "description": "Reinitialize button text"
   },
   "downloadingModelStatus": {
-    "message": "Downloading Model... $PROGRESS$%",
+    "message": "正在下载模型... $PROGRESS$%",
     "description": "Model download progress with percentage",
     "placeholders": {
       "progress": {
@@ -184,243 +184,243 @@
     }
   },
   "switchingModelStatus": {
-    "message": "Switching Model...",
+    "message": "正在切换模型...",
     "description": "Model switching progress message"
   },
   "modelLoadedStatus": {
-    "message": "Model Loaded",
+    "message": "模型已加载",
     "description": "Model successfully loaded status"
   },
   "modelFailedStatus": {
-    "message": "Model Failed to Load",
+    "message": "模型加载失败",
     "description": "Model failed to load status"
   },
   "lightweightModelDescription": {
-    "message": "Lightweight Multilingual Model",
+    "message": "轻量级多语言模型",
     "description": "Description for lightweight model option"
   },
   "betterThanSmallDescription": {
-    "message": "Slightly larger than e5-small, but better performance",
+    "message": "比 e5-small 稍大，但性能更好",
     "description": "Description for medium model option"
   },
   "multilingualModelDescription": {
-    "message": "Multilingual Semantic Model",
+    "message": "多语言语义模型",
     "description": "Description for multilingual model option"
   },
   "fastPerformance": {
-    "message": "Fast",
+    "message": "快速",
     "description": "Fast performance indicator"
   },
   "balancedPerformance": {
-    "message": "Balanced",
+    "message": "均衡",
     "description": "Balanced performance indicator"
   },
   "accuratePerformance": {
-    "message": "Accurate",
+    "message": "精准",
     "description": "Accurate performance indicator"
   },
   "networkErrorMessage": {
-    "message": "Network connection error, please check network and retry",
+    "message": "网络连接错误，请检查网络后重试",
     "description": "Network connection error message"
   },
   "modelCorruptedErrorMessage": {
-    "message": "Model file corrupted or incomplete, please retry download",
+    "message": "模型文件损坏或不完整，请重新下载",
     "description": "Model corruption error message"
   },
   "unknownErrorMessage": {
-    "message": "Unknown error, please check if your network can access HuggingFace",
+    "message": "未知错误，请检查你的网络是否可以访问 HuggingFace",
     "description": "Unknown error fallback message"
   },
   "permissionDeniedErrorMessage": {
-    "message": "Permission denied",
+    "message": "权限被拒绝",
     "description": "Permission denied error message"
   },
   "timeoutErrorMessage": {
-    "message": "Operation timed out",
+    "message": "操作超时",
     "description": "Timeout error message"
   },
   "indexedPagesLabel": {
-    "message": "Indexed Pages",
+    "message": "已索引页面",
     "description": "Number of indexed pages label"
   },
   "indexSizeLabel": {
-    "message": "Index Size",
+    "message": "索引大小",
     "description": "Index size label"
   },
   "activeTabsLabel": {
-    "message": "Active Tabs",
+    "message": "活动标签页",
     "description": "Number of active tabs label"
   },
   "vectorDocumentsLabel": {
-    "message": "Vector Documents",
+    "message": "向量文档",
     "description": "Number of vector documents label"
   },
   "cacheSizeLabel": {
-    "message": "Cache Size",
+    "message": "缓存大小",
     "description": "Cache size label"
   },
   "cacheEntriesLabel": {
-    "message": "Cache Entries",
+    "message": "缓存条目",
     "description": "Number of cache entries label"
   },
   "clearAllDataButton": {
-    "message": "Clear All Data",
+    "message": "清空所有数据",
     "description": "Clear all data button text"
   },
   "clearAllCacheButton": {
-    "message": "Clear All Cache",
+    "message": "清空所有缓存",
     "description": "Clear all cache button text"
   },
   "cleanExpiredCacheButton": {
-    "message": "Clean Expired Cache",
+    "message": "清理过期缓存",
     "description": "Clean expired cache button text"
   },
   "exportDataButton": {
-    "message": "Export Data",
+    "message": "导出数据",
     "description": "Export data button text"
   },
   "importDataButton": {
-    "message": "Import Data",
+    "message": "导入数据",
     "description": "Import data button text"
   },
   "confirmClearDataTitle": {
-    "message": "Confirm Clear Data",
+    "message": "确认清空数据",
     "description": "Clear data confirmation dialog title"
   },
   "settingsTitle": {
-    "message": "Settings",
+    "message": "设置",
     "description": "Settings dialog title"
   },
   "aboutTitle": {
-    "message": "About",
+    "message": "关于",
     "description": "About dialog title"
   },
   "helpTitle": {
-    "message": "Help",
+    "message": "帮助",
     "description": "Help dialog title"
   },
   "clearDataWarningMessage": {
-    "message": "This operation will clear all indexed webpage content and vector data, including:",
+    "message": "此操作将清空所有已索引的网页内容和向量数据，包括：",
     "description": "Clear data warning message"
   },
   "clearDataList1": {
-    "message": "All webpage text content index",
+    "message": "所有网页文本内容索引",
     "description": "First item in clear data list"
   },
   "clearDataList2": {
-    "message": "Vector embedding data",
+    "message": "向量嵌入数据",
     "description": "Second item in clear data list"
   },
   "clearDataList3": {
-    "message": "Search history and cache",
+    "message": "搜索历史和缓存",
     "description": "Third item in clear data list"
   },
   "clearDataIrreversibleWarning": {
-    "message": "This operation is irreversible! After clearing, you need to browse webpages again to rebuild the index.",
+    "message": "此操作不可撤销！清空后需要重新浏览网页以重建索引。",
     "description": "Irreversible operation warning"
   },
   "confirmClearButton": {
-    "message": "Confirm Clear",
+    "message": "确认清空",
     "description": "Confirm clear action button"
   },
   "cacheDetailsLabel": {
-    "message": "Cache Details",
+    "message": "缓存详情",
     "description": "Cache details section label"
   },
   "noCacheDataMessage": {
-    "message": "No cache data",
+    "message": "暂无缓存数据",
     "description": "No cache data available message"
   },
   "loadingCacheInfoStatus": {
-    "message": "Loading cache information...",
+    "message": "正在加载缓存信息...",
     "description": "Loading cache information status"
   },
   "processingCacheStatus": {
-    "message": "Processing cache...",
+    "message": "正在处理缓存...",
     "description": "Processing cache status"
   },
   "expiredLabel": {
-    "message": "Expired",
+    "message": "已过期",
     "description": "Expired item label"
   },
   "bookmarksBarLabel": {
-    "message": "Bookmarks Bar",
+    "message": "书签栏",
     "description": "Bookmarks bar folder name"
   },
   "newTabLabel": {
-    "message": "New Tab",
+    "message": "新标签页",
     "description": "New tab label"
   },
   "currentPageLabel": {
-    "message": "Current Page",
+    "message": "当前页面",
     "description": "Current page label"
   },
   "menuLabel": {
-    "message": "Menu",
+    "message": "菜单",
     "description": "Menu accessibility label"
   },
   "navigationLabel": {
-    "message": "Navigation",
+    "message": "导航",
     "description": "Navigation accessibility label"
   },
   "mainContentLabel": {
-    "message": "Main Content",
+    "message": "主要内容",
     "description": "Main content accessibility label"
   },
   "languageSelectorLabel": {
-    "message": "Language",
+    "message": "语言",
     "description": "Language selector label"
   },
   "themeLabel": {
-    "message": "Theme",
+    "message": "主题",
     "description": "Theme selector label"
   },
   "lightTheme": {
-    "message": "Light",
+    "message": "浅色",
     "description": "Light theme option"
   },
   "darkTheme": {
-    "message": "Dark",
+    "message": "深色",
     "description": "Dark theme option"
   },
   "autoTheme": {
-    "message": "Auto",
+    "message": "自动",
     "description": "Auto theme option"
   },
   "advancedSettingsLabel": {
-    "message": "Advanced Settings",
+    "message": "高级设置",
     "description": "Advanced settings section label"
   },
   "debugModeLabel": {
-    "message": "Debug Mode",
+    "message": "调试模式",
     "description": "Debug mode toggle label"
   },
   "verboseLoggingLabel": {
-    "message": "Verbose Logging",
+    "message": "详细日志",
     "description": "Verbose logging toggle label"
   },
   "successNotification": {
-    "message": "Operation completed successfully",
+    "message": "操作成功完成",
     "description": "Generic success notification"
   },
   "warningNotification": {
-    "message": "Warning: Please review before proceeding",
+    "message": "警告：请在继续之前仔细检查",
     "description": "Generic warning notification"
   },
   "infoNotification": {
-    "message": "Information",
+    "message": "信息",
     "description": "Generic info notification"
   },
   "configCopiedNotification": {
-    "message": "Configuration copied to clipboard",
+    "message": "配置已复制到剪贴板",
     "description": "Configuration copied success message"
   },
   "dataClearedNotification": {
-    "message": "Data cleared successfully",
+    "message": "数据已成功清空",
     "description": "Data cleared success message"
   },
   "bytesUnit": {
-    "message": "bytes",
+    "message": "字节",
     "description": "Bytes unit"
   },
   "kilobytesUnit": {
@@ -436,69 +436,183 @@
     "description": "Gigabytes unit"
   },
   "itemsUnit": {
-    "message": "items",
+    "message": "项",
     "description": "Items count unit"
   },
   "pagesUnit": {
-    "message": "pages",
+    "message": "页",
     "description": "Pages count unit"
   },
   "userscriptsManagerTitle": {
-    "message": "Userscripts Manager",
+    "message": "用户脚本管理器",
     "description": "Options page title"
   },
-  "emergencySwitchLabel": { "message": "Emergency Switch", "description": "Global disable switch" },
+  "emergencySwitchLabel": {
+    "message": "紧急开关",
+    "description": "Global disable switch"
+  },
   "createRunSectionTitle": {
-    "message": "Create / Run",
+    "message": "创建 / 运行",
     "description": "Create & run section title"
   },
-  "nameLabel": { "message": "Name", "description": "Name input label" },
-  "runAtLabel": { "message": "Run At", "description": "runAt select label" },
-  "runAtAuto": { "message": "auto", "description": "runAt auto" },
-  "runAtDocumentStart": { "message": "document_start", "description": "runAt document_start" },
-  "runAtDocumentEnd": { "message": "document_end", "description": "runAt document_end" },
-  "runAtDocumentIdle": { "message": "document_idle", "description": "runAt document_idle" },
-  "worldLabel": { "message": "World", "description": "world select label" },
-  "worldAuto": { "message": "auto", "description": "world auto" },
-  "worldIsolated": { "message": "ISOLATED", "description": "ISOLATED world" },
-  "worldMain": { "message": "MAIN", "description": "MAIN world" },
-  "modeLabel": { "message": "Mode", "description": "mode select label" },
-  "modeAuto": { "message": "auto", "description": "mode auto" },
-  "modePersistent": { "message": "persistent", "description": "mode persistent" },
-  "modeCss": { "message": "css", "description": "mode css" },
-  "modeOnce": { "message": "once", "description": "mode once" },
-  "allFramesLabel": { "message": "All Frames", "description": "allFrames checkbox" },
-  "persistLabel": { "message": "Persist", "description": "persist checkbox" },
-  "dnrFallbackLabel": { "message": "DNR Fallback", "description": "dnr fallback checkbox" },
-  "matchesInputLabel": { "message": "Matches (comma-separated)", "description": "matches input" },
+  "nameLabel": {
+    "message": "名称",
+    "description": "Name input label"
+  },
+  "runAtLabel": {
+    "message": "运行时机",
+    "description": "runAt select label"
+  },
+  "runAtAuto": {
+    "message": "自动",
+    "description": "runAt auto"
+  },
+  "runAtDocumentStart": {
+    "message": "document_start",
+    "description": "runAt document_start"
+  },
+  "runAtDocumentEnd": {
+    "message": "document_end",
+    "description": "runAt document_end"
+  },
+  "runAtDocumentIdle": {
+    "message": "document_idle",
+    "description": "runAt document_idle"
+  },
+  "worldLabel": {
+    "message": "执行环境",
+    "description": "world select label"
+  },
+  "worldAuto": {
+    "message": "自动",
+    "description": "world auto"
+  },
+  "worldIsolated": {
+    "message": "ISOLATED",
+    "description": "ISOLATED world"
+  },
+  "worldMain": {
+    "message": "MAIN",
+    "description": "MAIN world"
+  },
+  "modeLabel": {
+    "message": "模式",
+    "description": "mode select label"
+  },
+  "modeAuto": {
+    "message": "自动",
+    "description": "mode auto"
+  },
+  "modePersistent": {
+    "message": "持久",
+    "description": "mode persistent"
+  },
+  "modeCss": {
+    "message": "CSS",
+    "description": "mode css"
+  },
+  "modeOnce": {
+    "message": "单次",
+    "description": "mode once"
+  },
+  "allFramesLabel": {
+    "message": "所有框架",
+    "description": "allFrames checkbox"
+  },
+  "persistLabel": {
+    "message": "持久化",
+    "description": "persist checkbox"
+  },
+  "dnrFallbackLabel": {
+    "message": "DNR 回退",
+    "description": "dnr fallback checkbox"
+  },
+  "matchesInputLabel": {
+    "message": "匹配规则（逗号分隔）",
+    "description": "matches input"
+  },
   "excludesInputLabel": {
-    "message": "Excludes (comma-separated)",
+    "message": "排除规则（逗号分隔）",
     "description": "excludes input"
   },
-  "tagsInputLabel": { "message": "Tags (comma-separated)", "description": "tags input" },
-  "scriptLabel": { "message": "Script", "description": "script textarea label" },
-  "applyButton": { "message": "Apply", "description": "apply button" },
-  "runOnceButton": { "message": "Run Once (CDP)", "description": "run once button" },
-  "listSectionTitle": { "message": "List", "description": "list section title" },
-  "queryLabel": { "message": "Query", "description": "query input label" },
-  "statusAll": { "message": "all", "description": "status all" },
-  "statusEnabled": { "message": "enabled", "description": "status enabled" },
-  "statusDisabled": { "message": "disabled", "description": "status disabled" },
-  "domainLabel": { "message": "Domain", "description": "domain filter label" },
-  "exportAllButton": { "message": "Export All", "description": "export button" },
-  "tableHeaderName": { "message": "Name", "description": "table header name" },
-  "tableHeaderWorld": { "message": "World", "description": "table header world" },
-  "tableHeaderRunAt": { "message": "Run At", "description": "table header runAt" },
-  "tableHeaderUpdated": { "message": "Updated", "description": "table header updated" },
-  "deleteButton": { "message": "Delete", "description": "delete button" },
-  "placeholderOptional": { "message": "optional", "description": "generic optional placeholder" },
+  "tagsInputLabel": {
+    "message": "标签（逗号分隔）",
+    "description": "tags input"
+  },
+  "scriptLabel": {
+    "message": "脚本",
+    "description": "script textarea label"
+  },
+  "applyButton": {
+    "message": "应用",
+    "description": "apply button"
+  },
+  "runOnceButton": {
+    "message": "运行一次（CDP）",
+    "description": "run once button"
+  },
+  "listSectionTitle": {
+    "message": "列表",
+    "description": "list section title"
+  },
+  "queryLabel": {
+    "message": "查询",
+    "description": "query input label"
+  },
+  "statusAll": {
+    "message": "全部",
+    "description": "status all"
+  },
+  "statusEnabled": {
+    "message": "已启用",
+    "description": "status enabled"
+  },
+  "statusDisabled": {
+    "message": "已禁用",
+    "description": "status disabled"
+  },
+  "domainLabel": {
+    "message": "域名",
+    "description": "domain filter label"
+  },
+  "exportAllButton": {
+    "message": "全部导出",
+    "description": "export button"
+  },
+  "tableHeaderName": {
+    "message": "名称",
+    "description": "table header name"
+  },
+  "tableHeaderWorld": {
+    "message": "执行环境",
+    "description": "table header world"
+  },
+  "tableHeaderRunAt": {
+    "message": "运行时机",
+    "description": "table header runAt"
+  },
+  "tableHeaderUpdated": {
+    "message": "更新时间",
+    "description": "table header updated"
+  },
+  "deleteButton": {
+    "message": "删除",
+    "description": "delete button"
+  },
+  "placeholderOptional": {
+    "message": "可选",
+    "description": "generic optional placeholder"
+  },
   "placeholderMatchesExample": {
-    "message": "e.g. https://*.example.com/*",
+    "message": "例如 https://*.example.com/*",
     "description": "matches example placeholder"
   },
   "placeholderScriptHint": {
-    "message": "Paste JS/CSS/TM here",
+    "message": "在此粘贴 JS/CSS/TM 脚本",
     "description": "script textarea placeholder"
   },
-  "placeholderDomainHint": { "message": "example.com", "description": "domain filter placeholder" }
+  "placeholderDomainHint": {
+    "message": "example.com",
+    "description": "domain filter placeholder"
+  }
 }

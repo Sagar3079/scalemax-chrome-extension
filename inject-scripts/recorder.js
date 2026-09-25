@@ -24,6 +24,37 @@
   };
   // Cross-frame event channel
   const FRAME_EVENT = 'rr_iframe_event';
+  const FRAME_EVENT_KINDS = new Set([
+    'iframeStep',
+    'iframeStepUpsert',
+    'iframeFlush',
+    'iframeStopBarrier',
+  ]);
+  const isShortStr = (v, max) => typeof v === 'string' && v.length <= max;
+  // Shape check for steps forwarded by child frames (they are untrusted page-adjacent input).
+  function isValidFrameStep(step) {
+    if (!step || typeof step !== 'object' || Array.isArray(step)) return false;
+    if (!isShortStr(step.type, 64) || !/^[A-Za-z][\w-]*$/.test(step.type)) return false;
+    if (step.id !== undefined && !isShortStr(step.id, 128)) return false;
+    if (step.value !== undefined && step.value !== null) {
+      const vt = typeof step.value;
+      if (vt === 'string' ? step.value.length > 100000 : vt !== 'number' && vt !== 'boolean')
+        return false;
+    }
+    if (step.target !== undefined && step.target !== null) {
+      const t = step.target;
+      if (typeof t !== 'object' || Array.isArray(t)) return false;
+      if (t.selector !== undefined && !isShortStr(t.selector, 4096)) return false;
+      if (t.candidates !== undefined) {
+        if (!Array.isArray(t.candidates) || t.candidates.length > 50) return false;
+        for (const cand of t.candidates) {
+          if (!cand || typeof cand !== 'object') return false;
+          if (!isShortStr(cand.type, 32) || !isShortStr(cand.value, 4096)) return false;
+        }
+      }
+    }
+    return true;
+  }
 
   // Memoization caches for selector computations during recording
   const __cacheUnique = new WeakMap();
@@ -163,14 +194,14 @@
   // Extend SelectorEngine with a shared ref helper (attached after declaration)
   SelectorEngine._ensureGlobalRef = function (el) {
     try {
-      if (!window.__claudeElementMap) window.__claudeElementMap = {};
-      if (!window.__claudeRefCounter) window.__claudeRefCounter = 0;
-      for (const k in window.__claudeElementMap) {
-        const w = window.__claudeElementMap[k];
+      if (!window.__scalemaxElementMap) window.__scalemaxElementMap = {};
+      if (!window.__scalemaxRefCounter) window.__scalemaxRefCounter = 0;
+      for (const k in window.__scalemaxElementMap) {
+        const w = window.__scalemaxElementMap[k];
         if (w && typeof w.deref === 'function' && w.deref() === el) return k;
       }
-      const id = `ref_${++window.__claudeRefCounter}`;
-      window.__claudeElementMap[id] = new WeakRef(el);
+      const id = `ref_${++window.__scalemaxRefCounter}`;
+      window.__scalemaxElementMap[id] = new WeakRef(el);
       return id;
     } catch {
       return null;
@@ -206,16 +237,16 @@
       });
       root.innerHTML = `
         <div id="__rr_rec_panel" style="background: rgba(220,38,38,0.95); color: #fff; padding:8px 10px; border-radius:8px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,0.2);">
-          <span id="__rr_badge" style="font-weight:600;">录制中</span>
+          <span id="__rr_badge" style="font-weight:600;">Recording</span>
           <label style="display:inline-flex; align-items:center; gap:4px; font-size:12px;">
-            <input id="__rr_hide_values" type="checkbox" style="vertical-align:middle;" />隐藏输入值
+            <input id="__rr_hide_values" type="checkbox" style="vertical-align:middle;" />Hide values
           </label>
           <label style="display:inline-flex; align-items:center; gap:4px; font-size:12px;">
-            <input id="__rr_enable_highlight" type="checkbox" style="vertical-align:middle;" />高亮
+            <input id="__rr_enable_highlight" type="checkbox" style="vertical-align:middle;" />Highlight
           </label>
-          <button id="__rr_toggle_timeline" style="background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.5); border-radius:6px; padding:2px 6px; cursor:pointer; font-size:12px;">折叠</button>
-          <button id="__rr_pause" style="background:#fff; color:#111; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">暂停</button>
-          <button id="__rr_stop" style="background:#111; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">停止</button>
+          <button id="__rr_toggle_timeline" style="background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.5); border-radius:6px; padding:2px 6px; cursor:pointer; font-size:12px;">Collapse</button>
+          <button id="__rr_pause" style="background:#fff; color:#111; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Pause</button>
+          <button id="__rr_stop" style="background:#111; color:#fff; border:none; border-radius:6px; padding:4px 8px; cursor:pointer;">Stop</button>
         </div>`;
       document.documentElement.appendChild(root);
       // Build timeline container just below the panel
@@ -236,7 +267,7 @@
         lineHeight: '1.4',
       });
       const header = document.createElement('div');
-      header.textContent = '已录制步骤';
+      header.textContent = 'Recorded steps';
       header.style.opacity = '0.8';
       header.style.marginBottom = '4px';
       const list = document.createElement('ol');
@@ -269,7 +300,7 @@
           this._collapsed = !this._collapsed;
           if (this._timelineBox)
             this._timelineBox.style.display = this._collapsed ? 'none' : 'block';
-          btnToggle.textContent = this._collapsed ? '展开' : '折叠';
+          btnToggle.textContent = this._collapsed ? 'Expand' : 'Collapse';
         });
       }
       btnPause.addEventListener('click', () => {
@@ -305,15 +336,15 @@
     updateStatus() {
       const badge = document.getElementById('__rr_badge');
       const pauseBtn = document.getElementById('__rr_pause');
-      if (badge) badge.textContent = this.recorder.isPaused ? '已暂停' : '录制中';
-      if (pauseBtn) pauseBtn.textContent = this.recorder.isPaused ? '继续' : '暂停';
+      if (badge) badge.textContent = this.recorder.isPaused ? 'Paused' : 'Recording';
+      if (pauseBtn) pauseBtn.textContent = this.recorder.isPaused ? 'Resume' : 'Pause';
     }
 
     // Reset the timeline list content
     resetTimeline() {
       this._count = 0;
       const list = this._timeline || document.getElementById('__rr_rec_timeline_list') || null;
-      if (list) list.innerHTML = '';
+      if (list) list.replaceChildren();
     }
 
     // Append a new recorded step into the timeline UI
@@ -327,10 +358,7 @@
       item.style.display = 'flex';
       item.style.alignItems = 'flex-start';
       item.style.gap = '6px';
-      item.innerHTML = `
-        <span style="min-width:20px; text-align:right; opacity:0.8;">${this._count}.</span>
-        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:310px;">${text}</span>
-      `;
+      this._fillStepItem(item, this._count, text);
       list.appendChild(item);
       while (list.children.length > CONFIG.UI_MAX_STEPS) {
         list.removeChild(list.firstChild);
@@ -413,42 +441,52 @@
       item.style.display = 'flex';
       item.style.alignItems = 'flex-start';
       item.style.gap = '6px';
-      item.innerHTML = `
-        <span style="min-width:20px; text-align:right; opacity:0.8;">${displayIndex}.</span>
-        <span style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:310px;">${text}</span>
-      `;
+      this._fillStepItem(item, displayIndex, text);
       list.appendChild(item);
       const container = list.parentElement;
       if (container) container.scrollTop = container.scrollHeight;
     }
 
+    // Build a timeline row with textContent only: step text/value/selector come from
+    // page content (and iframes) and must never be parsed as HTML.
+    _fillStepItem(item, index, text) {
+      const num = document.createElement('span');
+      num.style.cssText = 'min-width:20px; text-align:right; opacity:0.8;';
+      num.textContent = `${index}.`;
+      const body = document.createElement('span');
+      body.style.cssText =
+        'white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:310px;';
+      body.textContent = String(text);
+      item.replaceChildren(num, body);
+    }
+
     // Create a short, human-readable text for a recorded step
     _formatStepText(step, _idx) {
       try {
-        if (!step || typeof step !== 'object') return '未知步骤';
+        if (!step || typeof step !== 'object') return 'Unknown step';
         const t = step.type;
         const sel = step.target && step.target.selector ? step.target.selector : '';
         if (t === 'click' || t === 'dblclick') {
-          return `${t === 'dblclick' ? '双击' : '点击'}: ${sel || '(document)'}`;
+          return `${t === 'dblclick' ? 'Double-click' : 'Click'}: ${sel || '(document)'}`;
         }
         if (t === 'fill') {
           const val = step.value;
           const shown = typeof val === 'string' && val.length > 0 ? val : String(val);
-          return `输入: ${sel} = ${shown}`;
+          return `Fill: ${sel} = ${shown}`;
         }
         if (t === 'scroll') {
-          const mode = step.mode === 'container' ? '容器' : '页面';
+          const mode = step.mode === 'container' ? 'container' : 'page';
           const off = step.offset || {};
-          return `滚动(${mode}): y=${off.y ?? 0}, x=${off.x ?? 0}`;
+          return `Scroll (${mode}): y=${off.y ?? 0}, x=${off.x ?? 0}`;
         }
-        if (t === 'openTab') return `打开标签页: ${step.url || ''}`;
-        if (t === 'switchTab') return `切换标签页: 包含 ${step.urlContains || ''}`;
+        if (t === 'openTab') return `Open tab: ${step.url || ''}`;
+        if (t === 'switchTab') return `Switch tab: contains ${step.urlContains || ''}`;
         if (t === 'switchFrame')
-          return `切换Frame: 包含 ${step.frame && step.frame.urlContains ? step.frame.urlContains : ''}`;
-        if (t === 'waitFor') return `等待: ${sel || step.until || ''}`;
+          return `Switch frame: contains ${step.frame && step.frame.urlContains ? step.frame.urlContains : ''}`;
+        if (t === 'waitFor') return `Wait for: ${sel || step.until || ''}`;
         return `${t}`;
       } catch (_) {
-        return '步骤';
+        return 'Step';
       }
     }
   }
@@ -882,7 +920,7 @@
       const nowIso = new Date().toISOString();
       return {
         id: `flow_${Date.now()}`,
-        name: '未命名录制',
+        name: 'Untitled recording',
         version: 1,
         steps: [],
         variables: [],
@@ -1765,42 +1803,49 @@
           return;
         }
 
-        // Additional origin check: only accept from same origin or about:blank iframes
-        // (cross-origin iframes legitimately send from their origin)
+        // Origin check: a same-origin (script-accessible) frame must post from our origin;
+        // any other frame must post from the origin of its src URL. Anything else
+        // (unknown/opaque origin, navigated-away frame) is rejected.
         try {
           const selfOrigin = window.location.origin;
           const msgOrigin = ev.origin;
-          // Allow same-origin, null (for sandboxed iframes), or if iframe src is same-origin
-          const frameSrc = frameEl.getAttribute('src') || '';
-          let iframeSameOrigin = false;
+          let sameOrigin = false;
           try {
-            if (!frameSrc || frameSrc === 'about:blank') {
-              iframeSameOrigin = true;
-            } else {
-              const frameUrl = new URL(frameSrc, selfOrigin);
-              iframeSameOrigin = frameUrl.origin === selfOrigin;
-            }
-          } catch {
-            // Invalid URL - assume cross-origin
+            sameOrigin = !!frameEl.contentDocument;
+          } catch {}
+          if (sameOrigin) {
+            if (msgOrigin !== selfOrigin) return;
+          } else {
+            const frameSrc = frameEl.getAttribute('src') || '';
+            let srcOrigin = null;
+            try {
+              if (frameSrc) srcOrigin = new URL(frameSrc, window.location.href).origin;
+            } catch {}
+            if (!srcOrigin || srcOrigin === 'null' || msgOrigin !== srcOrigin) return;
           }
-          // If iframe is same-origin, message origin should match
-          if (iframeSameOrigin && msgOrigin !== selfOrigin && msgOrigin !== 'null') {
-            return; // Origin mismatch for same-origin iframe - suspicious
-          }
-        } catch {}
+        } catch {
+          return;
+        }
 
-        const payload = d.payload || {};
+        const payload = d.payload;
+        if (!payload || typeof payload !== 'object') return;
         const kind = payload.kind;
+        if (!FRAME_EVENT_KINDS.has(kind)) return;
 
         // Stop barrier sync: ACK back to the iframe so it can finish stop only after
         // its final postMessages have been processed by the top aggregator
         if (kind === 'iframeStopBarrier') {
           try {
             const id = payload.id;
-            if (id && ev.source && typeof ev.source.postMessage === 'function') {
+            if (
+              typeof id === 'string' &&
+              id.length <= 128 &&
+              ev.source &&
+              typeof ev.source.postMessage === 'function'
+            ) {
               ev.source.postMessage(
                 { type: FRAME_EVENT, payload: { kind: 'iframeStopBarrierAck', id } },
-                '*',
+                ev.origin === 'null' ? '*' : ev.origin,
               );
             }
           } catch {}
@@ -1818,8 +1863,8 @@
           return;
         }
 
-        const { step, href } = payload;
-        if (!step || typeof step !== 'object') return;
+        const { step } = payload;
+        if (!isValidFrameStep(step)) return;
 
         // Compose frame selector for iframe steps
         const frameTarget = SelectorEngine.buildTarget(frameEl);

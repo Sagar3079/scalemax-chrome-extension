@@ -618,7 +618,7 @@
       <div class="em-panel" id="em_panel_root">
         <!-- Header -->
         <div class="em-header em-drag-handle" id="__em_drag_handle" title="Drag to move">
-          <h2 class="em-title">元素标注</h2>
+          <h2 class="em-title">Element Marker</h2>
           <div class="em-header-actions">
             <button class="em-icon-btn" id="__em_close" title="Close">
               <svg viewBox="0 0 24 24">
@@ -636,7 +636,7 @@
               <option value="xpath">XPath</option>
             </select>
           </div>
-          <button class="em-square-btn" id="__em_toggle_list" title="列表模式 - 批量标注相似元素 (仅支持CSS)">
+          <button class="em-square-btn" id="__em_toggle_list" title="List mode - mark similar elements in bulk (CSS only)">
             <svg viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
             </svg>
@@ -1405,9 +1405,16 @@
       const parentLabel = el.closest('label');
       if (parentLabel) return (parentLabel.textContent || '').trim();
 
+      // Never surface secret field values (passwords / OTP codes).
+      const sensitive =
+        el.tagName === 'INPUT' &&
+        (String(el.type || '').toLowerCase() === 'password' ||
+          /(^|\s)(current-password|new-password|one-time-code)(\s|$)/i.test(
+            el.getAttribute('autocomplete') || '',
+          ));
       return (
         el.getAttribute('placeholder') ||
-        el.getAttribute('value') ||
+        (sensitive ? '' : el.getAttribute('value')) ||
         el.textContent ||
         ''
       ).trim();
@@ -2255,7 +2262,7 @@
         StateStore.set({
           validation: {
             status: 'success',
-            message: `✓ 验证成功 (匹配 ${filteredMatches.length} 个元素)`,
+            message: `✓ Verified (${filteredMatches.length} element${filteredMatches.length === 1 ? '' : 's'} matched)`,
           },
           validationHistory: history,
         });
@@ -2263,7 +2270,7 @@
         StateStore.set({
           validation: {
             status: 'failure',
-            message: res?.tool?.error || '验证失败',
+            message: res?.tool?.error || 'Verification failed',
           },
           validationHistory: history,
         });
@@ -2280,7 +2287,7 @@
       StateStore.set({
         validation: {
           status: 'failure',
-          message: `错误: ${err.message}`,
+          message: `Error: ${err.message}`,
         },
         validationHistory: history,
       });
@@ -2334,6 +2341,7 @@
               try {
                 const data = ev?.data;
                 if (!data || data.type !== 'em-highlight-result' || data.reqId !== reqId) return;
+                if (ev.source !== cw) return;
                 window.removeEventListener('message', listener, true);
                 resolve(data.result);
               } catch {}
@@ -2345,16 +2353,24 @@
               resolve({ success: false, error: 'Frame highlight timeout' });
             }, 3000);
 
-            cw.postMessage(
-              {
-                type: 'em-highlight-request',
-                reqId,
-                selector: innerSel,
-                selectorType,
-                listMode,
-              },
-              '*',
-            );
+            mintBridgeToken(cw)
+              .then((token) =>
+                cw.postMessage(
+                  {
+                    type: 'em-highlight-request',
+                    reqId,
+                    token,
+                    selector: innerSel,
+                    selectorType,
+                    listMode,
+                  },
+                  '*',
+                ),
+              )
+              .catch(() => {
+                window.removeEventListener('message', listener, true);
+                resolve({ success: false, error: 'Frame highlight bridge unavailable' });
+              });
           });
         }
       }
@@ -2404,7 +2420,7 @@
       navigator.clipboard?.writeText(sel).catch(() => {});
 
       StateStore.set({
-        validation: { status: 'success', message: '✓ 已复制到剪贴板' },
+        validation: { status: 'success', message: '✓ Copied to clipboard' },
       });
 
       setTimeout(() => {
@@ -2700,6 +2716,61 @@
   // Cross-Frame Bridge
   // ============================================================================
 
+  // Frame-to-frame requests travel over window.postMessage, which page scripts can also
+  // send. The requesting helper therefore mints a one-time token in chrome.storage.local
+  // (readable only by extension contexts), bound to the target frame's id; the receiving
+  // helper consumes it before acting, so pages cannot forge bridge requests.
+  const BRIDGE_TOKEN_PREFIX = '__scalemax_fb_';
+  const BRIDGE_TOKEN_TTL_MS = 15000;
+
+  function bridgeFrameId(target) {
+    try {
+      const id = chrome.runtime.getFrameId(target);
+      return typeof id === 'number' && id >= 0 ? id : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function mintBridgeToken(targetWindow) {
+    const bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    const token = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+    await chrome.storage.local.set({
+      [BRIDGE_TOKEN_PREFIX + token]: {
+        fid: bridgeFrameId(targetWindow),
+        exp: Date.now() + BRIDGE_TOKEN_TTL_MS,
+      },
+    });
+    setTimeout(() => {
+      try {
+        chrome.storage.local.remove(BRIDGE_TOKEN_PREFIX + token);
+      } catch {}
+    }, BRIDGE_TOKEN_TTL_MS);
+    return token;
+  }
+
+  async function consumeBridgeToken(token) {
+    if (typeof token !== 'string' || !/^[0-9a-f]{32}$/.test(token)) return false;
+    const key = BRIDGE_TOKEN_PREFIX + token;
+    let entry = null;
+    try {
+      entry = (await chrome.storage.local.get(key))[key];
+    } catch {
+      return false;
+    }
+    if (!entry) return false;
+    // A token minted for another frame is left in place (and ignored) rather than consumed.
+    if (typeof entry.fid === 'number') {
+      const self = bridgeFrameId(window);
+      if (self !== null && self !== entry.fid) return false;
+    }
+    try {
+      await chrome.storage.local.remove(key);
+    } catch {}
+    return entry.exp > Date.now();
+  }
+
   // Register window message listener in all frames (not just main)
   // to support cross-frame highlighting from popup validation
   window.addEventListener(
@@ -2709,33 +2780,27 @@
         const data = ev?.data;
         if (!data) return;
 
-        // Handle iframe highlight request (works even when overlay is inactive)
+        // Handle iframe highlight request (works even when overlay is inactive).
+        // Only our parent frame's helper may ask, and only with a valid bridge token.
         if (data.type === 'em-highlight-request') {
-          highlightSelectorExternal({
-            selector: data.selector,
-            selectorType: data.selectorType || 'css',
-            listMode: !!data.listMode,
-          })
-            .then((result) => {
-              window.parent.postMessage(
-                {
-                  type: 'em-highlight-result',
-                  reqId: data.reqId,
-                  result,
-                },
-                '*',
-              );
+          if (window.parent === window || ev.source !== window.parent) return;
+          const source = ev.source;
+          const replyOrigin = ev.origin && ev.origin !== 'null' ? ev.origin : '*';
+          const reply = (result) => {
+            try {
+              source.postMessage({ type: 'em-highlight-result', reqId: data.reqId, result }, replyOrigin);
+            } catch {}
+          };
+          consumeBridgeToken(data.token)
+            .then((ok) => {
+              if (!ok) return;
+              return highlightSelectorExternal({
+                selector: data.selector,
+                selectorType: data.selectorType || 'css',
+                listMode: !!data.listMode,
+              }).then(reply);
             })
-            .catch((error) => {
-              window.parent.postMessage(
-                {
-                  type: 'em-highlight-result',
-                  reqId: data.reqId,
-                  result: { success: false, error: error?.message || String(error) },
-                },
-                '*',
-              );
-            });
+            .catch((error) => reply({ success: false, error: error?.message || String(error) }));
           return;
         }
 

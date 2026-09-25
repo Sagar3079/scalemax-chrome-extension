@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalemax Official — Approve action</title>
+    <style>
+      :root {
+        --bg: #faf7f5;
+        --card: #ffffff;
+        --text: #1f1b18;
+        --muted: #6b625c;
+        --border: #e6ddd6;
+        --accent: #a1442a;
+        --accent-text: #ffffff;
+        --danger-bg: #fbeae5;
+        --code-bg: #f3eee9;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171412;
+          --card: #211d1a;
+          --text: #f2ece7;
+          --muted: #a89d95;
+          --border: #3a332e;
+          --accent: #d4714f;
+          --accent-text: #171412;
+          --danger-bg: #3a221b;
+          --code-bg: #2b2521;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        padding: 20px;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      header { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+      header img { width: 28px; height: 28px; }
+      h1 { font-size: 16px; margin: 0; }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 12px;
+      }
+      .risk {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: var(--danger-bg);
+        color: var(--accent);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .label { color: var(--muted); font-size: 12px; margin: 10px 0 4px; }
+      pre {
+        margin: 0;
+        padding: 10px;
+        background: var(--code-bg);
+        border-radius: 8px;
+        max-height: 180px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace;
+      }
+      .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+      button {
+        flex: 1 1 auto;
+        padding: 9px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--card);
+        color: var(--text);
+        font: inherit;
+        cursor: pointer;
+      }
+      button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600; }
+      button:disabled { opacity: 0.5; cursor: default; }
+      .muted { color: var(--muted); font-size: 12px; }
+      #status { margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <header>
+      <img src="/icon/48.png" alt="">
+      <h1>The agent wants to run a high-risk action</h1>
+    </header>
+    <div class="card">
+      <div><strong id="tool">…</strong> <span class="risk" id="risk">high risk</span></div>
+      <div class="label">Why this needs approval</div>
+      <div id="why" class="muted">This tool can run code in your pages or send requests with your logged-in cookies.</div>
+      <div class="label">Task</div>
+      <pre id="task">…</pre>
+      <div class="label">Arguments</div>
+      <pre id="args">…</pre>
+    </div>
+    <div class="actions">
+      <button id="deny">Deny</button>
+      <button id="allow-run">Allow for this run</button>
+      <button id="allow-once" class="primary">Allow once</button>
+    </div>
+    <p id="status" class="muted"></p>
+    <script src="/approval.js"></script>
+  </body>
+</html>

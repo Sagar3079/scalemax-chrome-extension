@@ -2270,6 +2270,17 @@ var elementPicker = (function() {
 				controller = null;
 				currentSessionId = null;
 			});
+			// When the page is restored from the back/forward cache this script does
+			// not run again, so re-attach the listener removed in `pagehide` above
+			// (the controller is re-created lazily by ensureController()).
+			window.addEventListener("pageshow", (event) => {
+				if (!event.persisted) return;
+				try {
+					if (!chrome.runtime.onMessage.hasListener(handleMessage)) chrome.runtime.onMessage.addListener(handleMessage);
+				} catch (err) {
+					console.warn("[ElementPicker] Failed to re-attach message listener after bfcache restore:", err);
+				}
+			});
 		}
 	});
 	//#endregion
