@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translate Settings — Scalemax Official</title>
+    <meta name="manifest.type" content="unlisted_page">
+    <link rel="stylesheet" href="/assets/a11y-overrides.css">
+    <link rel="stylesheet" href="/translate-settings.css">
+  </head>
+  <body>
+    <main class="page">
+      <header class="page-header">
+        <h1>Translate</h1>
+        <p class="page-sub">AI-powered page translation. Uses the same provider configured on the AI Provider page.</p>
+      </header>
+
+      <section class="card" aria-labelledby="general-heading">
+        <h2 id="general-heading">General</h2>
+
+        <label class="row" for="enabled-toggle">
+          <span>Enable translation</span>
+          <input type="checkbox" id="enabled-toggle" class="switch">
+        </label>
+
+        <div class="field">
+          <label for="target-lang">Translate pages into</label>
+          <select id="target-lang"></select>
+        </div>
+
+        <div class="field">
+          <label for="default-policy">Default behavior for new sites</label>
+          <select id="default-policy">
+            <option value="ask">Ask every time</option>
+            <option value="always">Always translate</option>
+            <option value="never">Never translate</option>
+          </select>
+          <p class="hint">Applies to any site you haven't set a specific rule for below. Existing per-site rules always take priority over this.</p>
+        </div>
+
+        <div class="status" id="status-msg" role="status" aria-live="polite"></div>
+      </section>
+
+      <section class="card" aria-labelledby="sites-heading">
+        <div class="section-title-row">
+          <h2 id="sites-heading">Per-site rules</h2>
+          <button type="button" id="refresh-sites" class="btn-ghost">Refresh</button>
+        </div>
+        <p class="hint">Sites you've chosen "Always" or "Never" for on the translate prompt banner. Change or remove a rule any time.</p>
+
+        <div id="sites-empty" class="empty" hidden>No per-site rules yet. They'll appear here after you choose "Always" or "Never" on a page's translate prompt.</div>
+
+        <table class="sites-table" id="sites-table" hidden>
+          <thead>
+            <tr>
+              <th scope="col">Site</th>
+              <th scope="col">Rule</th>
+              <th scope="col"><span class="sr-only">Actions</span></th>
+            </tr>
+          </thead>
+          <tbody id="sites-tbody"></tbody>
+        </table>
+      </section>
+
+      <section class="card" aria-labelledby="current-heading">
+        <h2 id="current-heading">Current tab</h2>
+        <div id="current-tab-info" class="current-tab-info">Checking the active tab…</div>
+        <div class="row-buttons">
+          <button type="button" id="translate-now-btn" class="btn-primary" disabled>Translate this page</button>
+          <button type="button" id="revert-now-btn" class="btn-ghost" disabled>Show original</button>
+        </div>
+      </section>
+    </main>
+    <script src="/translate-settings.js"></script>
+  </body>
+</html>

@@ -1,0 +1,273 @@
+/**
+ * Accessibility & UX override layer
+ * ---------------------------------
+ * Additive stylesheet, loaded LAST on every extension page so it wins on
+ * cascade order without editing the generated stylesheets. Delete this file and
+ * remove the <link> tags to revert everything here.
+ *
+ * Fixes, in order:
+ *   1. Design tokens that fail WCAG contrast
+ *   2. Visible focus indicators (the build sets `outline: none` in ~15 places)
+ *   3. Minimum pointer target sizes
+ *   4. Scroll affordance in the fixed-size popup
+ *   5. Genuinely-disabled styling for stubbed controls
+ *   6. prefers-reduced-motion coverage for the builder + options pages
+ *   7. forced-colors / high-contrast support
+ *
+ * Contrast ratios below are computed against --ac-surface (#ffffff) and
+ * --ac-bg (#fdfcf8), the two backgrounds these tokens actually sit on.
+ */
+
+/* ==========================================================================
+   1. Token contrast
+   ========================================================================== */
+
+.agent-theme,
+.agent-theme[data-agent-theme='warm-editorial'] {
+  /* was #a8a29e -> 2.52:1 (fails AA for body text AND 3:1 for UI parts).
+     #6b6864 -> 5.54:1 on white, 5.42:1 on #fdfcf8. Still reads as "subtle"
+     against --ac-text (#1a1a1a) but is now legible. */
+  --ac-text-subtle: #6b6864;
+
+  /* Placeholders are body text and must clear 4.5:1. Same value. */
+  --ac-text-placeholder: #6b6864;
+
+  /* was rgba(214, 211, 209, .9) -> ~1.44:1 composited. WCAG 2.2 SC 1.4.11 and
+     2.4.13 both require >= 3:1 for a focus indicator. #a1442a is an on-brand
+     dark terracotta at 6.22:1. */
+  --ac-focus-ring: #a1442a;
+
+  /* Used as a hairline on light surfaces; #e7e5e4 is ~1.2:1. Non-decorative
+     borders that convey grouping need 3:1. */
+  --ac-border-strong: #8c8781;
+}
+
+/* .ai-hint hardcodes #9ca3af (2.54:1) instead of using a token. */
+.ai-provider-page .ai-hint,
+[class*='ai-provider'] .ai-hint,
+p.ai-hint {
+  color: #6b6864 !important;
+}
+
+/* 9px uppercase terracotta on white is a compound failure (small text + 3.12:1).
+   Raise the size to the 11px floor and darken. */
+.coming-soon-badge {
+  font-size: 11px !important;
+  color: #a1442a !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* ==========================================================================
+   2. Focus indicators
+   ========================================================================== */
+
+/* Baseline: every interactive element gets a real ring. The `!important` is
+   deliberate -- it exists to beat the ~15 scoped `outline: none` rules that
+   would otherwise win on specificity. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex]:focus-visible,
+[role='button']:focus-visible,
+[role='tab']:focus-visible,
+[role='menuitem']:focus-visible,
+[contenteditable='true']:focus-visible {
+  outline: 3px solid var(--ac-focus-ring, #a1442a) !important;
+  outline-offset: 2px !important;
+  /* Inner white keyline keeps the ring visible on dark surfaces too. */
+  box-shadow: 0 0 0 1px #fff !important;
+  border-radius: 4px;
+}
+
+/* The agent theme's own focus utility stripped the outline entirely. */
+.agent-theme .ac-focus-ring:focus-visible {
+  outline: 3px solid var(--ac-focus-ring, #a1442a) !important;
+  outline-offset: 2px !important;
+}
+
+/* Named overrides for the specific `outline: none` offenders, so focus works
+   even where :focus-visible is not supported / not matched. */
+.ai-input:focus,
+.dialog-button:focus,
+.chat-input:focus,
+.port-input:focus,
+.em-input:focus,
+.em-textarea:focus,
+.em-select:focus,
+.em-search-input:focus {
+  outline: 3px solid var(--ac-focus-ring, #a1442a) !important;
+  outline-offset: 1px !important;
+}
+
+/* Builder: the node graph is keyboard-navigable (Enter is in
+   elementSelectionKeys) but focus was made invisible. */
+.vue-flow__node.selectable:focus-visible,
+.vue-flow__edge:focus-visible,
+.vue-flow__nodesselection-rect:focus-visible,
+.vue-flow__selection:focus-visible {
+  outline: 3px solid var(--ac-focus-ring, #a1442a) !important;
+  outline-offset: 2px !important;
+}
+
+/* Never let a focused control be the invisible one. */
+:focus-visible {
+  outline-color: var(--ac-focus-ring, #a1442a);
+}
+
+/* ==========================================================================
+   3. Pointer target sizes  (WCAG 2.2 SC 2.5.8 -> 24x24 minimum)
+   ========================================================================== */
+
+.entry-item,
+.footer-link,
+.chat-icon-btn,
+.ai-btn,
+.rr-icon-btn {
+  min-height: 32px;
+}
+
+/* Icon-only buttons in the side panel session list are 14px SVGs in ~20px
+   boxes. Pad them out without moving anything else. */
+.ac-btn,
+button[title='Delete'],
+button[title='Rename session'],
+button[title='Delete session'] {
+  min-width: 24px;
+  min-height: 24px;
+}
+
+/* ==========================================================================
+   4. Popup scroll affordance
+   ========================================================================== */
+
+/* The popup is a fixed 400x600 with `.content { overflow-y: auto }` and the
+   scrollbar explicitly hidden -- so there is no cue that content continues
+   below the fold. Put a thin one back. */
+.content {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--ac-border-strong, #8c8781) transparent !important;
+  -ms-overflow-style: auto !important;
+}
+
+.content::-webkit-scrollbar {
+  display: block !important;
+  width: 8px !important;
+}
+
+.content::-webkit-scrollbar-thumb {
+  background: var(--ac-border-strong, #8c8781) !important;
+  border-radius: 4px;
+  /* Inset so the 8px track reads as a 4px thumb with breathing room. */
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.content::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+/* ==========================================================================
+   5. Stubbed / "coming soon" controls
+   ========================================================================== */
+
+/* These buttons render at 50% opacity with `cursor: default` but carry no
+   `disabled` and no `aria-disabled`, so assistive tech announces them as
+   enabled and they stay in the tab order. CSS cannot fix the semantics -- that
+   needs the source -- but it can stop them looking merely "dimmed" and can
+   surface the reason on focus as well as hover. */
+.rr-icon-btn-coming-soon {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+/* Tooltips were hover-only; show them on keyboard focus too. */
+.has-tooltip:focus-visible::after,
+.has-tooltip:focus-visible::before,
+.agent-theme [data-tooltip]:focus-visible::after,
+.agent-theme [data-tooltip]:focus-visible::before {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ==========================================================================
+   6. Reduced motion
+   ========================================================================== */
+
+/* popup-B5koS2gP.css has a blanket rule; sidepanel covers only a few
+   selectors; builder-e1a18J5r.css and options-Ccw8N_8t.css have none at all.
+   This covers every page uniformly, including the animation-heavy node graph. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Indefinite spinners/pulses: stop them outright rather than spinning at
+     0.01ms, which reads as a flicker. */
+  .spinner,
+  .ac-pulse,
+  .text-shimmer,
+  .loading-scribble,
+  .loading-scribble path,
+  .animate-pulse,
+  .rr-icon-btn-recording,
+  .vue-flow__edge-path,
+  .vue-flow__edge.animated .vue-flow__edge-path {
+    animation: none !important;
+  }
+
+  /* text-shimmer paints the text transparent and relies on a moving gradient;
+     with the animation off it would be invisible. */
+  .text-shimmer {
+    background: none !important;
+    color: var(--ac-accent, #a1442a) !important;
+    -webkit-text-fill-color: var(--ac-accent, #a1442a) !important;
+  }
+
+  .loading-scribble path {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* ==========================================================================
+   7. Forced colors / high contrast
+   ========================================================================== */
+
+@media (forced-colors: active) {
+  /* Keep focus visible when the OS replaces our palette. */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid Highlight !important;
+    outline-offset: 2px !important;
+  }
+
+  /* Status dots and engine badges carry meaning through colour alone; give
+     them a border so they survive forced-colors. */
+  .status-dot,
+  .entry-icon,
+  .coming-soon-badge {
+    border: 1px solid CanvasText !important;
+    forced-color-adjust: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .agent-theme {
+    --ac-text-subtle: #3f3d3a;
+    --ac-text-muted: #2a2826;
+    --ac-border: #6b6864;
+    --ac-border-strong: #1a1a1a;
+  }
+}

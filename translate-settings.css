@@ -1,0 +1,261 @@
+:root {
+  --tr-bg: #fdfcf8;
+  --tr-surface: #ffffff;
+  --tr-surface-muted: #f2f0eb;
+  --tr-text: #1a1a1a;
+  --tr-text-muted: #6b6864;
+  --tr-border: #e7e5e4;
+  --tr-accent: #d97757;
+  --tr-accent-hover: #c4664a;
+  --tr-danger: #dc2626;
+  --tr-focus: #a1442a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--tr-bg);
+  color: var(--tr-text);
+  font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+.page {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.page-header h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+}
+
+.page-sub {
+  margin: 0;
+  color: var(--tr-text-muted);
+  font-size: 13px;
+}
+
+.card {
+  background: var(--tr-surface);
+  border: 1px solid var(--tr-border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  margin-top: 20px;
+}
+
+.card h2 {
+  font-size: 16px;
+  margin: 0 0 14px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.section-title-row h2 {
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0;
+  cursor: pointer;
+}
+
+.field {
+  margin-top: 14px;
+}
+
+.field label {
+  display: block;
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--tr-border);
+  border-radius: 8px;
+  font: inherit;
+  background: var(--tr-surface);
+  color: var(--tr-text);
+}
+
+.hint {
+  color: var(--tr-text-muted);
+  font-size: 12px;
+  margin: 6px 0 0;
+}
+
+.switch {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--tr-accent);
+  cursor: pointer;
+}
+
+.status {
+  min-height: 18px;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.status.ok {
+  color: #15803d;
+}
+
+.status.err {
+  color: var(--tr-danger);
+}
+
+.empty {
+  color: var(--tr-text-muted);
+  font-size: 13px;
+  padding: 12px 0;
+}
+
+.sites-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+}
+
+.sites-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--tr-text-muted);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--tr-border);
+}
+
+.sites-table td {
+  padding: 8px 8px;
+  border-bottom: 1px solid var(--tr-border);
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.sites-table tr:last-child td {
+  border-bottom: none;
+}
+
+.rule-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.rule-badge.always {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.rule-badge.never {
+  background: rgba(220, 38, 38, 0.1);
+  color: var(--tr-danger);
+}
+
+.row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 8px;
+  border: 1px solid transparent;
+}
+
+.btn-primary {
+  background: var(--tr-accent);
+  color: #fff;
+  padding: 9px 16px;
+  border: none;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--tr-accent-hover);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: var(--tr-surface-muted);
+  color: var(--tr-text);
+  padding: 8px 14px;
+  border: 1px solid var(--tr-border);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--tr-border);
+}
+
+.btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-small {
+  padding: 5px 10px;
+  font-size: 12px;
+  background: var(--tr-surface-muted);
+  border: 1px solid var(--tr-border);
+  color: var(--tr-text);
+}
+
+.btn-small:hover {
+  background: var(--tr-border);
+}
+
+.btn-small.danger {
+  color: var(--tr-danger);
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid var(--tr-focus);
+  outline-offset: 2px;
+}
+
+.row-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.current-tab-info {
+  font-size: 13px;
+  color: var(--tr-text-muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
