@@ -1,7 +1,7 @@
 /* eslint-disable */
 
 (() => {
-  const GLOBAL_KEY = '__MCP_WEB_EDITOR__';
+  const GLOBAL_KEY = '__SCALEMAX_WEB_EDITOR__';
   if (window[GLOBAL_KEY]) return;
 
   // Reported on the ping reply so the background can detect a stale resident
@@ -711,7 +711,7 @@
 
     const root = document.createElement('div');
     state.root = root;
-    root.id = '__mcp_web_editor_root';
+    root.id = '__scalemax_web_editor_root';
     Object.assign(root.style, {
       position: 'fixed',
       inset: '0',

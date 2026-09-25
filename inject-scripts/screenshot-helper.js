@@ -32,7 +32,7 @@ if (window.__SCREENSHOT_HELPER_INITIALIZED__) {
         if (
           htmlEl.offsetWidth > 1 &&
           htmlEl.offsetHeight > 1 &&
-          !htmlEl.id.startsWith('chrome-mcp-')
+          !htmlEl.id.startsWith('scalemax-')
         ) {
           fixed.push({
             element: htmlEl,

@@ -4,10 +4,10 @@
 * Centralized configuration values and magic constants
 */
 var NATIVE_HOST = {
-	NAME: "com.chromemcp.nativehost",
+	NAME: "com.scalemax.nativehost",
 	DEFAULT_PORT: 12306
 };
-var LINKS = { TROUBLESHOOTING: "https://github.com/hangwin/mcp-chrome/blob/master/docs/TROUBLESHOOTING.md" };
+var LINKS = { TROUBLESHOOTING: "https://github.com/Sagar3079/scalemax-chrome-extension#readme" };
 var STORAGE_KEYS = {
 	SERVER_STATUS: "serverStatus",
 	NATIVE_SERVER_PORT: "nativeServerPort",

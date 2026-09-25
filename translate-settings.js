@@ -5,10 +5,10 @@
 // anything in chunks/.
 //
 // Message contract with background.js (must match registerTranslateMessaging exactly):
-//   potato_translate_settings_get  -> { ok, settings: { enabled, targetLang, defaultSitePolicy } }
-//   potato_translate_settings_set  -> { patch } -> { ok, settings }
-//   potato_translate_site_prefs_list -> { ok, prefs: { [hostname]: "always"|"never" } }
-//   potato_translate_site_policy_set -> { hostname, policy } -> { ok }
+//   scalemax_translate_settings_get  -> { ok, settings: { enabled, targetLang, defaultSitePolicy } }
+//   scalemax_translate_settings_set  -> { patch } -> { ok, settings }
+//   scalemax_translate_site_prefs_list -> { ok, prefs: { [hostname]: "always"|"never" } }
+//   scalemax_translate_site_policy_set -> { hostname, policy } -> { ok }
 //
 // Message contract with content-scripts/translate.js (via chrome.tabs.sendMessage):
 //   { action: "translate_now", targetLang } -> { success }
@@ -86,7 +86,7 @@
   // ---------------------------------------------------------------------------
 
   async function loadGeneralSettings() {
-    const res = await sendBackground({ type: "potato_translate_settings_get" });
+    const res = await sendBackground({ type: "scalemax_translate_settings_get" });
     if (!res || res.ok === false) {
       setStatus("Could not load settings: " + (res && res.error || "unknown error"), false);
       return;
@@ -98,7 +98,7 @@
   }
 
   async function saveGeneralSettings(patch) {
-    const res = await sendBackground({ type: "potato_translate_settings_set", patch });
+    const res = await sendBackground({ type: "scalemax_translate_settings_set", patch });
     if (!res || res.ok === false) {
       setStatus("Save failed: " + (res && res.error || "unknown error"), false);
       return;
@@ -121,7 +121,7 @@
   // ---------------------------------------------------------------------------
 
   async function loadSitePrefs() {
-    const res = await sendBackground({ type: "potato_translate_site_prefs_list" });
+    const res = await sendBackground({ type: "scalemax_translate_site_prefs_list" });
     if (!res || res.ok === false) {
       setStatus("Could not load site rules: " + (res && res.error || "unknown error"), false);
       return;
@@ -182,7 +182,7 @@
   }
 
   async function setHostPolicy(hostname, policy) {
-    const res = await sendBackground({ type: "potato_translate_site_policy_set", hostname, policy });
+    const res = await sendBackground({ type: "scalemax_translate_site_policy_set", hostname, policy });
     if (!res || res.ok === false) {
       setStatus("Could not update rule for " + hostname + ": " + (res && res.error || "unknown error"), false);
       return;

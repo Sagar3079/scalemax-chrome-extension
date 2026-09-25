@@ -24236,7 +24236,7 @@ var AgentProjectMenu_default = /* @__PURE__ */ defineComponent({
 		"model:update",
 		"reasoning-effort:update",
 		"ccr:update",
-		"chrome-mcp:update",
+		"scalemax:update",
 		"save"
 	],
 	setup(__props, { emit: __emit }) {
@@ -24291,7 +24291,7 @@ var AgentProjectMenu_default = /* @__PURE__ */ defineComponent({
 			emit("ccr:update", event.target.checked);
 		}
 		function handleChromeMcpChange(event) {
-			emit("chrome-mcp:update", event.target.checked);
+			emit("scalemax:update", event.target.checked);
 		}
 		function handleModelChange(event) {
 			const newModel = event.target.value;
@@ -28020,7 +28020,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 			_loadSessionList = _asyncToGenerator(function* () {
 				loadingList.value = true;
 				try {
-					const r = yield callBackground("potato_session_list");
+					const r = yield callBackground("scalemax_session_list");
 					sessions.value = r.ok ? r.sessions || [] : [];
 					if (!r.ok && r.error) errorMsg.value = r.error;
 					loadPreviews(sessions.value);
@@ -28041,7 +28041,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 					var _ref = _asyncToGenerator(function* (s) {
 						try {
 							var _r$session;
-							const firstUser = (_r$session = (yield callBackground("potato_session_get", { id: s.id })).session) === null || _r$session === void 0 ? void 0 : _r$session.messages.find((m) => m.role === "user" && m.content);
+							const firstUser = (_r$session = (yield callBackground("scalemax_session_get", { id: s.id })).session) === null || _r$session === void 0 ? void 0 : _r$session.messages.find((m) => m.role === "user" && m.content);
 							sessionPreviews.value = _objectSpread2(_objectSpread2({}, sessionPreviews.value), {}, { [s.id]: (firstUser === null || firstUser === void 0 ? void 0 : firstUser.content) ? String(firstUser.content) : "" });
 						} catch (_unused) {
 							sessionPreviews.value = _objectSpread2(_objectSpread2({}, sessionPreviews.value), {}, { [s.id]: "" });
@@ -28188,7 +28188,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 		function _loadCurrentSession() {
 			_loadCurrentSession = _asyncToGenerator(function* (id) {
 				const generation = ++sessionLoadGeneration;
-				const r = yield callBackground("potato_session_get", { id });
+				const r = yield callBackground("scalemax_session_get", { id });
 				if (disposed || generation !== sessionLoadGeneration || currentId.value !== id) return null;
 				if (r.ok) {
 					applySessionSnapshot(id, r.session || null);
@@ -28226,7 +28226,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				creating.value = true;
 				errorMsg.value = "";
 				try {
-					const r = yield callBackground("potato_session_create");
+					const r = yield callBackground("scalemax_session_create");
 					if (r.ok && r.session) {
 						yield loadSessionList();
 						yield openSession(r.session.id);
@@ -28258,7 +28258,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				const title = renameDraft.value.trim();
 				renamingId.value = null;
 				if (!title || title === s.title) return;
-				const r = yield callBackground("potato_session_rename", {
+				const r = yield callBackground("scalemax_session_rename", {
 					id: s.id,
 					title
 				});
@@ -28283,7 +28283,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 		function _confirmDelete() {
 			_confirmDelete = _asyncToGenerator(function* (id) {
 				confirmDeleteId.value = null;
-				const r = yield callBackground("potato_session_delete", {
+				const r = yield callBackground("scalemax_session_delete", {
 					id,
 					closeTab: true
 				});
@@ -28331,7 +28331,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 							stopPollingFor(sid);
 							return;
 						}
-						const r = yield callBackground("potato_session_get", { id: sid });
+						const r = yield callBackground("scalemax_session_get", { id: sid });
 						if (disposed || pollGenerations.get(sid) !== generation) return;
 						if (r.ok) {
 							applySessionSnapshot(sid, r.session || null);
@@ -28396,7 +28396,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 					var _r$result;
 					// The response channel is only a convenience. After 15s the UI detaches
 					// and follows durable session polling, so MV3 channel loss cannot freeze it.
-					const r = yield callBackground("potato_session_run", { payload }, 15000, (lateResponse) => {
+					const r = yield callBackground("scalemax_session_run", { payload }, 15000, (lateResponse) => {
 						if (!disposed) handleRunAcknowledgement(sid, lateResponse);
 					});
 					handleRunAcknowledgement(sid, r);
@@ -28471,7 +28471,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				if (!pollTimers.has(sid)) startPolling(sid);
 				let delivered = false;
 				try {
-					const r = yield callBackground("potato_session_stop", { sessionId: sid });
+					const r = yield callBackground("scalemax_session_stop", { sessionId: sid });
 					delivered = !!r.ok;
 					if (!r.ok) errorMsg.value = r.error || "Could not deliver the stop request.";
 				} catch (e) {
@@ -28516,7 +28516,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				let targetLang = "en";
 				try {
 					const settingsResp = yield new Promise((resolve) => {
-						chrome.runtime.sendMessage({ type: "potato_translate_settings_get" }, (resp) => resolve(resp || {}));
+						chrome.runtime.sendMessage({ type: "scalemax_translate_settings_get" }, (resp) => resolve(resp || {}));
 					});
 					if (settingsResp && settingsResp.ok && settingsResp.settings && settingsResp.settings.targetLang) targetLang = settingsResp.settings.targetLang;
 				} catch (_unusedSettings) {}
@@ -28616,7 +28616,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 			_loadSkills = _asyncToGenerator(function* () {
 				loadingSkills.value = true;
 				try {
-					const r = yield callBackground("potato_skill_list");
+					const r = yield callBackground("scalemax_skill_list");
 					if (r.ok) skills.value = r.skills || [];
 					else if (r.error) errorMsg.value = r.error;
 				} finally {
@@ -28660,7 +28660,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				if (!name || !task || savingSkill.value) return;
 				savingSkill.value = true;
 				try {
-					const r = yield callBackground("potato_skill_save", {
+					const r = yield callBackground("scalemax_skill_save", {
 						name,
 						task
 					});
@@ -28687,7 +28687,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 		function _confirmDeleteSkillAction() {
 			_confirmDeleteSkillAction = _asyncToGenerator(function* (sk) {
 				confirmDeleteSkillId.value = null;
-				const r = yield callBackground("potato_skill_delete", { id: sk.id });
+				const r = yield callBackground("scalemax_skill_delete", { id: sk.id });
 				if (r.ok) skills.value = skills.value.filter((s) => s.id !== sk.id);
 				else if (r.error) errorMsg.value = r.error;
 			});
@@ -28704,7 +28704,7 @@ var BrowserAgentChat_default = /* @__PURE__ */ defineComponent({
 				showSkills.value = false;
 				errorMsg.value = "";
 				try {
-					const created = yield callBackground("potato_session_create");
+					const created = yield callBackground("scalemax_session_create");
 					if (!created.ok || !created.session) {
 						errorMsg.value = created.error || "Failed to create session";
 						return;
@@ -31381,11 +31381,11 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			else if (tabParam === "workflows") activeTab.value = "workflows";
 			else if (tabParam === "browser-agent") activeTab.value = "browser-agent";
 			try {
-				const wanted = (yield chrome.storage.local.get("potato_sidepanel_tab"))["potato_sidepanel_tab"];
+				const wanted = (yield chrome.storage.local.get("scalemax_sidepanel_tab"))["scalemax_sidepanel_tab"];
 				if (wanted === "browser-agent" || wanted === "agent-chat" || wanted === "workflows" || wanted === "element-markers") {
 					activeTab.value = wanted;
 					if (wanted === "element-markers") yield loadMarkers();
-					yield chrome.storage.local.remove("potato_sidepanel_tab");
+					yield chrome.storage.local.remove("scalemax_sidepanel_tab");
 				}
 			} catch (_unused7) {}
 		}));

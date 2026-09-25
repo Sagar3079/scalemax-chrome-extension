@@ -386,7 +386,7 @@ var content = (function() {
 		};
 	}
 	//#endregion
-	//#region \0virtual:wxt-content-script-isolated-world-entrypoint?C:/Users/pc/Downloads/Opus-4.8-Unleashed/ClaudeJB/chrome-mcp/base-mcp-chrome/app/chrome-extension/entrypoints/content.ts
+	//#region \0virtual:wxt-content-script-isolated-world-entrypoint?entrypoints/content.ts
 	var _excluded = ["main"];
 	/** Wrapper around `console` with a "[wxt]" prefix */
 	var logger = {

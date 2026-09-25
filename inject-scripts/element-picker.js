@@ -12,8 +12,8 @@
   'use strict';
 
   // Prevent double initialization
-  if (window.__MCP_ELEMENT_PICKER_INITIALIZED__) return;
-  window.__MCP_ELEMENT_PICKER_INITIALIZED__ = true;
+  if (window.__SCALEMAX_ELEMENT_PICKER_INITIALIZED__) return;
+  window.__SCALEMAX_ELEMENT_PICKER_INITIALIZED__ = true;
 
   // ============================================================
   // Constants
@@ -23,8 +23,8 @@
   // copy of this script after an extension update.
   const PROTOCOL_VERSION = 1;
 
-  const UI_HOST_ID = '__mcp_element_picker_host__';
-  const HIGHLIGHT_ID = '__mcp_element_picker_highlight__';
+  const UI_HOST_ID = '__scalemax_element_picker_host__';
+  const HIGHLIGHT_ID = '__scalemax_element_picker_highlight__';
   const MAX_TEXT_LEN = 160;
 
   // Highlight colors matching Editorial accent (terracotta)
@@ -643,7 +643,7 @@
   // Expose API for Background Script
   // ============================================================
 
-  window.__mcpElementPicker = {
+  window.__scalemaxElementPicker = {
     startSession,
     stopSession,
     setActiveRequest,

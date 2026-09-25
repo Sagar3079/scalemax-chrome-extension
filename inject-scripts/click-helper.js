@@ -291,8 +291,8 @@ if (window.__CLICK_HELPER_INITIALIZED__) {
   }
 
   function dispatchClickSequence(element, x, y, options = {}, isDouble = false) {
-    try{ if(window.__mcpMouse) window.__mcpMouse.moveTo(x,y,{label:'click'}); else if(window.parent && window.parent.__mcpMouse) window.parent.__mcpMouse.moveTo(x,y,'click'); }catch(e){}
-    try{ if(window.__mcpMouse) window.__mcpMouse.clickEffect(x,y); }catch(e){}
+    try{ if(window.__scalemaxMouse) window.__scalemaxMouse.moveTo(x,y,{label:'click'}); else if(window.parent && window.parent.__scalemaxMouse) window.parent.__scalemaxMouse.moveTo(x,y,'click'); }catch(e){}
+    try{ if(window.__scalemaxMouse) window.__scalemaxMouse.clickEffect(x,y); }catch(e){}
     try{ element.focus(); }catch(e){}
     const base = normalizeMouseOpts(x, y, options);
     const pbase={...base, pointerId:1, pointerType:'mouse', isPrimary:true, composed:true};

@@ -116,10 +116,10 @@ function getClickablePoint(el){
  return {x:r.left+r.width/2, y:r.top+r.height/2};
 }
 function dispatchUniversalClick(el, x, y, opts={}, isDouble=false){
- try{ if(window.__mcpMouse) window.__mcpMouse.moveTo(x,y,{label:'click'}); else if(window.parent && window.parent.__mcpMouse) window.parent.__mcpMouse.moveTo(x,y,'click'); }catch(e){}
+ try{ if(window.__scalemaxMouse) window.__scalemaxMouse.moveTo(x,y,{label:'click'}); else if(window.parent && window.parent.__scalemaxMouse) window.parent.__scalemaxMouse.moveTo(x,y,'click'); }catch(e){}
  const rect=el.getBoundingClientRect();
  if(x===undefined||y===undefined){ const p=getClickablePoint(el); x=p.x; y=p.y; }
- try{ if(window.__mcpMouse) window.__mcpMouse.moveTo(x,y,{label:'click'}); }catch(e){}
+ try{ if(window.__scalemaxMouse) window.__scalemaxMouse.moveTo(x,y,{label:'click'}); }catch(e){}
  try{ el.focus(); }catch(e){}
  // hover pre-steps
  const base={bubbles:true, cancelable:true, composed:true, view:window, clientX:x, clientY:y, screenX:x, screenY:y, button:opts.button==='right'?2:opts.button==='middle'?1:0, buttons:opts.button==='right'?2:opts.button==='middle'?4:1, altKey:!!opts.altKey, ctrlKey:!!opts.ctrlKey, metaKey:!!opts.metaKey, shiftKey:!!opts.shiftKey, pointerId:1, pointerType:'mouse', isPrimary:true};

@@ -5,9 +5,9 @@
   if (window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_LOADED__) return;
   window.__INJECT_SCRIPT_TOOL_UNIVERSAL_BRIDGE_LOADED__ = true;
   const EVENT_NAME = {
-    RESPONSE: 'chrome-mcp:response',
-    CLEANUP: 'chrome-mcp:cleanup',
-    EXECUTE: 'chrome-mcp:execute',
+    RESPONSE: 'scalemax:response',
+    CLEANUP: 'scalemax:cleanup',
+    EXECUTE: 'scalemax:execute',
   };
 
   // Keep in sync with the 30000ms convention used in inject-scripts/network-helper.js.
@@ -18,8 +18,8 @@
    *
    * This bridge lives in the ISOLATED world and talks to the MAIN world over
    * `window` CustomEvents. Page scripts share that MAIN world, so they can
-   * observe every `chrome-mcp:execute` event (including its requestId) and can
-   * synthesise `chrome-mcp:response` events. There is no browser primitive that
+   * observe every `scalemax:execute` event (including its requestId) and can
+   * synthesise `scalemax:response` events. There is no browser primitive that
    * lets an ISOLATED-world listener prove a CustomEvent came from our own
    * MAIN-world handler rather than from page code, so this channel CANNOT be
    * made fully authentic.

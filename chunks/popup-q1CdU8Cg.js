@@ -970,8 +970,8 @@ var _hoisted_18$4 = {
 	class: "ai-output"
 };
 var PORT = 12306;
-var PROVIDER_STORAGE_KEY = "potato_ai_provider";
-var RUN_MODE_KEY = "potato_ai_run_mode";
+var PROVIDER_STORAGE_KEY = "scalemax_ai_provider";
+var RUN_MODE_KEY = "scalemax_ai_run_mode";
 //#endregion
 //#region entrypoints/popup/components/AiProviderPage.vue
 var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ */ defineComponent({
@@ -1031,7 +1031,7 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 			return _setRunMode.apply(this, arguments);
 		}
 		/**
-		* Mirror the provider config into chrome.storage.local['potato_ai_provider'] so the
+		* Mirror the provider config into chrome.storage.local['scalemax_ai_provider'] so the
 		* in-extension agent (Mode 2, no PC) can read it directly, in addition to whatever
 		* the Native path does. Keeps the previously stored key when the field is left blank,
 		* matching the native save behavior.
@@ -1200,7 +1200,7 @@ var AiProviderPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* 
 						const payload = { task: testTask.value };
 						if (testTabId.value != null) payload.tabId = testTabId.value;
 						res = yield chrome.runtime.sendMessage({
-							type: "potato_agent_run",
+							type: "scalemax_agent_run",
 							payload
 						});
 						if (!res) throw new Error("No response from the background agent runner.");
@@ -1350,7 +1350,7 @@ init_asyncToGenerator();
 * - The AES-GCM key is derived from a user passphrase via PBKDF2 (SHA-256,
 *   >=100k iterations, random salt). The salt + iteration count + IV +
 *   ciphertext are the ONLY things ever written to `chrome.storage.local`
-*   under `potato_vault`. Nothing else is persisted.
+*   under `scalemax_vault`. Nothing else is persisted.
 * - The passphrase itself is never stored anywhere, and the derived
 *   `CryptoKey` + decrypted entry list live only in the module-level
 *   variables below — i.e. only in memory, only for as long as this JS
@@ -1361,7 +1361,7 @@ init_asyncToGenerator();
 *   "for free": AES-GCM authenticates the ciphertext, so decrypting with the
 *   wrong derived key throws instead of silently returning garbage.
 */
-var STORAGE_KEY = "potato_vault";
+var STORAGE_KEY = "scalemax_vault";
 var PBKDF2_ITERATIONS = 21e4;
 var SALT_BYTES = 16;
 var IV_BYTES = 12;
@@ -2072,7 +2072,7 @@ var _hoisted_21$1 = ["disabled", "onClick"];
 var _hoisted_22$1 = { class: "agent-close-toggle" };
 var _hoisted_23$1 = ["onUpdate:modelValue"];
 var _hoisted_24$1 = ["onClick"];
-var REGISTRY_KEY = "potato_agent_registry";
+var REGISTRY_KEY = "scalemax_agent_registry";
 var POLL_MS = 2e3;
 //#endregion
 //#region entrypoints/popup/components/AgentDashboard.vue
@@ -2398,7 +2398,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 		}
 		function _loadSessions() {
 			_loadSessions = _asyncToGenerator(function* () {
-				const r = yield send_("potato_session_list");
+				const r = yield send_("scalemax_session_list");
 				sessions.value = r.sessions || [];
 			});
 			return _loadSessions.apply(this, arguments);
@@ -2488,7 +2488,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				if (disposed || generation !== pollGeneration || currentId.value !== id) return;
 				pollTimer = setTimeout(() => {
 					_asyncToGenerator(function* () {
-						const r = yield send_("potato_session_get", { id });
+						const r = yield send_("scalemax_session_get", { id });
 						if (disposed || generation !== pollGeneration || currentId.value !== id) return;
 						if (r.ok) {
 							applyPopupSessionSnapshot(id, r.session || null);
@@ -2520,7 +2520,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					stopSessionPolling();
 					return null;
 				}
-				const r = yield send_("potato_session_get", { id });
+				const r = yield send_("scalemax_session_get", { id });
 				if (disposed || generation !== loadGeneration || currentId.value !== id) return null;
 				if (!r.ok) {
 					statusUnknown.value = true;
@@ -2559,7 +2559,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 		}
 		function _newSession() {
 			_newSession = _asyncToGenerator(function* () {
-				const r = yield send_("potato_session_create");
+				const r = yield send_("scalemax_session_create");
 				if (r.session) {
 					yield loadSessions();
 					currentId.value = r.session.id;
@@ -2575,7 +2575,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 			_removeSession = _asyncToGenerator(function* () {
 				if (!currentId.value) return;
 				const deletedId = currentId.value;
-				yield send_("potato_session_delete", {
+				yield send_("scalemax_session_delete", {
 					id: deletedId,
 					closeTab: true
 				});
@@ -2780,7 +2780,7 @@ var AgentChatPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 				running.value = true;
 				startSessionPolling(sid);
 				yield scrollToBottom();
-				const r = yield send_("potato_session_run", { payload: {
+				const r = yield send_("scalemax_session_run", { payload: {
 					sessionId: sid,
 					requestId,
 					task: task || "Describe the attached image(s).",
@@ -2961,7 +2961,7 @@ var _hoisted_16$1 = {
 var _hoisted_17$1 = { class: "sched-item-actions" };
 var _hoisted_18$1 = ["onClick"];
 var _hoisted_19$1 = ["onClick"];
-var JOBS_KEY = "potato_jobs";
+var JOBS_KEY = "scalemax_jobs";
 //#endregion
 //#region entrypoints/popup/components/SchedulerPage.vue
 var SchedulerPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ */ defineComponent({
@@ -3025,7 +3025,7 @@ var SchedulerPage_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @
 					return;
 				}
 				try {
-					yield chrome.runtime.sendMessage({ type: "potato_jobs_changed" });
+					yield chrome.runtime.sendMessage({ type: "scalemax_jobs_changed" });
 				} catch (_unused2) {}
 			});
 			return _persistJobs.apply(this, arguments);
@@ -3253,7 +3253,7 @@ var App_default = /*#__PURE__*/ _plugin_vue_export_helper_default(/* @__PURE__ *
 			_openBrowserAgentSidepanel = _asyncToGenerator(function* () {
 				try {
 					var _chrome$sidePanel, _chrome$sidePanel$ope;
-					yield chrome.storage.local.set({ potato_sidepanel_tab: "browser-agent" });
+					yield chrome.storage.local.set({ scalemax_sidepanel_tab: "browser-agent" });
 					let tabId=null; let winId=null;
 					try{const [tab]=yield chrome.tabs.query({active:true,currentWindow:true}); if(tab){tabId=tab.id; winId=tab.windowId;}}catch(e){}
 					if(!winId){const win=yield chrome.windows.getCurrent(); winId=win.id;}

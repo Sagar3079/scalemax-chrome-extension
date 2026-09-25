@@ -2049,7 +2049,7 @@ Tip: If the returned elements do not include the specific element you need, use 
 	var NATIVE_HOST, TIMEOUTS, LIMITS, ERROR_MESSAGES, SUCCESS_MESSAGES, NETWORK_FILTERS, STORAGE_KEYS, ExecutionWorld;
 	var init_constants$2 = __esmMin((() => {
 		NATIVE_HOST = {
-			NAME: "com.chromemcp.nativehost",
+			NAME: "com.scalemax.nativehost",
 			DEFAULT_PORT: 12306
 		};
 		TIMEOUTS = {
@@ -44546,7 +44546,7 @@ Originally allocated`);
 						injectImmediately: false,
 						func: (methodName, data) => {
 							try {
-								const api = globalThis.__mcpElementPicker;
+								const api = globalThis.__scalemaxElementPicker;
 								const fn = api && api[methodName];
 								if (typeof fn === "function") fn(data);
 							} catch (_unused) {}
@@ -50905,7 +50905,7 @@ Originally allocated`);
 	function _handleCleanup() {
 		_handleCleanup = _asyncToGenerator(function* (tabId) {
 			if (!injectedTabs.has(tabId)) return;
-			chrome.tabs.sendMessage(tabId, { type: "chrome-mcp:cleanup" }).catch((err) => console.warn(`Could not send cleanup message to tab ${tabId}. It might have been closed.`));
+			chrome.tabs.sendMessage(tabId, { type: "scalemax:cleanup" }).catch((err) => console.warn(`Could not send cleanup message to tab ${tabId}. It might have been closed.`));
 			injectedTabs.delete(tabId);
 			console.log(`Cleanup signal sent to tab ${tabId}. State cleared.`);
 		});
@@ -54502,7 +54502,7 @@ Originally allocated`);
 				const wrapped = `(() => {
       try {
         // Optional command API: window.__userscript_onCommand(action, payload)
-        window.addEventListener('chrome-mcp:execute', (ev) => {
+        window.addEventListener('scalemax:execute', (ev) => {
           const { action, payload, requestId } = ev.detail || {};
           try {
             let result;
@@ -54510,9 +54510,9 @@ Originally allocated`);
             if (typeof handler === 'function') {
               result = handler(action, payload);
             }
-            window.dispatchEvent(new CustomEvent('chrome-mcp:response', { detail: { requestId, data: result } }));
+            window.dispatchEvent(new CustomEvent('scalemax:response', { detail: { requestId, data: result } }));
           } catch (err) {
-            window.dispatchEvent(new CustomEvent('chrome-mcp:response', { detail: { requestId, error: String(err && (err as any).message || err) } }));
+            window.dispatchEvent(new CustomEvent('scalemax:response', { detail: { requestId, error: String(err && (err as any).message || err) } }));
           }
         });
         (new Function(${JSON.stringify(code)}))();
@@ -54932,7 +54932,7 @@ Originally allocated`);
 					const active = typeof (args === null || args === void 0 ? void 0 : args.tabId) === "number" ? yield chrome.tabs.get(args.tabId).catch(() => null) : yield getActiveTab();
 					if (active && active.id) try {
 						if (rec.sourceType === "CSS") yield removeCssFromTab(active.id, rec.script, rec.allFrames);
-						else chrome.tabs.sendMessage(active.id, { type: "chrome-mcp:cleanup" }).catch(() => {});
+						else chrome.tabs.sendMessage(active.id, { type: "scalemax:cleanup" }).catch(() => {});
 						clearActiveInjection(active.id, rec.id);
 					} catch (err) {
 						console.warn("Userscript cleanup failed:", err);
@@ -55469,7 +55469,7 @@ Originally allocated`);
 		performanceAnalyzeInsightTool = new PerformanceAnalyzeInsightTool();
 	}));
 	//#endregion
-	//#region entrypoints/background/tools/browser/potato.ts
+	//#region entrypoints/background/tools/browser/scalemax.ts
 	/** Small helper: wrap a JSON-serializable payload in a successful ToolResult. */
 	function ok$1(payload) {
 		return {
@@ -55500,7 +55500,7 @@ Originally allocated`);
 		return _waitForTabComplete$1.apply(this, arguments);
 	}
 	var TabGroupTool, tabGroupTool, ENGINE_HOME, GoogleSearchTool, googleSearchTool, REGISTRY_KEY, AgentDispatchTool, agentDispatchTool;
-	var init_potato = __esmMin((() => {
+	var init_scalemax_tools = __esmMin((() => {
 		init_vue_runtime_esm_bundler();
 		init_tool_handler();
 		init_base_browser();
@@ -55760,7 +55760,7 @@ Originally allocated`);
 			}
 		};
 		googleSearchTool = new GoogleSearchTool();
-		REGISTRY_KEY = "potato_agent_registry";
+		REGISTRY_KEY = "scalemax_agent_registry";
 		AgentDispatchTool = class extends BaseBrowserToolExecutor {
 			constructor(..._args3) {
 				super(..._args3);
@@ -55971,7 +55971,7 @@ Originally allocated`);
 		init_userscript();
 		init_performance();
 		init_gif_recorder();
-		init_potato();
+		init_scalemax_tools();
 	}));
 	//#endregion
 	//#region common/step-types.ts
@@ -68389,7 +68389,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 	* Content script ID prefix for early injection (document_start).
 	* Registered scripts persist across sessions and survive browser restarts.
 	*/
-	var PROPS_AGENT_EARLY_INJECTION_ID_PREFIX = "mcp_we_props_early";
+	var PROPS_AGENT_EARLY_INJECTION_ID_PREFIX = "scalemax_we_props_early";
 	/**
 	* Sanitize a string for use in content script ID
 	* Only allows alphanumeric, underscore, and hyphen
@@ -69836,12 +69836,12 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 	*   - Feature 5: token/cost meter
 	*   - Message router for the UI
 	*/
-	var AGENT_SETTINGS_KEY = "potato_agent_settings";
-	var AGENT_AUDIT_KEY = "potato_agent_audit";
+	var AGENT_SETTINGS_KEY = "scalemax_agent_settings";
+	var AGENT_AUDIT_KEY = "scalemax_agent_audit";
 	/** Ring-buffer cap for the audit log. Oldest entries are dropped first. */
 	var AGENT_AUDIT_MAX = 500;
 	/** Storage key of the session map. Kept as a literal so this module has no load-order dependency. */
-	var AGENT_SESSIONS_STORAGE_KEY = "potato_agent_sessions";
+	var AGENT_SESSIONS_STORAGE_KEY = "scalemax_agent_sessions";
 	/**
 	* Default agent settings. `approvalMode` is one of:
 	*   "auto"         — run every allowed tool without ceremony
@@ -69863,7 +69863,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 			// just suggested in the system prompt — so the model cannot silently escape it
 			// via chrome_navigate width/height, chrome_google_search newTab, or
 			// chrome_agent_dispatch action="assign". Set to false via
-			// potato_agent_settings_set to restore the old up-to-4-tabs behavior.
+			// scalemax_agent_settings_set to restore the old up-to-4-tabs behavior.
 			singleTabMode: true
 		};
 	}
@@ -70342,7 +70342,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 		try {
 			chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 				const type = message === null || message === void 0 ? void 0 : message.type;
-				if (type === "potato_agent_settings_get") {
+				if (type === "scalemax_agent_settings_get") {
 					loadAgentSettings().then((settings) => sendResponse({
 						ok: true,
 						settings
@@ -70352,7 +70352,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 					}));
 					return true;
 				}
-				if (type === "potato_agent_settings_set") {
+				if (type === "scalemax_agent_settings_set") {
 					saveAgentSettings(message.patch).then((settings) => sendResponse({
 						ok: true,
 						settings
@@ -70362,7 +70362,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 					}));
 					return true;
 				}
-				if (type === "potato_agent_runs_list") {
+				if (type === "scalemax_agent_runs_list") {
 					try {
 						sendResponse({
 							ok: true,
@@ -70376,7 +70376,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 					}
 					return true;
 				}
-				if (type === "potato_agent_stop_all") {
+				if (type === "scalemax_agent_stop_all") {
 					stopAllAgentRuns().then((stopped) => sendResponse({
 						ok: true,
 						stopped
@@ -70386,7 +70386,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 					}));
 					return true;
 				}
-				if (type === "potato_agent_stop_run") {
+				if (type === "scalemax_agent_stop_run") {
 					stopAgentRun(message.runId).then((stopped) => sendResponse({
 						ok: true,
 						stopped
@@ -70396,7 +70396,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 					}));
 					return true;
 				}
-				if (type === "potato_agent_audit_get") {
+				if (type === "scalemax_agent_audit_get") {
 					readAuditLog().then((entries) => sendResponse({
 						ok: true,
 						entries
@@ -70406,14 +70406,14 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 					}));
 					return true;
 				}
-				if (type === "potato_agent_audit_clear") {
+				if (type === "scalemax_agent_audit_clear") {
 					clearAuditLog().then(() => sendResponse({ ok: true })).catch((e) => sendResponse({
 						ok: false,
 						error: String(e)
 					}));
 					return true;
 				}
-				if (type === "potato_agent_audit_export") {
+				if (type === "scalemax_agent_audit_export") {
 					exportAuditLog().then((r) => sendResponse(r)).catch((e) => sendResponse({
 						ok: false,
 						error: String(e)
@@ -70439,7 +70439,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 	*   translation automatically on every future visit to that host with no prompt;
 	*   "never" suppresses the prompt entirely; "ask" shows the content script's banner.
 	* - Translation itself is delegated to the user's configured OpenAI-compatible
-	*   provider (the same `potato_ai_provider` config the agent uses) via
+	*   provider (the same `scalemax_ai_provider` config the agent uses) via
 	*   `postChatCompletions`, NOT a bundled MT model — this reuses infrastructure that
 	*   already exists and lets the user pick a model good at translation, at the cost of
 	*   needing a provider configured. Batches of source strings go out as a single
@@ -70450,9 +70450,9 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 	* - Results are cached per (targetLang, sourceText) hash so re-translating the same
 	*   page (or navigating back to it) doesn't re-spend tokens.
 	*/
-	var TRANSLATE_SETTINGS_KEY = "potato_translate_settings";
-	var TRANSLATE_SITE_PREFS_KEY = "potato_translate_site_prefs";
-	var TRANSLATE_CACHE_KEY = "potato_translate_cache";
+	var TRANSLATE_SETTINGS_KEY = "scalemax_translate_settings";
+	var TRANSLATE_SITE_PREFS_KEY = "scalemax_translate_site_prefs";
+	var TRANSLATE_CACHE_KEY = "scalemax_translate_cache";
 	var TRANSLATE_CACHE_MAX_ENTRIES = 2000;
 	// Smaller chunks than you'd pick for throughput, because these are dispatched
 	// CONCURRENTLY (see TRANSLATE_MAX_CONCURRENCY) and wall-clock latency is what the
@@ -70566,7 +70566,7 @@ function _ensureContextMenu$1_disabled(){ return _ensureContextMenu$1.apply(this
 	* can't read `chrome.storage.session` directly under the default access level,
 	* which is why this is exposed over the message router instead.
 	*/
-	var TRANSLATE_SESSION_AUTO_KEY = "potato_translate_session_auto";
+	var TRANSLATE_SESSION_AUTO_KEY = "scalemax_translate_session_auto";
 	function getSessionAutoHosts() {
 		return _getSessionAutoHosts.apply(this, arguments);
 	}
@@ -70764,15 +70764,15 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	function registerTranslateMessaging() {
 		chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 			const type = message === null || message === void 0 ? void 0 : message.type;
-			if (type === "potato_translate_settings_get") {
+			if (type === "scalemax_translate_settings_get") {
 				loadTranslateSettings().then((settings) => sendResponse({ ok: true, settings }));
 				return true;
 			}
-			if (type === "potato_translate_settings_set") {
+			if (type === "scalemax_translate_settings_set") {
 				saveTranslateSettings(message.patch || {}).then((settings) => sendResponse({ ok: true, settings }));
 				return true;
 			}
-			if (type === "potato_translate_site_policy_get") {
+			if (type === "scalemax_translate_site_policy_get") {
 				(async () => {
 					const [prefs, settings, autoHosts] = await Promise.all([loadSitePrefs(), loadTranslateSettings(), getSessionAutoHosts()]);
 					sendResponse({
@@ -70786,19 +70786,19 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 				})();
 				return true;
 			}
-			if (type === "potato_translate_session_auto_set") {
+			if (type === "scalemax_translate_session_auto_set") {
 				setSessionAutoHost(message.hostname, message.on !== false).then(() => sendResponse({ ok: true }));
 				return true;
 			}
-			if (type === "potato_translate_site_policy_set") {
+			if (type === "scalemax_translate_site_policy_set") {
 				setSitePolicy(message.hostname, message.policy).then(() => sendResponse({ ok: true }));
 				return true;
 			}
-			if (type === "potato_translate_site_prefs_list") {
+			if (type === "scalemax_translate_site_prefs_list") {
 				loadSitePrefs().then((prefs) => sendResponse({ ok: true, prefs }));
 				return true;
 			}
-			if (type === "potato_translate_batch") {
+			if (type === "scalemax_translate_batch") {
 				translateBatch(message.texts, message.targetLang, message.sourceLang).then((result) => sendResponse(result)).catch((e) => sendResponse({ ok: false, translations: (message.texts || []).slice(), error: String(e) }));
 				return true;
 			}
@@ -70824,7 +70824,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 		"chrome_close_tabs"
 	]);
 	var MAX_TOOL_RESULT_CHARS = 4e3;
-	var PROVIDER_STORAGE_KEY = "potato_ai_provider";
+	var PROVIDER_STORAGE_KEY = "scalemax_ai_provider";
 	var DEFAULT_MAX_STEPS = 1000;
 	/** Strip a single trailing slash so `${baseURL}/chat/completions` is always well-formed. */
 	function normalizeBaseUrl(url) {
@@ -71613,7 +71613,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 			if (!model) return finishRun("error", "", "No model selected.");
 			// Feature 1 + bug C2: this runner had no AbortController and could not be
 			// stopped once started, and the scheduler drives it unattended. Register it in
-			// the shared run registry so potato_agent_stop_all / potato_agent_stop_run and
+			// the shared run registry so scalemax_agent_stop_all / scalemax_agent_stop_run and
 			// the toolbar badge can see and cancel it.
 			const runId = newRunId();
 			const controller = new AbortController();
@@ -71917,10 +71917,10 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	}
 	//#endregion
 	//#region entrypoints/background/ai-agent/register.ts
-	function isPotatoAgentRunMessage(message) {
+	function isScalemaxAgentRunMessage(message) {
 		if (!message || typeof message !== "object") return false;
 		const m = message;
-		if (m.type !== "potato_agent_run") return false;
+		if (m.type !== "scalemax_agent_run") return false;
 		const payload = m.payload;
 		return !!payload && typeof payload.task === "string";
 	}
@@ -71937,7 +71937,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	*/
 	function registerAiAgentMessaging() {
 		chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-			if (!isPotatoAgentRunMessage(message)) return void 0;
+			if (!isScalemaxAgentRunMessage(message)) return void 0;
 			const { payload } = message;
 			runAgentInExtension({
 				task: payload.task,
@@ -71972,7 +71972,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	* for the live browser. All state lives in chrome.storage.local, so it survives
 	* the popup closing and the service worker restarting.
 	*/
-	var SESSIONS_KEY = "potato_agent_sessions";
+	var SESSIONS_KEY = "scalemax_agent_sessions";
 	var MAX_STEPS_PER_TURN = 1000;
 	/** Checkpoint partial streamed content to storage every N deltas. */
 	var STREAM_CHECKPOINT_EVERY = 5;
@@ -73109,12 +73109,12 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 				}));
 				return true;
 			};
-			if (type === "potato_session_list") return respondAfterReady(() => listSessions(), (sessions) => ({ ok: true, sessions }));
-			if (type === "potato_session_get") return respondAfterReady(() => getSession(message.id), (session) => ({ ok: true, session }));
-			if (type === "potato_session_create") return respondAfterReady(() => createSession(message.title), (session) => ({ ok: true, session }));
-			if (type === "potato_session_delete") return respondAfterReady(() => deleteSession(message.id, !!message.closeTab), () => ({ ok: true }));
-			if (type === "potato_session_rename") return respondAfterReady(() => renameSession(message.id, message.title), () => ({ ok: true }));
-			if (type === "potato_session_run") {
+			if (type === "scalemax_session_list") return respondAfterReady(() => listSessions(), (sessions) => ({ ok: true, sessions }));
+			if (type === "scalemax_session_get") return respondAfterReady(() => getSession(message.id), (session) => ({ ok: true, session }));
+			if (type === "scalemax_session_create") return respondAfterReady(() => createSession(message.title), (session) => ({ ok: true, session }));
+			if (type === "scalemax_session_delete") return respondAfterReady(() => deleteSession(message.id, !!message.closeTab), () => ({ ok: true }));
+			if (type === "scalemax_session_rename") return respondAfterReady(() => renameSession(message.id, message.title), () => ({ ok: true }));
+			if (type === "scalemax_session_run") {
 				const p = message.payload || {};
 				return respondAfterReady(() => runSessionTurn({
 					sessionId: p.sessionId,
@@ -73125,7 +73125,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 					attachments: p.attachments
 				}), (result) => ({ ok: true, result }));
 			}
-			if (type === "potato_session_stop") return respondAfterReady(() => stopSession(message.sessionId || message.id), (result) => Object.assign({ ok: true }, result));
+			if (type === "scalemax_session_stop") return respondAfterReady(() => stopSession(message.sessionId || message.id), (result) => Object.assign({ ok: true }, result));
 		});
 	}
 	//#endregion
@@ -73135,11 +73135,11 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	* Per-site / reusable "skills" store for the in-extension agent (Mode 2).
 	*
 	* A skill is just a saved task prompt the user can re-run later: the UI creates a
-	* session (`potato_session_create`) and runs it (`potato_session_run`) with the
+	* session (`scalemax_session_create`) and runs it (`scalemax_session_run`) with the
 	* skill's `task` text. All state lives in chrome.storage.local, so it survives the
 	* popup closing and the service worker restarting — same pattern as `sessions.ts`.
 	*/
-	var SKILLS_KEY = "potato_skills";
+	var SKILLS_KEY = "scalemax_skills";
 	function readAll() {
 		return _readAll.apply(this, arguments);
 	}
@@ -73220,7 +73220,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 		try {
 			chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 				const type = message === null || message === void 0 ? void 0 : message.type;
-				if (type === "potato_skill_list") {
+				if (type === "scalemax_skill_list") {
 					listSkills().then((skills) => sendResponse({
 						ok: true,
 						skills
@@ -73230,7 +73230,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 					}));
 					return true;
 				}
-				if (type === "potato_skill_save") {
+				if (type === "scalemax_skill_save") {
 					const payload = (message === null || message === void 0 ? void 0 : message.payload) || message || {};
 					saveSkill({
 						name: payload.name,
@@ -73244,7 +73244,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 					}));
 					return true;
 				}
-				if (type === "potato_skill_delete") {
+				if (type === "scalemax_skill_delete") {
 					deleteSkill(((message === null || message === void 0 ? void 0 : message.payload) || message || {}).id).then(() => sendResponse({ ok: true })).catch((e) => sendResponse({
 						ok: false,
 						error: (e === null || e === void 0 ? void 0 : e.message) || String(e)
@@ -73260,8 +73260,8 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	//#region entrypoints/background/scheduler/scheduler.ts
 	init_asyncToGenerator();
 	init_objectSpread2();
-	var JOBS_KEY = "potato_jobs";
-	var ALARM_PREFIX$3 = "potato_job_";
+	var JOBS_KEY = "scalemax_jobs";
+	var ALARM_PREFIX$3 = "scalemax_job_";
 	var NATIVE_AGENT_RUN_URL = "http://127.0.0.1:12306/ai/agent/run";
 	var MAX_RESULT_LEN = 500;
 	function alarmName(id) {
@@ -73371,7 +73371,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 			try {
 				var _response$result;
 				const response = yield chrome.runtime.sendMessage({
-					type: "potato_agent_run",
+					type: "scalemax_agent_run",
 					payload: { task: job.task }
 				});
 				if (!response) throw new Error("no response from in-extension runner");
@@ -73434,7 +73434,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 		});
 	}
 	function handleMessage(message, _sender, sendResponse) {
-		if ((message === null || message === void 0 ? void 0 : message.type) === "potato_jobs_changed") {
+		if ((message === null || message === void 0 ? void 0 : message.type) === "scalemax_jobs_changed") {
 			syncAlarms().then(() => sendResponse === null || sendResponse === void 0 ? void 0 : sendResponse({ ok: true })).catch((e) => sendResponse === null || sendResponse === void 0 ? void 0 : sendResponse({
 				ok: false,
 				error: errMessage(e)
@@ -84124,7 +84124,37 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	* Background script entry point
 	* Initializes all background services and listeners
 	*/
+	/**
+	* One-time migration of storage keys written by builds that used the legacy
+	* `potato_` prefix. Copies each value to its `scalemax_` key (without clobbering
+	* a value already written under the new name), then removes the legacy key.
+	*/
+	async function migrateLegacyStorageKeys() {
+		try {
+			const all = await chrome.storage.local.get(null);
+			const patch = {};
+			const legacy = [];
+			for (const key of Object.keys(all)) {
+				if (!key.startsWith("potato_")) continue;
+				legacy.push(key);
+				const next = "scalemax_" + key.slice(7);
+				if (!(next in all)) patch[next] = all[key];
+			}
+			if (!legacy.length) return;
+			if (Object.keys(patch).length) await chrome.storage.local.set(patch);
+			await chrome.storage.local.remove(legacy);
+			const alarms = await chrome.alarms.getAll();
+			for (const alarm of alarms) {
+				if (!alarm.name.startsWith("potato_job_")) continue;
+				await chrome.alarms.clear(alarm.name);
+			}
+			if (legacy.includes("potato_jobs")) await syncAlarms();
+		} catch (error) {
+			console.warn("[storage] Legacy key migration failed:", error);
+		}
+	}
 	var background_default = defineBackground(() => {
+		migrateLegacyStorageKeys();
 		chrome.runtime.onInstalled.addListener((details) => {
 			if (details.reason === "install") chrome.tabs.create({ url: chrome.runtime.getURL("/welcome.html") });
 		});
@@ -84170,7 +84200,7 @@ Reply with ONLY a JSON array of strings, same length and same order as the input
 	//#region \0virtual:wxt-plugins
 	function initPlugins() {}
 	//#endregion
-	//#region \0virtual:wxt-background-entrypoint?C:/Users/pc/Downloads/Opus-4.8-Unleashed/ClaudeJB/chrome-mcp/base-mcp-chrome/app/chrome-extension/entrypoints/background/index.ts
+	//#region \0virtual:wxt-background-entrypoint?entrypoints/background/index.ts
 	/** Wrapper around `console` with a "[wxt]" prefix */
 	var logger = {
 		debug: (...args) => ([...args], void 0),

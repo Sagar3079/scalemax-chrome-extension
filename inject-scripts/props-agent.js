@@ -23,7 +23,7 @@
   // Constants & Guards
   // =============================================================================
 
-  const GLOBAL_KEY = '__MCP_WEB_EDITOR_PROPS_AGENT__';
+  const GLOBAL_KEY = '__SCALEMAX_WEB_EDITOR_PROPS_AGENT__';
   if (window[GLOBAL_KEY]) return;
 
   const PROTOCOL_VERSION = 1;

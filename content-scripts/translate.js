@@ -18,7 +18,7 @@
 //   4. "always" -> translate immediately. "ask" -> show a small shadow-DOM banner
 //      offering Translate / Always / Never / dismiss, and only translate on demand.
 //   5. Walk visible text nodes, batch them, send to the background
-//      (potato_translate_batch), and write results back onto the SAME node
+//      (scalemax_translate_batch), and write results back onto the SAME node
 //      references in the SAME order the batch was sent -- this ordering guarantee is
 //      what makes the zip-back safe.
 //   6. A MutationObserver catches text added after the initial pass (SPA navigation,
@@ -175,7 +175,7 @@
     if (!nodes.length) return;
     const texts = nodes.map((n) => n.nodeValue);
     const response = await sendMessage({
-      type: 'potato_translate_batch',
+      type: 'scalemax_translate_batch',
       texts,
       targetLang: state.targetLang,
       sourceLang: state.detectedLang,
@@ -545,7 +545,7 @@
       state.active = true;
       // Remember this domain for the rest of the browsing session, so navigating
       // around the same site keeps translating without re-prompting on every page.
-      sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: true });
+      sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: true });
       await runTranslationPass();
       startObserving();
     });
@@ -554,7 +554,7 @@
     alwaysBtn.textContent = 'Always translate this site';
     alwaysBtn.addEventListener('click', async () => {
       banner.remove();
-      await sendMessage({ type: 'potato_translate_site_policy_set', hostname: getHostname(), policy: 'always' });
+      await sendMessage({ type: 'scalemax_translate_site_policy_set', hostname: getHostname(), policy: 'always' });
       state.active = true;
       await runTranslationPass();
       startObserving();
@@ -564,7 +564,7 @@
     neverBtn.textContent = 'Never translate this site';
     neverBtn.addEventListener('click', async () => {
       banner.remove();
-      await sendMessage({ type: 'potato_translate_site_policy_set', hostname: getHostname(), policy: 'never' });
+      await sendMessage({ type: 'scalemax_translate_site_policy_set', hostname: getHostname(), policy: 'never' });
     });
 
     const closeBtn = document.createElement('button');
@@ -598,7 +598,7 @@
       stopObserving();
       // Clear the session flag too, otherwise the next page on this domain would
       // immediately re-translate and reverting would feel like it didn't stick.
-      sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: false });
+      sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: false });
       banner.remove();
     });
     const closeBtn = document.createElement('button');
@@ -640,7 +640,7 @@
     const hostname = getHostname();
     if (!hostname) return;
 
-    const policyResp = await sendMessage({ type: 'potato_translate_site_policy_get', hostname });
+    const policyResp = await sendMessage({ type: 'scalemax_translate_site_policy_get', hostname });
     if (!policyResp || policyResp.ok === false) return;
     const settings = policyResp.settings || { enabled: true, targetLang: 'en' };
     if (!settings.enabled) return;
@@ -709,7 +709,7 @@
         state.active = true;
         // Manual translate also opts this domain in for the session, same as the
         // banner's Translate button.
-        sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: true });
+        sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: true });
         await runTranslationPass();
         startObserving();
         sendResponse({ success: true });
@@ -719,7 +719,7 @@
     if (request && request.action === 'translate_revert') {
       revertAll();
       stopObserving();
-      sendMessage({ type: 'potato_translate_session_auto_set', hostname: getHostname(), on: false });
+      sendMessage({ type: 'scalemax_translate_session_auto_set', hostname: getHostname(), on: false });
       sendResponse({ success: true });
       return false;
     }
